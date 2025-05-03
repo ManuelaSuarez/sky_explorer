@@ -6,25 +6,26 @@ const Header = () => {
     <>
       <div className="header_container">
         <div className="header_logo">
-          <img src="" alt="logo" className="header_icon" />
+          <i class="fa-solid fa-globe"></i>
           <h1 className="header_title">Sky Explorer</h1>
         </div>
         <ul className="header_list">
           <li>
-            <img src="#" alt="" />
+            <i class="fa-solid fa-plane-up"></i>
             <a href="">Vuelos</a>
           </li>
           <li>
-            <img src="#" alt="" />
+            <i class="fa-solid fa-bookmark"></i>
             <a href="">Favoritos</a>
           </li>
           <li>
-            <img src="#" alt="" />
-            <a href="">Viajes</a>
+            <i class="fa-solid fa-passport"></i>
+            <a href="">Mis Viajes</a>
           </li>
         </ul>
-        <button></button>
-        <button className="header_signIn">Iniciar Sesión</button>
+        <button className="header_signIn">
+          Iniciar Sesión <i class="fa-solid fa-user"></i>
+        </button>
       </div>
     </>
   );

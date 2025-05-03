@@ -2,26 +2,57 @@
   background-color: #b8dccc;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding: 1% 5%;
 }
 
 .header_logo {
   display: flex;
-  align-items: center;
+  align-items: baseline;
+  width: 19%;
+  color: #428780;
+}
+
+.header_logo i {
+  font-size: 2em;
 }
 
 .header_title {
-  color: #428780;
+  margin-left: 4%;
 }
 
 .header_list {
+  width: 50%;
   list-style: none;
   display: flex;
+  justify-content: space-between;
 }
 
-.header_list li a {
+.header_list li {
   color: #428780;
+  width: 19%;
+  transition: all 0.2s ease-in-out;
 }
 
-.header_signIn button {
-  color: #428780;
+.header_list li:hover {
+  transform: scale(1.05);
+  color: #3a7670;
+}
+
+.header_list li i {
+  margin-right: 5%;
+}
+
+.header_signIn {
+  background-color: #428780;
+  color: #fff;
+  padding: 1%;
+  border-radius: 5px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease-in-out;
+}
+
+.header_signIn:hover {
+  transform: scale(1.05);
+  background-color: #3a7670;
 }
