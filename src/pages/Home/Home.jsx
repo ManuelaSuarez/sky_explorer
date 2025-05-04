@@ -26,7 +26,7 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      <SearchBar />
+      <SearchBar buttonText="Buscar"/>
 
       <div className="offers-container">
         {offers.map((offer) => (

@@ -1,7 +1,7 @@
 import { FaMapMarkerAlt, FaCalendarAlt, FaExchangeAlt } from "react-icons/fa"
 import "./SearchBar.css"
 
-const SearchBar = () => {
+const SearchBar = ({ buttonText }) => {
   return (
     <div className="search-container">
       <h2 className="search-title">Buscá el destino con el que más soñaste</h2>
@@ -11,8 +11,6 @@ const SearchBar = () => {
             <p>Ida y vuelta</p>
           </div>
           <div className="passengers-dropdown">
-            {/* <p>Cantidad pasajeros</p>
-            <span className="dropdown-arrow">▼</span> */}
             <p>Cantidad pasajeros</p>
             <select>
               <option value="one">1</option>
@@ -62,11 +60,12 @@ const SearchBar = () => {
             </div>
           </div>
 
-          <button className="search-button">Buscar</button>
+          <button className="search-button">{buttonText}</button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SearchBar
+export default SearchBar;
+
