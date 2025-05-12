@@ -1,0 +1,326 @@
+.checkout-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #b8dccc;
+}
+
+.checkout-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  width: 70%;
+}
+
+.back-link {
+  margin-bottom: 10px;
+}
+
+.back-link a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #27785c;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: "League Spartan", sans-serif;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+}
+
+.checkout-title {
+  color: #428780;
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 20px;
+  line-height: 31px;
+}
+
+.checkout-subtitle {
+  color: #428780;
+  font-weight: 400;
+}
+
+.checkout-main {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 30px;
+}
+
+.checkout-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.passenger-info-form {
+  background-color: #52a39b;
+  border-radius: 5px;
+  padding: 15px 20px;
+  color: white;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: white;
+  font-family: "League Spartan", sans-serif;
+}
+
+.passenger-count {
+  font-size: 12px;
+  font-family: "League Spartan", sans-serif;
+  font-weight: 400;
+  padding-left: 550px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group input {
+  width: 50%;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: "Radio Canada", sans-serif;
+  font-weight: 600;
+  color: #333;
+  height: 27px;
+}
+
+.form-group input::placeholder {
+  color: #999;
+}
+
+.option-buttons {
+  display: flex;
+  margin-bottom: 15px;
+  background-color: white;
+  border-radius: 3px;
+  overflow: hidden;
+  height: 27px;
+  width: fit-content;
+}
+
+.gender-buttons {
+  width: 109px;
+}
+
+.class-buttons {
+  width: 142px;
+}
+
+.option-buttons button {
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 9px;
+  color: #000;
+  font-family: "Radio Canada", sans-serif;
+  font-weight: 600;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.option-divider {
+  width: 1px;
+  background-color: #d9d9d9;
+  height: 23px;
+  align-self: center;
+}
+
+.option-buttons button.option-selected {
+  background-color: #333;
+  color: white;
+}
+
+.voucher-section-title {
+  color: #428780;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 31px;
+  margin-top: 10px;
+}
+
+.voucher-section {
+  background-color: #52a39b;
+  border-radius: 5px;
+  padding: 15px 20px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.buy-button {
+  background-color: #428780;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 0 10px;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 84px;
+  height: 33px;
+  line-height: 31px;
+  text-align: center;
+}
+
+.buy-button:hover {
+  background-color: #27785c;
+}
+
+.info-card {
+  background-color: #fdfbf6;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 15px;
+  color: #323255;
+  font-family: "League Spartan", sans-serif;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-family: "League Spartan", sans-serif;
+  font-weight: 400;
+}
+
+.price {
+  text-align: right;
+}
+
+.divider {
+  height: 1px;
+  background-color: #409373;
+  margin: 10px 0;
+}
+
+.detail-row.total {
+  font-weight: 500;
+  font-size: 14px;
+  color: #323255;
+}
+
+/* Estilos actualizados para los detalles del vuelo según la imagen 4 */
+.info-card.flight-details {
+  padding: 20px;
+  background-color: #fdfbf6;
+  border-radius: 5px;
+}
+
+.flight-details-title {
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 15px;
+  color: #323255;
+  font-family: "League Spartan", sans-serif;
+}
+
+.flight-plane-icon {
+  font-size: 22px;
+  margin-top: 20px;
+  color: #323255;
+}
+
+.route-line {
+  margin-bottom: 5px;
+}
+
+.route-line strong {
+  font-size: 16px;
+  font-weight: 700;
+  color: #323255;
+  line-height: 1.4;
+}
+
+/* Estilos para la sección de fechas */
+.flight-date-column {
+  margin-top: 20px;
+  float: left;
+}
+
+.flight-date-column-2 {
+  margin-top: 20px;
+  float: right;
+  text-align: right;
+}
+
+.date-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #323255;
+  margin-bottom: 5px;
+}
+
+.date-value {
+  font-size: 16px;
+  color: #323255;
+  margin-bottom: 2px;
+}
+
+.time-value {
+  font-size: 16px;
+  color: #323255;
+  margin-bottom: 15px;
+}
+
+.airline-name {
+  clear: both;
+  padding-top: 15px;
+  font-size: 16px;
+  color: #323255;
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .checkout-main {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-sidebar {
+    order: -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .option-buttons {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .option-divider {
+    width: 100%;
+    height: 1px;
+  }
+
+  .flight-date-column,
+  .flight-date-column-2 {
+    float: none;
+    text-align: left;
+  }
+}
