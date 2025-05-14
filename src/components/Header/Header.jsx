@@ -11,8 +11,8 @@ const Header = () => {
         </div>
         <ul className="header_list">
           <li>
-            <i class="fa-solid fa-plane-up"></i>
-            <a href="">Vuelos</a>
+            <i class="fa-solid fa-compass"></i>
+            <a href="">Destinos</a>
           </li>
           <li>
             <i class="fa-solid fa-bookmark"></i>
@@ -20,7 +20,7 @@ const Header = () => {
           </li>
           <li>
             <i class="fa-solid fa-passport"></i>
-            <a href="">Mis Viajes</a>
+            <a href="">Mis Vuelos</a>
           </li>
         </ul>
         <button className="header_signIn">

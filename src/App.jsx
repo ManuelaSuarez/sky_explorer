@@ -6,6 +6,7 @@ import Home from "./pages/Home/Home.jsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Flights from "./pages/Flights/Flights";
 import Checkout from "./pages/Checkout/Checkout.jsx";
+import MyFlights from "./pages/MyFlights/MyFlights.jsx";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/flights" element={<Flights />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/myFlights" element={<MyFlights />} />
         </Routes>
         <Footer />
       </Router>

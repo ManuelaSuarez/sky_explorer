@@ -1,0 +1,34 @@
+.flightPanel-container {
+  width: 100%;
+  color: black;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.3);
+}
+
+.flightPanel-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.flightPanel-table th,
+.flightPanel-table td {
+  border: 1px solid #c7c8ca;
+  padding: 8px;
+}
+
+.flightPanel-table tr:first-child th {
+  border-top: none;
+}
+.flightPanel-table tr:last-child td {
+  border-bottom: none;
+}
+.flightPanel-table tr td:first-child,
+.flightPanel-table tr th:first-child {
+  border-left: none;
+}
+.flightPanel-table tr td:last-child,
+.flightPanel-table tr th:last-child {
+  border-right: none;
+}
