@@ -1,5 +1,5 @@
-import { FaMapMarkerAlt, FaCalendarAlt, FaExchangeAlt } from "react-icons/fa"
-import "./SearchBar.css"
+import { FaMapMarkerAlt, FaCalendarAlt, FaExchangeAlt } from "react-icons/fa";
+import "./SearchBar.css";
 
 const SearchBar = ({ buttonText }) => {
   return (
@@ -23,7 +23,7 @@ const SearchBar = ({ buttonText }) => {
 
         <div className="search-fields">
           <div className="field-group">
-            <label className="field-label">Destino*</label>
+            <label className="field-label">Origen*</label>
             <div className="input-with-icon">
               <FaMapMarkerAlt className="field-icon" />
               <input type="text" value="Buenos Aires (BUE)" readOnly />
@@ -37,7 +37,7 @@ const SearchBar = ({ buttonText }) => {
           </div>
 
           <div className="field-group">
-            <label className="field-label">Origen*</label>
+            <label className="field-label">Destino*</label>
             <div className="input-with-icon">
               <FaMapMarkerAlt className="field-icon" />
               <input type="text" value="Catamarca (CTC)" readOnly />
@@ -68,4 +68,3 @@ const SearchBar = ({ buttonText }) => {
 };
 
 export default SearchBar;
-
