@@ -1,0 +1,387 @@
+.flight-management-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #b8dccc;
+}
+
+.management-content {
+  max-width: 1200px;
+  width: 95%;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.management-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Tabla de vuelos */
+.flights-table-container {
+  background-color: white;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.table-with-scrollbar {
+  max-height: 300px;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Estilo para la barra de desplazamiento */
+.table-with-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.table-with-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #428780;
+  border-radius: 4px;
+}
+
+.table-with-scrollbar::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.flights-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.flights-table th,
+.flights-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.flights-table th {
+  background-color: #f8f8f8;
+  font-weight: 600;
+  color: #333;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.flights-table tr:last-child td {
+  border-bottom: none;
+}
+
+.active-row {
+  background-color: #f9fffc;
+}
+
+.inactive-row {
+  background-color: #f9f9f9;
+}
+
+.status-active {
+  color: #409373;
+  font-weight: 600;
+}
+
+.status-inactive {
+  color: #777;
+  font-weight: 600;
+}
+
+.edit-button {
+  background-color: #428780;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.edit-button:hover {
+  background-color: #27785c;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  color: #d32f2f;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.delete-button:hover {
+  color: #b71c1c;
+}
+
+/* Formulario de creación */
+.create-flight-section {
+  background-color: #428780;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-height: 500px;
+  overflow: hidden;
+}
+
+.create-flight-title {
+  color: white;
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+/* Contenedor con scroll */
+.create-flight-form-container {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+/* Estilo para la barra de desplazamiento del formulario */
+.create-flight-form-container::-webkit-scrollbar {
+  width: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.create-flight-form-container::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+}
+
+.create-flight-form-container::-webkit-scrollbar-track {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.create-flight-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Primera fila con todos los inputs al mismo nivel */
+.form-row {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+}
+
+.first-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  display: block;
+  color: white;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 3px;
+  font-size: 14px;
+  height: 35px;
+}
+
+/* Ajustes específicos para cada grupo de inputs */
+.origin-group,
+.destination-group {
+  flex: 1.5;
+}
+
+/* Nuevo estilo para el contenedor del botón de intercambio */
+.exchange-button-container {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 0;
+  height: 35px; /* Misma altura que los inputs */
+  padding-bottom: 20px;
+}
+
+.exchange-button {
+  background-color: white;
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #428780;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.exchange-button:hover {
+  transform: scale(1.1);
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 10px;
+  color: #428780;
+  font-size: 16px;
+  z-index: 1;
+}
+
+.input-with-icon input {
+  padding-left: 35px;
+}
+
+/* Segunda fila */
+.second-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+/* Estilos para el selector de fecha */
+.date-picker-container {
+  position: relative;
+}
+
+.date-picker {
+  width: 100%;
+  padding-left: 35px !important;
+  height: 35px;
+  border: none;
+  border-radius: 3px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Estilos para el selector de hora */
+.time-picker-container {
+  position: relative;
+}
+
+.time-picker {
+  width: 100%;
+  padding-left: 35px;
+  height: 35px;
+  border: none;
+  border-radius: 3px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Estilos para la subida de archivos */
+.file-upload-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.file-button {
+  background-color: white;
+  color: #333;
+  border: none;
+  border-radius: 3px;
+  padding: 8px 15px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.file-name {
+  color: white;
+  font-size: 14px;
+  margin-left: 10px;
+}
+
+.file-input {
+  display: none;
+}
+
+/* Botón de crear */
+.create-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.create-button {
+  background-color: white;
+  color: #428780;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  height: 35px;
+}
+
+.create-button:hover {
+  background-color: #f0f0f0;
+}
+
+/* Estilos para react-datepicker */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .first-row,
+  .second-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .second-row {
+    grid-template-columns: 1fr;
+  }
+
+  .exchange-button-container {
+    align-self: center;
+    margin: 10px 0;
+  }
+
+  .create-button-container {
+    justify-content: center;
+  }
+}
