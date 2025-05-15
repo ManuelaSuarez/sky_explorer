@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import "./App.css";
 import Header from "./components/Header/Header.jsx";
 import Footer from "./components/Footer/Footer.jsx";
@@ -9,11 +10,20 @@ import Checkout from "./pages/Checkout/Checkout.jsx";
 import MyFlights from "./pages/MyFlights/MyFlights.jsx";
 import FlightManagement from "./pages/Admin/FlightManagement.jsx";
 
+// Nuevo componente combinado
+import ModalWrapper from "./components/ModalWrapper/ModalWrapper.jsx";
+
 function App() {
+  const [modalVisible, setModalVisible] = useState(null); // "login" | "register" | null
+
+  const openLogin = () => setModalVisible("login");
+  const openRegister = () => setModalVisible("register");
+  const closeModal = () => setModalVisible(null);
+
   return (
     <div className="app">
       <Router>
-        <Header />
+        <Header openLogin={openLogin} openRegister={openRegister} />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/flights" element={<Flights />} />
@@ -22,6 +32,14 @@ function App() {
           <Route path="/admin/flights" element={<FlightManagement />} />
         </Routes>
         <Footer />
+
+        {/* ModalWrapper con flip */}
+        {modalVisible && (
+          <ModalWrapper
+            initialView={modalVisible}
+            onClose={closeModal}
+          />
+        )}
       </Router>
     </div>
   );

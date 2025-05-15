@@ -1,7 +1,7 @@
 import React from "react";
 import "./Header.css";
 
-const Header = () => {
+const Header = ({ openLogin, openRegister }) => {
   return (
     <>
       <div className="header_container">
@@ -23,8 +23,8 @@ const Header = () => {
             <a href="">Mis Vuelos</a>
           </li>
         </ul>
-        <button className="header_signIn">
-          Iniciar Sesión <i class="fa-solid fa-user"></i>
+        <button className="header_signIn" onClick={openLogin}>
+          Iniciar Sesión <i className="fa-solid fa-user"></i>
         </button>
       </div>
     </>
