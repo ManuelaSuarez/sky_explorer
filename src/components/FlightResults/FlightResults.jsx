@@ -1,5 +1,5 @@
-import { FaHeart, FaPlane } from "react-icons/fa";
-//import "./FlightResults.css"
+import { FaHeart, FaPlane } from "react-icons/fa"
+import "./FlightResults.css"
 
 const FlightResults = ({ flight }) => {
   return (
@@ -41,8 +41,7 @@ const FlightResults = ({ flight }) => {
                   {flight.returnDepartureTime} - {flight.returnArrivalTime}
                 </span>
                 <span className="flight-airports">
-                  {flight.returnDepartureAirport} -{" "}
-                  {flight.returnArrivalAirport}
+                  {flight.returnDepartureAirport} - {flight.returnArrivalAirport}
                 </span>
               </div>
               <div className="flight-duration">{flight.returnDuration}</div>
@@ -61,7 +60,7 @@ const FlightResults = ({ flight }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default FlightResults;
+export default FlightResults

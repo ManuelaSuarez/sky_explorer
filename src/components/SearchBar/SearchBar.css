@@ -98,6 +98,7 @@
   justify-content: center;
   align-items: center;
   z-index: 10;
+  padding-top: 70px;
 }
 
 .exchange-button {
@@ -120,15 +121,14 @@
   padding: 12px;
   font-weight: 500;
   cursor: pointer;
-  font-size: 22px;
-  margin-top: 25px;
+  transition: background-color 0.2s;
+font-size: 16px;
+  margin-top: 20px;
   border-radius: 5px;
-  transition: all 0.2s ease-in-out;
 }
 
 .search-button:hover {
-  transform: scale(1.05);
-  background-color: #3a7670;
+  background-color: #27785c;
 }
 
 @media (max-width: 1024px) {

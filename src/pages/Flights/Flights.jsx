@@ -1,7 +1,7 @@
-import SearchBar from "../../components/SearchBar/SearchBar.jsx";
-import FlightResults from "../../components/FlightResults/FlightResults.jsx";
-// import FlightFilters from "../../components/FlightFilters/FlightFilters.jsx";
-import "./Flights.css";
+import SearchBar from "../../components/SearchBar/SearchBar"
+import FlightResults from "../../components/FlightResults/FlightResults"
+import FlightFilters from "../../components/FlightFilters/FlightFilters"
+import "./Flights.css"
 
 const Flights = () => {
   const flights = [
@@ -35,7 +35,7 @@ const Flights = () => {
       returnDuration: "11h 20m",
       price: "1.044.559",
     },
-  ];
+  ]
 
   return (
     <div className="flights-container">
@@ -65,7 +65,7 @@ const Flights = () => {
         </div>
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default Flights;
+export default Flights
