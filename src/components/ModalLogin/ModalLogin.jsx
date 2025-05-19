@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./ModalLogin.css";
-import Validations from "../Validations/Validations.jsx"
+import Validations from "../Validations/Validations.jsx";
 
 const ModalLogin = ({ closeModal, openRegister, onSubmit, errores, refs  }) => {
     const [formData, setFormData] =
