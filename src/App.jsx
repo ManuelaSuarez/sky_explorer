@@ -1,3 +1,4 @@
+import React, { use, useState } from "react";
 import "./App.css";
 import Header from "./components/Header/Header.jsx";
 import Footer from "./components/Footer/Footer.jsx";
@@ -9,11 +10,21 @@ import Checkout from "./pages/Checkout/Checkout.jsx";
 import MyFlights from "./pages/MyFlights/MyFlights.jsx";
 import FlightManagement from "./pages/Admin/FlightManagement.jsx";
 
+// Nuevo componente combinado
+import ModalLogin from "./components/ModalLogin/ModalLogin.jsx";
+import ModalRegister from "./components/ModalRegister/ModalRegister.jsx";
+
 function App() {
+  const [modalVisible, setModalVisible] = useState(""); // "login" | "register" | null
+
+
+  const closeModal = () => setModalVisible("");
+
   return (
     <div className="app">
       <Router>
-        <Header />
+        <Header modalVisible={setModalVisible}/>
+        {console.log(modalVisible)}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/flights" element={<Flights />} />
@@ -22,6 +33,21 @@ function App() {
           <Route path="/admin/flights" element={<FlightManagement />} />
         </Routes>
         <Footer />
+
+        {modalVisible === "login" && (
+          <ModalLogin 
+            closeModal={closeModal} 
+            openRegister={setModalVisible} 
+          />
+        )}
+
+        {modalVisible === "register" && (
+          <ModalRegister 
+            closeModal={closeModal} 
+            openLogin={setModalVisible} 
+          />
+        )}
+      
       </Router>
     </div>
   );

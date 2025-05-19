@@ -7,8 +7,8 @@
 
 .offers-container {
   margin-top: 30px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: row;  
   gap: 20px;
 }
 
