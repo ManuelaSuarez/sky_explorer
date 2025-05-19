@@ -34,7 +34,6 @@ function App() {
         </Routes>
         <Footer />
 
-        {/* ModalWrapper con flip */}
         {modalVisible === "login" && (
           <ModalLogin 
             closeModal={closeModal} 
