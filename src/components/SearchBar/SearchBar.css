@@ -29,8 +29,7 @@
   margin-bottom: 20px;
 }
 
-.trip-type p,
-.passengers-dropdown p {
+.trip-type p, .passengers-dropdown p {
   color: white;
   font-weight: 500;
   margin: 0;
@@ -91,13 +90,14 @@
   outline: none;
 }
 
+
 .exchange-button-container {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 10;
-  padding-top: 70px;
+  padding-top: 100px;
 }
 
 .exchange-button {
@@ -121,7 +121,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
-font-size: 16px;
+  font-size: 16px;
   margin-top: 20px;
   border-radius: 5px;
 }
@@ -130,11 +130,19 @@ font-size: 16px;
   background-color: #27785c;
 }
 
+.date-input{
+  height: 42px;
+}
+
+.datepicker-input{
+  padding-bottom: 10px;
+}
+
 @media (max-width: 1024px) {
   .search-fields {
     grid-template-columns: 1fr 1fr;
   }
-
+  
   .exchange-button-container {
     display: none;
   }
