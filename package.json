@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
+    "cors": "^2.8.5",
+    "jwt-decode": "^4.0.0",
     "react": "^19.0.0",
     "react-datepicker": "^8.3.0",
     "react-dom": "^19.0.0",
