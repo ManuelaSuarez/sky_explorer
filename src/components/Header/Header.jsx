@@ -1,6 +1,14 @@
 import "./Header.css";
 
-const Header = ({ modalVisible }) => {
+const Header = ({ modalVisible, user, onLogout }) => {
+  const handleAuthClick = () => {
+    if (user) {
+      onLogout()
+    } else {
+      modalVisible("login")
+    }
+  }
+
   return (
     <>
       <div className="header_container">
@@ -19,12 +27,16 @@ const Header = ({ modalVisible }) => {
           </li>
           <li>
             <i className="fa-solid fa-passport"></i>
-            <a href="">Mis Vuelos</a>
+            <a href="/myFlights">Mis Vuelos</a>
           </li>
         </ul>
-        <button className="header_signIn" onClick={() => modalVisible("login")}>
-          Iniciar Sesión <i className="fa-solid fa-user"></i>
-        </button>
+        <div className="header_user">
+          {/*Mostramos el nombre si está logueado */}
+          {user && <span className="user-email">Hola, {user.name}</span>}
+          <button className="header_signIn" onClick={handleAuthClick}>
+            {user ? "Cerrar Sesión" : "Iniciar Sesión"} <i className="fa-solid fa-user"></i>
+          </button>
+        </div>
       </div>
     </>
   );
