@@ -14,6 +14,7 @@ import {
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import "./FlightManagement.css"
+import es from 'date-fns/locale/es';
 
 const FlightManagement = () => {
   // Estado para los vuelos existentes
@@ -42,6 +43,13 @@ const FlightManagement = () => {
     },
   ])
 
+  // Estado para validación
+  const [errors, setErrors] = useState({
+    date: "",
+    departureTime: "",
+    arrivalTime: ""
+  })
+
   // Estado para el formulario de creación de vuelo
   const [newFlight, setNewFlight] = useState({
     airline: "Aerolineas Argentina",
@@ -62,14 +70,52 @@ const FlightManagement = () => {
       ...newFlight,
       [name]: value,
     })
+    
+    // Validar horarios cuando cambian
+    if (name === "departureTime" || name === "arrivalTime") {
+      validateTimes(name, value)
+    }
   }
 
   // Manejar cambio de fecha
   const handleDateChange = (date) => {
+    // Validar que la fecha no sea en el pasado
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    if (date < today) {
+      setErrors({...errors, date: "La fecha no puede ser en el pasado"})
+    } else {
+      setErrors({...errors, date: ""})
+    }
+    
     setNewFlight({
       ...newFlight,
       date: date,
     })
+  }
+
+  // Validar horarios
+  const validateTimes = (field, value) => {
+    // Simplificación de la validación de horarios
+    if (field === "departureTime" && newFlight.arrivalTime && value >= newFlight.arrivalTime) {
+      setErrors({
+        ...errors,
+        departureTime: "La hora de salida debe ser anterior a la llegada",
+        arrivalTime: ""
+      })
+    } else if (field === "arrivalTime" && newFlight.departureTime && value <= newFlight.departureTime) {
+      setErrors({
+        ...errors,
+        arrivalTime: "La hora de llegada debe ser posterior a la salida",
+        departureTime: ""
+      })
+    } else {
+      // Solo limpia el error del campo actual
+      const newErrors = {...errors}
+      newErrors[field] = ""
+      setErrors(newErrors)
+    }
   }
 
   // Manejar intercambio de origen y destino
@@ -81,19 +127,63 @@ const FlightManagement = () => {
     })
   }
 
-  // Manejar subida de archivo
-  const handleFileChange = (e) => {
-    setNewFlight({
-      ...newFlight,
-      file: e.target.files[0],
-    })
-  }
-
   // Crear nuevo vuelo
   const handleCreateFlight = () => {
-    // Validar campos requeridos
-    if (!newFlight.airline || !newFlight.origin || !newFlight.destination || !newFlight.date) {
-      alert("Por favor complete todos los campos obligatorios")
+    // Validar campos requeridos de forma simple
+    if (!newFlight.airline) {
+      alert("Por favor ingrese el nombre de la aerolínea")
+      return
+    }
+    
+    if (!newFlight.origin) {
+      alert("Por favor ingrese el origen")
+      return
+    }
+    
+    if (!newFlight.destination) {
+      alert("Por favor ingrese el destino")
+      return
+    }
+    
+    if (!newFlight.capacity) {
+      alert("Por favor ingrese la capacidad total")
+      return
+    }
+    
+    if (!newFlight.basePrice) {
+      alert("Por favor ingrese el precio base")
+      return
+    }
+    
+    if (!newFlight.departureTime) {
+      alert("Por favor ingrese el horario de salida")
+      return
+    }
+    
+    if (!newFlight.arrivalTime) {
+      alert("Por favor ingrese el horario de llegada")
+      return
+    }
+    
+    // Verificar errores específicos
+    if (errors.date) {
+      alert("La fecha seleccionada no es válida")
+      return
+    }
+    
+    if (errors.departureTime) {
+      alert("El horario de salida no es válido")
+      return
+    }
+    
+    if (errors.arrivalTime) {
+      alert("El horario de llegada no es válido")
+      return
+    }
+    
+    // Origen y destino no pueden ser iguales
+    if (newFlight.origin === newFlight.destination) {
+      alert("El origen y destino no pueden ser iguales")
       return
     }
 
@@ -125,8 +215,14 @@ const FlightManagement = () => {
       capacity: "",
       basePrice: "",
       departureTime: "",
-      arrivalTime: "",
-      file: null,
+      arrivalTime: ""
+    })
+    
+    // Resetear errores
+    setErrors({
+      date: "",
+      departureTime: "",
+      arrivalTime: ""
     })
 
     alert("Vuelo creado con éxito")
@@ -147,7 +243,6 @@ const FlightManagement = () => {
 
   return (
     <div className="flight-management-container">
-        
       <div className="management-content">
         <h1 className="management-title">Panel de Gestión de Vuelos</h1>
 
@@ -237,11 +332,9 @@ const FlightManagement = () => {
                   </div>
                 </div>
 
-                <div className="exchange-button-container">
-                  <button type="button" className="exchange-button" onClick={handleExchangeLocations}>
-                    <FaExchangeAlt />
-                  </button>
-                </div>
+                <button type="button" className="exchange-button" onClick={handleExchangeLocations}>
+                  <FaExchangeAlt />
+                </button>
 
                 <div className="form-group destination-group">
                   <label>Destino*</label>
@@ -266,8 +359,11 @@ const FlightManagement = () => {
                       onChange={handleDateChange}
                       dateFormat="dd/MM/yyyy"
                       className="date-picker"
+                      minDate={new Date()} // No permitir fechas en el pasado
+                      locale={es}
                     />
                   </div>
+                  {errors.date && <p className="error-message">{errors.date}</p>}
                 </div>
               </div>
 
@@ -283,6 +379,7 @@ const FlightManagement = () => {
                       value={newFlight.capacity}
                       onChange={handleInputChange}
                       placeholder="Número de pasajeros"
+                      min="1"
                     />
                   </div>
                 </div>
@@ -297,6 +394,7 @@ const FlightManagement = () => {
                       value={newFlight.basePrice}
                       onChange={handleInputChange}
                       placeholder="Precio en pesos"
+                      min="0"
                     />
                   </div>
                 </div>
@@ -313,6 +411,7 @@ const FlightManagement = () => {
                       className="time-picker"
                     />
                   </div>
+                  {errors.departureTime && <p className="error-message">{errors.departureTime}</p>}
                 </div>
 
                 <div className="form-group">
@@ -327,18 +426,8 @@ const FlightManagement = () => {
                       className="time-picker"
                     />
                   </div>
+                  {errors.arrivalTime && <p className="error-message">{errors.arrivalTime}</p>}
                 </div>
-              </div>
-
-              {/* Tercera fila - Botón de archivo */}
-              <div className="file-upload-container">
-                <label className="file-upload-label">
-                  <span className="file-button">Seleccionar archivo</span>
-                  <input type="file" onChange={handleFileChange} className="file-input" />
-                </label>
-                <span className="file-name">
-                  {newFlight.file ? newFlight.file.name : "Ningún archivo seleccionado"}
-                </span>
               </div>
 
               {/* Botón de crear */}

@@ -8,7 +8,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import Flights from "./pages/Flights/Flights"
 import Checkout from "./pages/Checkout/Checkout.jsx"
 import MyFlights from "./pages/MyFlights/MyFlights.jsx"
-import FlightManagement from "./pages/Admin/FlightManagement.jsx"
+import AdminPanel from "./pages/Admin/AdminPanel.jsx"
 // Modales de autenticación
 import ModalLogin from "./components/ModalLogin/ModalLogin.jsx"
 import ModalRegister from "./components/ModalRegister/ModalRegister.jsx"
@@ -54,7 +54,7 @@ function App() {
           <Route path="/flights" element={<Flights />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/myFlights" element={<MyFlights />} />
-          <Route path="/admin/flights" element={<FlightManagement />} />
+          <Route path="/admin/*" element={<AdminPanel />} />
         </Routes>
         <Footer />
         {modalVisible === "login" && (
