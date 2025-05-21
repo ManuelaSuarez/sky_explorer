@@ -1,55 +1,33 @@
 "use client"
-
-import { useState, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { useState } from "react"
 import { FaPlane, FaUserCog } from "react-icons/fa"
 import FlightManagement from "../FlightManagement/FlightManagement"
 import AccountManagement from "../AccountManagement/AccountManagement"
 import "./AdminPanel.css"
 
 const AdminPanel = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
-
-  // Obtener la sección de la URL (si existe)
-  const queryParams = new URLSearchParams(location.search)
-  const sectionParam = queryParams.get("section")
-
-  // Estado para controlar qué sección se muestra
-  const [activeSection, setActiveSection] = useState(sectionParam === "accounts" ? "accounts" : "flights")
-
-  // Actualizar la sección activa cuando cambia la URL
-  useEffect(() => {
-    if (sectionParam === "accounts") {
-      setActiveSection("accounts")
-    } else if (sectionParam === "flights" || !sectionParam) {
-      setActiveSection("flights")
-    }
-  }, [sectionParam])
-
-  // Cambiar sección y actualizar URL
-  const handleSectionChange = (section) => {
-    setActiveSection(section)
-    navigate(`/admin${section === "accounts" ? "?section=accounts" : ""}`)
-  }
+  // Estado simple para controlar la sección activa
+  const [activeSection, setActiveSection] = useState("flights") // Valor por defecto
 
   return (
     <div className="admin-panel-container">
+      {/* Pestañas */}
       <div className="admin-tabs">
         <button
           className={`admin-tab ${activeSection === "flights" ? "active-tab" : ""}`}
-          onClick={() => handleSectionChange("flights")}
+          onClick={() => setActiveSection("flights")}
         >
           <FaPlane /> Vuelos
         </button>
         <button
           className={`admin-tab ${activeSection === "accounts" ? "active-tab" : ""}`}
-          onClick={() => handleSectionChange("accounts")}
+          onClick={() => setActiveSection("accounts")}
         >
           <FaUserCog /> Cuentas
         </button>
       </div>
 
+      {/* Contenido */}
       {activeSection === "flights" && <FlightManagement />}
       {activeSection === "accounts" && <AccountManagement />}
     </div>
