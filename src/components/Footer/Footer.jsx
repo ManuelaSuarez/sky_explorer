@@ -17,14 +17,14 @@ const Footer = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <i className="fa-brands fa-facebook"></i>
+            <i class="fab fa-facebook-square"></i>
           </a>
           <a
             href="https://instagram.com"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <i className="fa-brands fa-square-instagram"></i>
+            <i class="fab fa-instagram"></i>
           </a>
         </div>
       </div>

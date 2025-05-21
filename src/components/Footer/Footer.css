@@ -4,7 +4,7 @@
   background-color: #b8dccc;
   padding: 20px 10px;
   text-align: center;
-  border-top: 2px solid #409373;
+  border-top: 1px solid #52a39b;
 }
 
 .container_footer > div {
@@ -15,7 +15,7 @@
 
 /* Líneas divisorias */
 .container_footer > div:not(:first-child) {
-  border-left: 1px solid #409373;
+  border-left: 1px solid #52a39b;
 }
 
 .container_footer h5 {
@@ -27,9 +27,15 @@
 .container_footer a {
   display: block;
   text-decoration: none;
-  color: #333;
+  color: #52a39b;
   margin-bottom: 5px;
   font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.container_footer a:hover {
+  transform: scale(1.2);
+  color: #428780;
 }
 
 /* Íconos centrados y en línea */
@@ -42,12 +48,13 @@
 
 .social_icons i {
   font-size: 24px;
-  color: black;
-  transition: transform 0.3s ease;
+  color: #52a39b;
+  transition: all 0.3s ease;
 }
 
 .social_icons i:hover {
   transform: scale(1.2);
+  color: #428780;
 }
 
 /* Lista en columna centrada */

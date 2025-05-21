@@ -1,19 +1,18 @@
-import "./Header.css"
-import { Link } from "react-router-dom"
+import "./Header.css";
+import { Link } from "react-router-dom";
 
 const Header = ({ modalVisible, user, onLogout }) => {
   const handleAuthClick = () => {
     if (user) {
-      onLogout()
+      onLogout();
     } else {
-      modalVisible("login")
+      modalVisible("login");
     }
-  }
+  };
 
   return (
     <>
       <div className="header_container">
-        {/* Logo con redirección al home */}
         <Link to="/" className="header_logo">
           <i className="fa-solid fa-globe"></i>
           <h1 className="header_title">Sky Explorer</h1>
@@ -37,12 +36,13 @@ const Header = ({ modalVisible, user, onLogout }) => {
         <div className="header_user">
           {user && <span className="user-email">Hola, {user.name}</span>}
           <button className="header_signIn" onClick={handleAuthClick}>
-            {user ? "Cerrar Sesión" : "Iniciar Sesión"} <i className="fa-solid fa-user"></i>
+            {user ? "Cerrar Sesión" : "Iniciar Sesión"}{" "}
+            <i className="fa-solid fa-user"></i>
           </button>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
