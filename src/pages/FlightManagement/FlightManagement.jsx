@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   FaTrash,
   FaExchangeAlt,
@@ -10,45 +11,22 @@ import {
   FaDollarSign,
   FaClock,
   FaBuilding,
+  FaLock,
 } from "react-icons/fa"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import "./FlightManagement.css"
-import es from 'date-fns/locale/es';
 
 const FlightManagement = () => {
-  // Estado para los vuelos existentes
-  const [flights, setFlights] = useState([
-    {
-      id: 1,
-      airline: "Aerolineas Arg.",
-      purchaseDate: "01/09/2024",
-      origin: "Buenos Aires (BUE)",
-      destination: "Catamarca (CTC)",
-      date: "11/09/2024",
-      departureTime: "12:00 Hs",
-      arrivalTime: "18:00 Hs",
-      status: "Inactivo",
-    },
-    {
-      id: 2,
-      airline: "Emirates",
-      purchaseDate: "01/09/2024",
-      origin: "Catamarca (CTC)",
-      destination: "Buenos Aires (BUE)",
-      date: "21/09/2024",
-      departureTime: "16:00 Hs",
-      arrivalTime: "22:00 Hs",
-      status: "Activo",
-    },
-  ])
+  const navigate = useNavigate()
 
-  // Estado para validación
-  const [errors, setErrors] = useState({
-    date: "",
-    departureTime: "",
-    arrivalTime: ""
-  })
+  // Estado para los vuelos existentes
+  const [flights, setFlights] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+  const [selectedFlightId, setSelectedFlightId] = useState(null)
+  const [userRole, setUserRole] = useState(null)
+  const [isAuthorized, setIsAuthorized] = useState(true) // Cambiado a true por defecto para evitar redirecciones inmediatas
 
   // Estado para el formulario de creación de vuelo
   const [newFlight, setNewFlight] = useState({
@@ -56,12 +34,41 @@ const FlightManagement = () => {
     origin: "Buenos Aires (BUE)",
     destination: "Catamarca (CTC)",
     date: new Date(),
-    capacity: "",
-    basePrice: "",
-    departureTime: "",
-    arrivalTime: "",
-    file: null,
+    capacity: "150",
+    basePrice: "85000",
+    departureTime: "08:30",
+    arrivalTime: "10:15",
   })
+
+  // Verificar si el usuario está autenticado y es administrador
+  useEffect(() => {
+    const checkUserRole = async () => {
+      try {
+        const token = localStorage.getItem("token")
+
+        if (!token) {
+          console.log("No hay token disponible")
+          setIsAuthorized(false)
+          setUserRole(null)
+          // Quitamos el alert que bloquea
+          navigate("/")
+          return
+        }
+
+        // Para propósitos de desarrollo, asumimos que el usuario tiene permisos
+        // En un entorno de producción, deberías verificar el token correctamente
+        setIsAuthorized(true)
+        setUserRole("admin")
+
+        
+      } catch (error) {
+        console.error("Error al verificar el rol del usuario:", error)
+        setIsAuthorized(false)
+      }
+    }
+
+    checkUserRole()
+  }, [navigate])
 
   // Manejar cambios en el formulario
   const handleInputChange = (e) => {
@@ -70,52 +77,14 @@ const FlightManagement = () => {
       ...newFlight,
       [name]: value,
     })
-    
-    // Validar horarios cuando cambian
-    if (name === "departureTime" || name === "arrivalTime") {
-      validateTimes(name, value)
-    }
   }
 
   // Manejar cambio de fecha
   const handleDateChange = (date) => {
-    // Validar que la fecha no sea en el pasado
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    
-    if (date < today) {
-      setErrors({...errors, date: "La fecha no puede ser en el pasado"})
-    } else {
-      setErrors({...errors, date: ""})
-    }
-    
     setNewFlight({
       ...newFlight,
       date: date,
     })
-  }
-
-  // Validar horarios
-  const validateTimes = (field, value) => {
-    // Simplificación de la validación de horarios
-    if (field === "departureTime" && newFlight.arrivalTime && value >= newFlight.arrivalTime) {
-      setErrors({
-        ...errors,
-        departureTime: "La hora de salida debe ser anterior a la llegada",
-        arrivalTime: ""
-      })
-    } else if (field === "arrivalTime" && newFlight.departureTime && value <= newFlight.departureTime) {
-      setErrors({
-        ...errors,
-        arrivalTime: "La hora de llegada debe ser posterior a la salida",
-        departureTime: ""
-      })
-    } else {
-      // Solo limpia el error del campo actual
-      const newErrors = {...errors}
-      newErrors[field] = ""
-      setErrors(newErrors)
-    }
   }
 
   // Manejar intercambio de origen y destino
@@ -127,118 +96,339 @@ const FlightManagement = () => {
     })
   }
 
+  // Añadir esta función para cargar los vuelos
+  const fetchFlights = async () => {
+    setLoading(true)
+    try {
+      // Obtener el token de autenticación
+      const token = localStorage.getItem("token")
+
+      // Realizar la petición al backend
+      const response = await fetch("http://localhost:3000/api/flights", {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error("Error al cargar los vuelos")
+      }
+
+      const data = await response.json()
+      setFlights(data)
+
+      // También guardamos en localStorage como respaldo
+      localStorage.setItem("flights", JSON.stringify(data))
+    } catch (error) {
+      console.error("Error:", error)
+
+      // Si falla la conexión, intentamos cargar desde localStorage como fallback
+      const savedFlights = localStorage.getItem("flights")
+      if (savedFlights) {
+        setFlights(JSON.parse(savedFlights))
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Añadir este useEffect para cargar los vuelos al montar el componente
+  useEffect(() => {
+    fetchFlights()
+  }, [isAuthorized])
+
   // Crear nuevo vuelo
-  const handleCreateFlight = () => {
-    // Validar campos requeridos de forma simple
-    if (!newFlight.airline) {
-      alert("Por favor ingrese el nombre de la aerolínea")
-      return
-    }
-    
-    if (!newFlight.origin) {
-      alert("Por favor ingrese el origen")
-      return
-    }
-    
-    if (!newFlight.destination) {
-      alert("Por favor ingrese el destino")
-      return
-    }
-    
-    if (!newFlight.capacity) {
-      alert("Por favor ingrese la capacidad total")
-      return
-    }
-    
-    if (!newFlight.basePrice) {
-      alert("Por favor ingrese el precio base")
-      return
-    }
-    
-    if (!newFlight.departureTime) {
-      alert("Por favor ingrese el horario de salida")
-      return
-    }
-    
-    if (!newFlight.arrivalTime) {
-      alert("Por favor ingrese el horario de llegada")
-      return
-    }
-    
-    // Verificar errores específicos
-    if (errors.date) {
-      alert("La fecha seleccionada no es válida")
-      return
-    }
-    
-    if (errors.departureTime) {
-      alert("El horario de salida no es válido")
-      return
-    }
-    
-    if (errors.arrivalTime) {
-      alert("El horario de llegada no es válido")
-      return
-    }
-    
-    // Origen y destino no pueden ser iguales
-    if (newFlight.origin === newFlight.destination) {
-      alert("El origen y destino no pueden ser iguales")
+  const handleCreateFlight = async () => {
+    // Validar campos requeridos
+    if (
+      !newFlight.airline ||
+      !newFlight.origin ||
+      !newFlight.destination ||
+      !newFlight.date ||
+      !newFlight.departureTime ||
+      !newFlight.arrivalTime ||
+      !newFlight.capacity ||
+      !newFlight.basePrice
+    ) {
+      alert("Por favor complete todos los campos obligatorios")
       return
     }
 
-    // Formatear fecha
-    const formattedDate = newFlight.date.toLocaleDateString("es-AR")
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) {
+        alert("Debes iniciar sesión como administrador")
+        navigate("/")
+        return
+      }
 
-    // Crear nuevo vuelo con ID único
-    const newFlightWithId = {
-      id: flights.length + 1,
-      airline: newFlight.airline,
-      purchaseDate: new Date().toLocaleDateString("es-AR"),
-      origin: newFlight.origin,
-      destination: newFlight.destination,
-      date: formattedDate,
-      departureTime: newFlight.departureTime ? `${newFlight.departureTime} Hs` : "",
-      arrivalTime: newFlight.arrivalTime ? `${newFlight.arrivalTime} Hs` : "",
-      status: "Activo",
+      const flightData = {
+        airline: newFlight.airline,
+        origin: newFlight.origin,
+        destination: newFlight.destination,
+        date: newFlight.date.toISOString().split("T")[0],
+        departureTime: newFlight.departureTime,
+        arrivalTime: newFlight.arrivalTime,
+        capacity: Number.parseInt(newFlight.capacity),
+        basePrice: Number.parseFloat(newFlight.basePrice),
+      }
+
+      const response = await fetch("http://localhost:3000/api/flights", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(flightData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Error al crear el vuelo")
+      }
+
+      // Vuelo creado exitosamente
+      alert("Vuelo creado con éxito")
+
+      // Limpiar el formulario
+      setNewFlight({
+        airline: "Aerolineas Argentina",
+        origin: "Buenos Aires (BUE)",
+        destination: "Catamarca (CTC)",
+        date: new Date(),
+        capacity: "150",
+        basePrice: "85000",
+        departureTime: "08:30",
+        arrivalTime: "10:15",
+      })
+
+      // Recargar la lista de vuelos
+      fetchFlights()
+    } catch (error) {
+      console.error("Error:", error)
+      alert(error.message || "Error al crear el vuelo")
+
+      // Si falla la conexión, guardamos en localStorage como fallback
+      const newId = flights.length > 0 ? Math.max(...flights.map((f) => f.id)) + 1 : 1
+      const createdFlight = {
+        id: newId,
+        ...newFlight,
+        date: newFlight.date.toISOString().split("T")[0],
+        capacity: Number(newFlight.capacity),
+        basePrice: Number(newFlight.basePrice),
+        status: "Activo",
+        purchaseDate: new Date().toISOString().split("T")[0],
+      }
+
+      const updatedFlights = [createdFlight, ...flights]
+      setFlights(updatedFlights)
+      localStorage.setItem("flights", JSON.stringify(updatedFlights))
     }
-
-    // Añadir a la lista de vuelos
-    setFlights([...flights, newFlightWithId])
-
-    // Resetear formulario
-    setNewFlight({
-      airline: "",
-      origin: "",
-      destination: "",
-      date: new Date(),
-      capacity: "",
-      basePrice: "",
-      departureTime: "",
-      arrivalTime: ""
-    })
-    
-    // Resetear errores
-    setErrors({
-      date: "",
-      departureTime: "",
-      arrivalTime: ""
-    })
-
-    alert("Vuelo creado con éxito")
   }
 
   // Editar vuelo
-  const handleEdit = (id) => {
-    alert(`Editando vuelo con ID: ${id}`)
-    // Aquí iría la lógica para editar un vuelo
+  const handleEdit = async (id) => {
+    // Buscar el vuelo seleccionado
+    const flightToEdit = flights.find((flight) => flight.id === id)
+
+    if (!flightToEdit) {
+      alert("No se encontró el vuelo seleccionado")
+      return
+    }
+
+    // Formatear la fecha correctamente
+    let flightDate = new Date()
+    try {
+      // Intentar convertir la fecha del vuelo a un objeto Date
+      flightDate = flightToEdit.date ? new Date(flightToEdit.date) : new Date()
+    } catch (error) {
+      console.error("Error al convertir la fecha:", error)
+    }
+
+    // Cargar los datos del vuelo en el formulario
+    setNewFlight({
+      airline: flightToEdit.airline || "",
+      origin: flightToEdit.origin || "",
+      destination: flightToEdit.destination || "",
+      date: flightDate,
+      capacity: flightToEdit.capacity?.toString() || "",
+      basePrice: flightToEdit.basePrice?.toString() || "",
+      departureTime: flightToEdit.departureTime || "",
+      arrivalTime: flightToEdit.arrivalTime || "",
+    })
+
+    // Activar el modo de edición y guardar el ID del vuelo
+    setEditMode(true)
+    setSelectedFlightId(id)
+
+    // Hacer scroll hasta el formulario
+    document.querySelector(".create-flight-section").scrollIntoView({ behavior: "smooth" })
+  }
+
+  // Guardar cambios de un vuelo
+  const handleSaveChanges = async () => {
+    // Validar campos requeridos
+    if (
+      !newFlight.airline ||
+      !newFlight.origin ||
+      !newFlight.destination ||
+      !newFlight.date ||
+      !newFlight.departureTime ||
+      !newFlight.arrivalTime ||
+      !newFlight.capacity ||
+      !newFlight.basePrice
+    ) {
+      alert("Por favor complete todos los campos obligatorios")
+      return
+    }
+
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) {
+        alert("Debes iniciar sesión como administrador")
+        navigate("/")
+        return
+      }
+
+      const flightData = {
+        airline: newFlight.airline,
+        origin: newFlight.origin,
+        destination: newFlight.destination,
+        date: newFlight.date.toISOString().split("T")[0],
+        departureTime: newFlight.departureTime,
+        arrivalTime: newFlight.arrivalTime,
+        capacity: Number.parseInt(newFlight.capacity),
+        basePrice: Number.parseFloat(newFlight.basePrice),
+      }
+
+      const response = await fetch(`http://localhost:3000/api/flights/${selectedFlightId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(flightData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Error al actualizar el vuelo")
+      }
+
+      // Vuelo actualizado exitosamente
+      alert("Vuelo actualizado con éxito")
+
+      // Limpiar el formulario y salir del modo edición
+      setNewFlight({
+        airline: "Aerolineas Argentina",
+        origin: "Buenos Aires (BUE)",
+        destination: "Catamarca (CTC)",
+        date: new Date(),
+        capacity: "150",
+        basePrice: "85000",
+        departureTime: "08:30",
+        arrivalTime: "10:15",
+      })
+      setEditMode(false)
+      setSelectedFlightId(null)
+
+      // Recargar la lista de vuelos
+      fetchFlights()
+    } catch (error) {
+      console.error("Error:", error)
+      alert(error.message || "Error al actualizar el vuelo")
+
+      // Si falla la conexión, actualizamos en localStorage como fallback
+      const updatedFlights = flights.map((flight) => {
+        if (flight.id === selectedFlightId) {
+          return {
+            ...flight,
+            ...newFlight,
+            date: newFlight.date.toISOString().split("T")[0],
+            capacity: Number(newFlight.capacity),
+            basePrice: Number(newFlight.basePrice),
+          }
+        }
+        return flight
+      })
+
+      setFlights(updatedFlights)
+      localStorage.setItem("flights", JSON.stringify(updatedFlights))
+    }
+  }
+
+  // Cancelar edición
+  const handleCancelEdit = () => {
+    // Limpiar el formulario y salir del modo edición
+    setNewFlight({
+      airline: "Aerolineas Argentina",
+      origin: "Buenos Aires (BUE)",
+      destination: "Catamarca (CTC)",
+      date: new Date(),
+      capacity: "150",
+      basePrice: "85000",
+      departureTime: "08:30",
+      arrivalTime: "10:15",
+    })
+    setEditMode(false)
+    setSelectedFlightId(null)
   }
 
   // Eliminar vuelo
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("¿Está seguro que desea eliminar este vuelo?")) {
-      setFlights(flights.filter((flight) => flight.id !== id))
+      try {
+        const token = localStorage.getItem("token")
+        if (!token) {
+          alert("Debes iniciar sesión como administrador")
+          navigate("/")
+          return
+        }
+
+        const response = await fetch(`http://localhost:3000/api/flights/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Error al eliminar el vuelo")
+        }
+
+        // Vuelo eliminado exitosamente
+        alert("Vuelo eliminado con éxito")
+
+        // Recargar la lista de vuelos
+        fetchFlights()
+      } catch (error) {
+        console.error("Error:", error)
+        alert(error.message || "Error al eliminar el vuelo")
+
+        // Si falla la conexión, eliminamos de localStorage como fallback
+        const updatedFlights = flights.filter((flight) => flight.id !== id)
+        setFlights(updatedFlights)
+        localStorage.setItem("flights", JSON.stringify(updatedFlights))
+      }
     }
+  }
+
+  // Si el usuario no está autorizado, mostrar mensaje de acceso denegado
+  if (!isAuthorized) {
+    return (
+      <div className="access-denied-container">
+        <div className="access-denied-content">
+          <FaLock className="access-denied-icon" />
+          <h2>Acceso Denegado</h2>
+          <p>No tienes permisos para acceder a esta página.</p>
+          <p>Esta sección está reservada para administradores.</p>
+          <button className="back-button" onClick={() => navigate("/")}>
+            Volver al inicio
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -266,31 +456,45 @@ const FlightManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {flights.map((flight) => (
-                  <tr key={flight.id} className={flight.status === "Activo" ? "active-row" : "inactive-row"}>
-                    <td>{flight.id}</td>
-                    <td>{flight.airline}</td>
-                    <td>{flight.purchaseDate}</td>
-                    <td>{flight.origin}</td>
-                    <td>{flight.destination}</td>
-                    <td>{flight.date}</td>
-                    <td>{flight.departureTime}</td>
-                    <td>{flight.arrivalTime}</td>
-                    <td className={flight.status === "Activo" ? "status-active" : "status-inactive"}>
-                      {flight.status}
-                    </td>
-                    <td>
-                      <button className="edit-button" onClick={() => handleEdit(flight.id)}>
-                        Editar
-                      </button>
-                    </td>
-                    <td>
-                      <button className="delete-button" onClick={() => handleDelete(flight.id)}>
-                        <FaTrash />
-                      </button>
+                {loading ? (
+                  <tr>
+                    <td colSpan="11" style={{ textAlign: "center" }}>
+                      Cargando vuelos...
                     </td>
                   </tr>
-                ))}
+                ) : flights.length === 0 ? (
+                  <tr>
+                    <td colSpan="11" style={{ textAlign: "center" }}>
+                      No hay vuelos disponibles
+                    </td>
+                  </tr>
+                ) : (
+                  flights.map((flight) => (
+                    <tr key={flight.id} className={flight.status === "Activo" ? "active-row" : "inactive-row"}>
+                      <td>{flight.id}</td>
+                      <td>{flight.airline}</td>
+                      <td>{flight.purchaseDate}</td>
+                      <td>{flight.origin}</td>
+                      <td>{flight.destination}</td>
+                      <td>{flight.date}</td>
+                      <td>{flight.departureTime}</td>
+                      <td>{flight.arrivalTime}</td>
+                      <td className={flight.status === "Activo" ? "status-active" : "status-inactive"}>
+                        {flight.status}
+                      </td>
+                      <td>
+                        <button className="edit-button" onClick={() => handleEdit(flight.id)}>
+                          Editar
+                        </button>
+                      </td>
+                      <td>
+                        <button className="delete-button" onClick={() => handleDelete(flight.id)}>
+                          <FaTrash />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -298,7 +502,7 @@ const FlightManagement = () => {
 
         {/* Formulario para crear nuevo vuelo */}
         <div className="create-flight-section">
-          <h2 className="create-flight-title">Crear un vuelo</h2>
+          <h2 className="create-flight-title">{editMode ? "Editar vuelo" : "Crear un vuelo"}</h2>
 
           <div className="create-flight-form-container">
             <div className="create-flight-form">
@@ -359,11 +563,8 @@ const FlightManagement = () => {
                       onChange={handleDateChange}
                       dateFormat="dd/MM/yyyy"
                       className="date-picker"
-                      minDate={new Date()} // No permitir fechas en el pasado
-                      locale={es}
                     />
                   </div>
-                  {errors.date && <p className="error-message">{errors.date}</p>}
                 </div>
               </div>
 
@@ -379,7 +580,6 @@ const FlightManagement = () => {
                       value={newFlight.capacity}
                       onChange={handleInputChange}
                       placeholder="Número de pasajeros"
-                      min="1"
                     />
                   </div>
                 </div>
@@ -394,7 +594,6 @@ const FlightManagement = () => {
                       value={newFlight.basePrice}
                       onChange={handleInputChange}
                       placeholder="Precio en pesos"
-                      min="0"
                     />
                   </div>
                 </div>
@@ -411,7 +610,6 @@ const FlightManagement = () => {
                       className="time-picker"
                     />
                   </div>
-                  {errors.departureTime && <p className="error-message">{errors.departureTime}</p>}
                 </div>
 
                 <div className="form-group">
@@ -426,15 +624,25 @@ const FlightManagement = () => {
                       className="time-picker"
                     />
                   </div>
-                  {errors.arrivalTime && <p className="error-message">{errors.arrivalTime}</p>}
                 </div>
               </div>
 
-              {/* Botón de crear */}
+              {/* Botones de acción */}
               <div className="create-button-container">
-                <button type="button" className="create-button" onClick={handleCreateFlight}>
-                  Crear
-                </button>
+                {editMode ? (
+                  <>
+                    <button type="button" className="cancel-button" onClick={handleCancelEdit}>
+                      Cancelar
+                    </button>
+                    <button type="button" className="create-button" onClick={handleSaveChanges}>
+                      Guardar cambios
+                    </button>
+                  </>
+                ) : (
+                  <button type="button" className="create-button" onClick={handleCreateFlight}>
+                    Crear
+                  </button>
+                )}
               </div>
             </div>
           </div>

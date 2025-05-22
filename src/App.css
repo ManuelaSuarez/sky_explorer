@@ -28,6 +28,29 @@
   text-align: left;
 }
 
+/* Estilos para páginas en construcción */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  padding: 20px;
+  text-align: center;
+}
+
+.page-container h1 {
+  color: #428780;
+  margin-bottom: 20px;
+  font-size: 32px;
+}
+
+.page-container p {
+  color: #333;
+  font-size: 18px;
+}
+
+
 @media (max-width: 768px) {
   .offers-container {
     grid-template-columns: 1fr;
