@@ -1,108 +1,150 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import "./App.css"
-import Header from "./components/Header/Header.jsx"
-import Footer from "./components/Footer/Footer.jsx"
-import "@fortawesome/fontawesome-free/css/all.min.css"
-import Home from "./pages/Home/Home.jsx"
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
-import Flights from "./pages/Flights/Flights"
-import Checkout from "./pages/Checkout/Checkout.jsx"
-import MyFlights from "./pages/MyFlights/MyFlights.jsx"
-import AdminPanel from "./pages/Admin/AdminPanel.jsx"
+import { useState, useEffect } from "react";
+import "./App.css";
+import Header from "./components/Header/Header.jsx";
+import Footer from "./components/Footer/Footer.jsx";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import Home from "./pages/Home/Home.jsx";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Flights from "./pages/Flights/Flights";
+import Checkout from "./pages/Checkout/Checkout.jsx";
+import MyFlights from "./pages/MyFlights/MyFlights.jsx";
+import AdminPanel from "./pages/Admin/AdminPanel.jsx";
 
 // Modales de autenticación
-import ModalLogin from "./components/ModalLogin/ModalLogin.jsx"
-import ModalRegister from "./components/ModalRegister/ModalRegister.jsx"
+import ModalLogin from "./components/ModalLogin/ModalLogin.jsx";
+import ModalRegister from "./components/ModalRegister/ModalRegister.jsx";
 // Importar jwtDecode correctamente
-import { jwtDecode } from "jwt-decode"
+import { jwtDecode } from "jwt-decode";
 
 // Componente para proteger rutas de usuario (solo accesibles para usuarios normales)
 const UserRoute = ({ children, user }) => {
-  const isAdmin = user && user.role === "admin"
+  const isAdmin = user && (user.role === "admin" || user.role === "ADMIN");
 
   if (isAdmin) {
-    return <Navigate to="/admin" replace />
+    return <Navigate to="/admin" replace />;
   }
 
-  return children
-}
+  return children;
+};
 
 // Componente para proteger rutas de administrador (solo accesibles para administradores)
 const AdminRoute = ({ children, user }) => {
-  const isAdmin = user && user.role === "admin"
+  const isAdmin = user && (user.role === "admin" || user.role === "ADMIN");
 
   if (!isAdmin) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/" replace />;
   }
 
-  return children
-}
+  return children;
+};
 
 function App() {
-  const [modalVisible, setModalVisible] = useState("") // "login" | "register" | ""
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [modalVisible, setModalVisible] = useState(""); // "login" | "register" | ""
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Verificar si hay un token guardado al cargar la aplicación
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (token) {
-      try {
-        const decoded = jwtDecode(token)
-        setUser(decoded)
-      } catch (error) {
-        console.error("Token inválido:", error)
-        localStorage.removeItem("token")
+    const verifyToken = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
       }
-    }
-    setLoading(false)
-  }, [])
 
-  const closeModal = () => setModalVisible("")
+      try {
+        // Intentar verificar el token con el backend
+        const response = await fetch("http://localhost:3000/auth/verify", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        } else {
+          // Si el token no es válido, eliminarlo
+          localStorage.removeItem("token");
+        }
+      } catch (error) {
+        console.error("Error al verificar el token:", error);
+        // Como fallback, intentar decodificar el token localmente
+        try {
+          const decoded = jwtDecode(token);
+          // Verificar si el token ha expirado
+          const currentTime = Date.now() / 1000;
+          if (decoded.exp && decoded.exp > currentTime) {
+            setUser(decoded);
+          } else {
+            localStorage.removeItem("token");
+          }
+        } catch (decodeError) {
+          console.error("Error al decodificar el token:", decodeError);
+          localStorage.removeItem("token");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verifyToken();
+  }, []);
+
+  const closeModal = () => setModalVisible("");
 
   const handleLoginSuccess = ({ token, user }) => {
     try {
-      localStorage.setItem("token", token)
+      localStorage.setItem("token", token);
       // Si recibimos el usuario directamente, lo usamos
       if (user) {
-        setUser(user)
+        setUser(user);
       } else {
         // Si no, intentamos decodificar el token
-        const decoded = jwtDecode(token)
-        setUser(decoded)
+        const decoded = jwtDecode(token);
+        setUser(decoded);
       }
       // La redirección ahora se maneja en el componente ModalLogin
     } catch (error) {
-      console.error("Error al decodificar el token:", error)
+      console.error("Error al decodificar el token:", error);
     }
-    closeModal()
-  }
+    closeModal();
+  };
 
   const handleLogout = () => {
     // Eliminar el token del localStorage
-    localStorage.removeItem("token")
+    localStorage.removeItem("token");
 
     // Actualizar el estado del usuario
-    setUser(null)
+    setUser(null);
 
     // Disparar un evento de storage para que otros componentes se enteren
-    window.dispatchEvent(new Event("storage"))
+    window.dispatchEvent(new Event("storage"));
 
     // Cerrar cualquier modal abierto
-    closeModal()
-  }
+    closeModal();
+  };
 
   // Mostrar un indicador de carga mientras se verifica la autenticación
   if (loading) {
-    return <div className="loading-container">Cargando...</div>
+    return <div className="loading-container">Cargando...</div>;
   }
 
   return (
     <div className="app">
       <Router>
-        <Header modalVisible={setModalVisible} user={user} onLogout={handleLogout} />
+        <Header
+          modalVisible={setModalVisible}
+          user={user}
+          onLogout={handleLogout}
+        />
         <Routes>
           {/* Rutas para usuarios normales */}
           <Route
@@ -180,12 +222,18 @@ function App() {
         </Routes>
         <Footer />
         {modalVisible === "login" && (
-          <ModalLogin closeModal={closeModal} openRegister={setModalVisible} onSubmit={handleLoginSuccess} />
+          <ModalLogin
+            closeModal={closeModal}
+            openRegister={setModalVisible}
+            onSubmit={handleLoginSuccess}
+          />
         )}
-        {modalVisible === "register" && <ModalRegister closeModal={closeModal} openLogin={setModalVisible} />}
+        {modalVisible === "register" && (
+          <ModalRegister closeModal={closeModal} openLogin={setModalVisible} />
+        )}
       </Router>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

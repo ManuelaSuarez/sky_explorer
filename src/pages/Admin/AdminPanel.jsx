@@ -1,79 +1,80 @@
-
-import { useState, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
-import { FaLock } from "react-icons/fa"
-import { jwtDecode } from "jwt-decode"
-import FlightManagement from "../FlightManagement/FlightManagement"
-import AccountManagement from "../AccountManagement/AccountManagement"
-import "./AdminPanel.css"
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { FaLock } from "react-icons/fa";
+import { jwtDecode } from "jwt-decode";
+import FlightManagement from "../FlightManagement/FlightManagement";
+import AirlineManagement from "../AirlineManagement/AirlineManagement.jsx";
+import "./AdminPanel.css";
 
 const AdminPanel = () => {
-  const [isAuthorized, setIsAuthorized] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
-  const location = useLocation()
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Determinar qué sección mostrar basado en la URL
-  const currentPath = location.pathname
-  const activeSection = currentPath.includes("/accounts") ? "accounts" : "flights"
+  const currentPath = location.pathname;
+  const activeSection = currentPath.includes("/airlines")
+    ? "airlines"
+    : "flights";
 
   // Función para verificar permisos de administrador
   const checkAdminPermission = () => {
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
 
       if (!token) {
-        setIsAuthorized(false)
-        setLoading(false)
-        return
+        setIsAuthorized(false);
+        setLoading(false);
+        return;
       }
 
       try {
-        const payload = jwtDecode(token)
+        const payload = jwtDecode(token);
 
         if (payload.role === "admin") {
-          setIsAuthorized(true)
+          setIsAuthorized(true);
         } else {
-          setIsAuthorized(false)
+          setIsAuthorized(false);
         }
       } catch (error) {
-        console.error("Error al decodificar el token:", error)
-        setIsAuthorized(false)
+        console.error("Error al decodificar el token:", error);
+        setIsAuthorized(false);
       }
     } catch (error) {
-      console.error("Error al verificar permisos:", error)
-      setIsAuthorized(false)
+      console.error("Error al verificar permisos:", error);
+      setIsAuthorized(false);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Verificar permisos al cargar el componente
   useEffect(() => {
-    checkAdminPermission()
-  }, [])
+    checkAdminPermission();
+  }, []);
 
   // Verificar permisos cuando cambia la URL (por si el usuario navega manualmente)
   useEffect(() => {
-    checkAdminPermission()
-  }, [location.pathname])
+    checkAdminPermission();
+  }, [location.pathname]);
 
   // Escuchar cambios en localStorage (para detectar inicio/cierre de sesión)
   useEffect(() => {
     const handleStorageChange = () => {
-      checkAdminPermission()
-    }
+      checkAdminPermission();
+    };
 
-    window.addEventListener("storage", handleStorageChange)
+    window.addEventListener("storage", handleStorageChange);
 
     return () => {
-      window.removeEventListener("storage", handleStorageChange)
-    }
-  }, [])
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   // Mostrar pantalla de carga mientras se verifica la autorización
   if (loading) {
-    return <div className="loading-container">Verificando permisos...</div>
+    return <div className="loading-container">Verificando permisos...</div>;
   }
 
   // Mostrar mensaje de acceso denegado si no está autorizado
@@ -90,16 +91,16 @@ const AdminPanel = () => {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="admin-panel-container">
       {/* Contenido */}
       {activeSection === "flights" && <FlightManagement />}
-      {activeSection === "accounts" && <AccountManagement />}
+      {activeSection === "airlines" && <AirlineManagement />}
     </div>
-  )
-}
+  );
+};
 
-export default AdminPanel
+export default AdminPanel;

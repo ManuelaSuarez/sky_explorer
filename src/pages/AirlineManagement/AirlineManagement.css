@@ -1,4 +1,4 @@
-.account-management-container {
+.airline-management-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -19,7 +19,7 @@
   margin-bottom: 20px;
 }
 
-/* Tabla de usuarios */
+/* Tabla de aerolíneas */
 .airline-table-container {
   background-color: white;
   border-radius: 10px;
@@ -82,7 +82,7 @@
   align-items: center;
 }
 
-/* Formulario de creación de usuario */
+/* Formulario de creación de aerolínea */
 .create-airline-section {
   background-color: #428780;
   border-radius: 10px;
@@ -156,20 +156,6 @@
 
 .input-with-icon input {
   padding-left: 35px;
-}
-
-/* Estilos para el selector de fecha */
-.date-picker-container {
-  position: relative;
-}
-
-.date-picker {
-  width: 100%;
-  padding-left: 35px !important;
-  height: 35px;
-  border: none;
-  border-radius: 3px;
-  font-size: 14px;
 }
 
 /* Botón de crear */
