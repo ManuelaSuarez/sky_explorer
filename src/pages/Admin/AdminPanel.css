@@ -6,46 +6,7 @@
 }
 
 /* Pestañas de navegación */
-.admin-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin: 20px 0;
-  padding: 0 20px;
-}
-
-.admin-tab {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: white;
-  color: #428780;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.admin-tab:hover {
-  background-color: #f0f0f0;
-}
-
-.admin-tab.active-tab {
-  background-color: #428780;
-  color: white;
-}
-
-@media (max-width: 768px) {
-  .admin-tabs {
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-}
+/* Remove these styles */
 
 .management-content {
   max-width: 1200px;
@@ -445,4 +406,65 @@
   .user-form-row {
     flex-direction: column;
   }
+}
+
+/* Añadir estilos para la pantalla de acceso denegado y carga */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  font-size: 18px;
+  color: #428780;
+}
+
+.access-denied-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  background-color: #b8dccc;
+}
+
+.access-denied-content {
+  background-color: white;
+  border-radius: 10px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 90%;
+}
+
+.access-denied-icon {
+  font-size: 60px;
+  color: #d32f2f;
+  margin-bottom: 20px;
+}
+
+.access-denied-content h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.access-denied-content p {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.back-button {
+  background-color: #428780;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.back-button:hover {
+  background-color: #27785c;
 }

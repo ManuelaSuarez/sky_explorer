@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { FaTrash, FaCog, FaUser, FaEnvelope, FaIdCard, FaPhone, FaGlobe, FaLock, FaCalendarAlt } from "react-icons/fa"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
@@ -8,20 +8,9 @@ import "./AccountManagement.css"
 
 const AccountManagement = () => {
   // Estado para los usuarios existentes
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "Usuario Admin",
-      email: "usuarioadmin@gmail.com",
-      role: "Administrador",
-    },
-    {
-      id: 2,
-      name: "Example Cliente",
-      email: "examplecliente@gmail.com",
-      role: "Cliente",
-    },
-  ])
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   // Estado para el formulario de creación de usuario
   const [newUser, setNewUser] = useState({
@@ -36,6 +25,50 @@ const AccountManagement = () => {
     password: "",
     confirmPassword: "",
   })
+
+  // Obtener token del localStorage
+  const getToken = () => {
+    return localStorage.getItem('token')
+  }
+
+  // Cargar usuarios al montar el componente
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+
+  // Función para obtener todos los usuarios
+  const fetchUsers = async () => {
+    setLoading(true)
+    setError("")
+    
+    try {
+      const token = getToken()
+      if (!token) {
+        setError("No se encontró token de autenticación")
+        return
+      }
+
+      const response = await fetch("http://localhost:3000/api/users", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
+
+      const data = await response.json()
+      setUsers(data)
+    } catch (error) {
+      console.error("Error al obtener usuarios:", error)
+      setError("Error al cargar los usuarios")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Manejar cambios en el formulario de usuario
   const handleUserInputChange = (e) => {
@@ -55,7 +88,7 @@ const AccountManagement = () => {
   }
 
   // Crear nuevo usuario
-  const handleCreateUser = () => {
+  const handleCreateUser = async () => {
     // Validar campos requeridos
     if (!newUser.name || !newUser.email || !newUser.password) {
       alert("Por favor complete todos los campos obligatorios")
@@ -74,46 +107,152 @@ const AccountManagement = () => {
       return
     }
 
-    // Crear nuevo usuario con ID único
-    const newUserWithId = {
-      id: users.length + 1,
-      name: newUser.name,
-      email: newUser.email,
-      role: "Cliente",
+    setLoading(true)
+    setError("")
+
+    try {
+      const token = getToken()
+      if (!token) {
+        alert("No se encontró token de autenticación")
+        return
+      }
+
+      // Formatear fecha de nacimiento
+      const formattedBirthday = newUser.birthday.toISOString().split('T')[0]
+
+      const response = await fetch("http://localhost:3000/api/users", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...newUser,
+          birthday: formattedBirthday,
+          role: "user" // Por defecto crear como usuario normal
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || `Error: ${response.status}`)
+      }
+
+      const createdUser = await response.json()
+      
+      // Actualizar la lista de usuarios
+      setUsers([createdUser, ...users])
+
+      // Resetear formulario
+      setNewUser({
+        username: "",
+        name: "",
+        birthday: new Date(),
+        nationality: "Argentina",
+        dni: "",
+        phone: "",
+        email: "",
+        confirmEmail: "",
+        password: "",
+        confirmPassword: "",
+      })
+
+      alert("Usuario creado con éxito")
+    } catch (error) {
+      console.error("Error al crear usuario:", error)
+      alert(`Error al crear usuario: ${error.message}`)
+    } finally {
+      setLoading(false)
     }
-
-    // Añadir a la lista de usuarios
-    setUsers([...users, newUserWithId])
-
-    // Resetear formulario
-    setNewUser({
-      username: "",
-      name: "",
-      birthday: new Date(),
-      nationality: "Argentina",
-      dni: "",
-      phone: "",
-      email: "",
-      confirmEmail: "",
-      password: "",
-      confirmPassword: "",
-    })
-
-    alert("Usuario creado con éxito")
   }
 
   // Editar usuario
   const handleEditUser = (id) => {
     alert(`Editando usuario con ID: ${id}`)
-    // Aquí iría la lógica para editar un usuario
+    // Aquí podrías implementar un modal o formulario de edición
   }
 
   // Eliminar usuario
-  const handleDeleteUser = (id) => {
-    if (window.confirm("¿Está seguro que desea eliminar este usuario?")) {
+  const handleDeleteUser = async (id) => {
+    if (!window.confirm("¿Está seguro que desea eliminar este usuario?")) {
+      return
+    }
+
+    setLoading(true)
+    setError("")
+
+    try {
+      const token = getToken()
+      if (!token) {
+        alert("No se encontró token de autenticación")
+        return
+      }
+
+      const response = await fetch(`http://localhost:3000/api/users/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || `Error: ${response.status}`)
+      }
+
+      // Actualizar la lista de usuarios
       setUsers(users.filter((user) => user.id !== id))
+      alert("Usuario eliminado correctamente")
+    } catch (error) {
+      console.error("Error al eliminar usuario:", error)
+      alert(`Error al eliminar usuario: ${error.message}`)
+    } finally {
+      setLoading(false)
     }
   }
+
+  // Cambiar estado del usuario (activo/inactivo)
+  const handleToggleUserStatus = async (id) => {
+    setLoading(true)
+    setError("")
+
+    try {
+      const token = getToken()
+      if (!token) {
+        alert("No se encontró token de autenticación")
+        return
+      }
+
+      const response = await fetch(`http://localhost:3000/api/users/${id}/toggle-status`, {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || `Error: ${response.status}`)
+      }
+
+      const result = await response.json()
+      
+      // Actualizar el usuario en la lista
+      setUsers(users.map(user => 
+        user.id === id ? { ...user, isActive: result.user.isActive } : user
+      ))
+
+      alert(result.message)
+    } catch (error) {
+      console.error("Error al cambiar estado del usuario:", error)
+      alert(`Error: ${error.message}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
 
   return (
     <div className="account-management-container">

@@ -6,8 +6,6 @@ import "./FlightFilters.css"
 
 const FlightFilters = () => {
   const [airlinesOpen, setAirlinesOpen] = useState(true)
-  const [classOpen, setClassOpen] = useState(true)
-  const [aircraftOpen, setAircraftOpen] = useState(false)
 
   return (
     <div className="flight-filters">
@@ -35,38 +33,7 @@ const FlightFilters = () => {
         )}
       </div>
 
-      <div className="filter-section">
-        <div className="filter-header" onClick={() => setClassOpen(!classOpen)}>
-          <h3>Clase</h3>
-          {classOpen ? <FaChevronUp /> : <FaChevronDown />}
-        </div>
-
-        {classOpen && (
-          <div className="filter-options">
-            <label className="filter-option">
-              <input type="checkbox" name="class" value="economica" />
-              <span>Economica</span>
-            </label>
-            <label className="filter-option">
-              <input type="checkbox" name="class" value="mixta" />
-              <span>Mixta</span>
-            </label>
-            <label className="filter-option">
-              <input type="checkbox" name="class" value="business" />
-              <span>Business</span>
-            </label>
-          </div>
-        )}
-      </div>
-
-      <div className="filter-section">
-        <div className="filter-header" onClick={() => setAircraftOpen(!aircraftOpen)}>
-          <h3>Avion</h3>
-          {aircraftOpen ? <FaChevronUp /> : <FaChevronDown />}
-        </div>
-
-        {aircraftOpen && <div className="filter-options">{/* Aircraft options would go here */}</div>}
-      </div>
+     
     </div>
   )
 }
