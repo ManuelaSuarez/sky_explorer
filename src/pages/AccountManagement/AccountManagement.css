@@ -20,7 +20,7 @@
 }
 
 /* Tabla de usuarios */
-.users-table-container {
+.airline-table-container {
   background-color: white;
   border-radius: 10px;
   padding: 15px;
@@ -33,19 +33,19 @@
   overflow-y: auto;
 }
 
-.users-table {
+.airline-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.users-table th,
-.users-table td {
+.airline-table th,
+.airline-table td {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #eee;
 }
 
-.users-table th {
+.airline-table th {
   background-color: #f8f8f8;
   font-weight: 600;
   color: #333;
@@ -83,39 +83,39 @@
 }
 
 /* Formulario de creación de usuario */
-.create-user-section {
+.create-airline-section {
   background-color: #428780;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.create-user-title {
+.create-airline-title {
   color: white;
   font-size: 22px;
   font-weight: 500;
   margin-bottom: 20px;
 }
 
-.create-user-form-container {
+.create-airline-form-container {
   max-height: 400px;
   overflow-y: auto;
   padding-right: 10px;
 }
 
-.create-user-form {
+.create-airline-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.user-form-row {
+.airline-form-row {
   display: flex;
   gap: 15px;
   flex-wrap: wrap;
 }
 
-.user-form-row .form-group {
+.airline-form-row .form-group {
   flex: 1;
   min-width: 200px;
 }

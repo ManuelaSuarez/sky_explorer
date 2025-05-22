@@ -257,7 +257,7 @@ const AccountManagement = () => {
   return (
     <div className="account-management-container">
       <div className="management-content">
-        <h1 className="management-title">Panel de Administración</h1>
+        <h1 className="management-title">Administrar Aerolineas</h1>
 
         {/* Tabla de usuarios existentes */}
         <div className="users-table-container">
@@ -295,15 +295,15 @@ const AccountManagement = () => {
         </div>
 
         {/* Formulario para crear nuevo usuario */}
-        <div className="create-user-section">
-          <h2 className="create-user-title">Crear Nuevo Usuario</h2>
+        <div className="create-airline-section">
+          <h2 className="create-airline-title">Crear Nueva Aerolinea</h2>
 
-          <div className="create-user-form-container">
-            <div className="create-user-form">
+          <div className="create-airline-form-container">
+            <div className="create-airline-form">
               {/* Primera fila */}
-              <div className="user-form-row">
+              <div className="airline-form-row">
                 <div className="form-group">
-                  <label>Usuario</label>
+                  <label>Nombre Aerolinea</label>
                   <div className="input-with-icon">
                     <FaUser className="input-icon" />
                     <input
@@ -311,7 +311,7 @@ const AccountManagement = () => {
                       name="username"
                       value={newUser.username}
                       onChange={handleUserInputChange}
-                      placeholder="Usuario"
+                      placeholder="Nombre Aerolinea"
                     />
                   </div>
                 </div>
@@ -359,7 +359,7 @@ const AccountManagement = () => {
               </div>
 
               {/* Segunda fila */}
-              <div className="user-form-row">
+              <div className="airline-form-row">
                 <div className="form-group">
                   <label>DNI</label>
                   <div className="input-with-icon">
@@ -390,7 +390,7 @@ const AccountManagement = () => {
               </div>
 
               {/* Tercera fila */}
-              <div className="user-form-row">
+              <div className="airline-form-row">
                 <div className="form-group">
                   <label>Email</label>
                   <div className="input-with-icon">
@@ -421,7 +421,7 @@ const AccountManagement = () => {
               </div>
 
               {/* Cuarta fila */}
-              <div className="user-form-row">
+              <div className="airline-form-row">
                 <div className="form-group">
                   <label>Contraseña</label>
                   <div className="input-with-icon">
