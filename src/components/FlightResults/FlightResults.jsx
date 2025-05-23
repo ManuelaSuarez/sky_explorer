@@ -1,5 +1,5 @@
-import { FaHeart, FaPlane } from "react-icons/fa"
-import "./FlightResults.css"
+import { FaHeart, FaPlane } from "react-icons/fa";
+import "./FlightResults.css";
 
 const FlightResults = ({ flight }) => {
   return (
@@ -60,7 +60,7 @@ const FlightResults = ({ flight }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default FlightResults
+export default FlightResults;

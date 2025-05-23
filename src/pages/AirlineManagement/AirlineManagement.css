@@ -1,0 +1,281 @@
+/* AirlineManagement.css */
+
+.airline-management-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra el contenido horizontalmente */
+  background-color: #b8dccc; /* Un color de fondo suave */
+  padding: 20px; /* Espaciado general */
+  box-sizing: border-box; /* Incluye padding en el tamaño total */
+}
+
+.airline-management-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 25px; /* Reducir un poco el margen */
+  font-size: 26px; /* Reducir un poco el tamaño del título principal */
+  font-weight: 700;
+}
+
+/* Contenedores de la lista y el formulario */
+.airline-list,
+.airline-form {
+  background-color: white; /* Color de fondo */
+  border-radius: 10px;
+  padding: 20px; /* Reducir padding */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra ligeramente más sutil */
+  width: 100%; /* Ocupa todo el ancho disponible */
+  max-width: 900px; /* Ancho máximo para no estirarse demasiado */
+  margin-bottom: 30px; /* Espacio entre secciones */
+  box-sizing: border-box;
+}
+
+/* Títulos de sección */
+.airline-list h3,
+.airline-form h3 {
+  text-align: center;
+  color: #333; /* Color de texto para títulos */
+  font-size: 20px; /* Reducir el tamaño de los subtítulos */
+  font-weight: 600;
+  margin-bottom: 20px; /* Reducir margen inferior */
+}
+
+/* --- ESTILOS DEL FORMULARIO --- */
+.airline-form {
+  background-color: #428780; /* Mantiene el color de fondo para el formulario */
+}
+
+.airline-form h3 {
+  color: white; /* Título del formulario en blanco */
+}
+
+.form-group {
+  margin-bottom: 15px; /* Reducir espacio entre grupos de formulario */
+}
+
+.form-group label {
+  display: block;
+  color: white;
+  font-size: 13px; /* Fuente más pequeña para labels */
+  margin-bottom: 6px; /* Reducir margen */
+  font-weight: 500;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon input {
+  width: 100%;
+  padding: 8px 10px 8px 38px; /* Ajusta el padding para el icono y hazlo más compacto */
+  border: none;
+  border-radius: 5px;
+  font-size: 15px; /* Fuente más pequeña para inputs */
+  height: 40px; /* Altura más compacta */
+  box-sizing: border-box;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px; /* Ajustar posición del icono */
+  color: #428780;
+  font-size: 17px; /* Tamaño del icono */
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px; /* Reducir espacio entre botones de acción */
+  justify-content: center;
+  margin-top: 20px; /* Reducir margen superior */
+}
+
+.create-button,
+.update-button,
+.cancel-button {
+  border: none;
+  border-radius: 5px;
+  padding: 10px 25px; /* Hacer los botones más compactos */
+  font-size: 15px; /* Fuente más pequeña */
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  height: 40px; /* Mantener la misma altura que los inputs para consistencia */
+  box-sizing: border-box;
+}
+
+.create-button {
+  background-color: white;
+  color: #428780;
+}
+.create-button:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-1px); /* Efecto hover más sutil */
+}
+
+.update-button {
+  background-color: #28a745;
+  color: white;
+}
+.update-button:hover {
+  background-color: #218838;
+}
+
+.cancel-button {
+  background-color: #dc3545;
+  color: white;
+}
+.cancel-button:hover {
+  background-color: #c82333;
+}
+
+/* --- ESTILOS DE LA LISTA DE AEROLÍNEAS --- */
+.airline-list table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* Reducir el min-width si es posible, o ajusta media queries */
+}
+
+.airline-list th,
+.airline-list td {
+  padding: 12px 15px; /* Reducir padding de celdas */
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  font-size: 14px; /* Fuente más pequeña para el texto de la tabla */
+}
+
+.airline-list th {
+  background-color: #f8f8f8;
+  font-weight: 600;
+  color: #555;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.airline-list tr:hover {
+  background-color: #f5f5f5;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 6px; /* Espacio más pequeño entre los botones de acción en la tabla */
+  justify-content: center;
+}
+
+.delete-button,
+.settings-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px; /* Iconos más pequeños */
+  padding: 4px; /* Pequeño padding */
+  transition: color 0.2s ease;
+}
+
+.delete-button {
+  color: #dc3545;
+}
+.delete-button:hover {
+  color: #c82333;
+}
+
+.settings-button {
+  color: #007bff;
+}
+.settings-button:hover {
+  color: #0056b3;
+}
+
+.error-message {
+  color: #dc3545;
+  text-align: center;
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+/* Media Queries para responsividad (ajusta estos valores según sea necesario) */
+@media (max-width: 768px) {
+  .airline-management-container {
+    padding: 15px;
+  }
+
+  .airline-list,
+  .airline-form {
+    padding: 15px;
+  }
+
+  .airline-management-container h2 {
+    font-size: 22px;
+  }
+
+  .airline-list h3,
+  .airline-form h3 {
+    font-size: 18px;
+  }
+
+  .input-with-icon input {
+    font-size: 14px;
+    height: 38px;
+    padding: 7px 10px 7px 35px;
+  }
+
+  .input-icon {
+    font-size: 16px;
+    left: 10px;
+  }
+
+  .create-button,
+  .update-button,
+  .cancel-button {
+    padding: 8px 20px;
+    font-size: 14px;
+    height: 38px;
+  }
+
+  .airline-list th,
+  .airline-list td {
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  .action-buttons {
+    flex-direction: row; /* Mantener en fila si hay espacio, o ajustar a columna si es necesario */
+    gap: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .airline-management-container {
+    padding: 10px;
+  }
+
+  .airline-list table {
+    min-width: 100%; /* Permite que la tabla se ajuste más al ancho de pantalla */
+    display: block; /* Permite scroll horizontal */
+    overflow-x: auto;
+  }
+
+  .airline-list th,
+  .airline-list td {
+    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+  }
+
+  .airline-list .action-buttons {
+    flex-direction: column; /* Apila los botones definitivamente */
+    gap: 2px;
+  }
+
+  .create-button,
+  .update-button,
+  .cancel-button {
+    width: 100%; /* Botones de acción ocupan todo el ancho */
+    margin-bottom: 5px; /* Espacio entre botones apilados */
+  }
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

@@ -1,41 +1,61 @@
-import SearchBar from "../../components/SearchBar/SearchBar"
-import FlightResults from "../../components/FlightResults/FlightResults"
-import FlightFilters from "../../components/FlightFilters/FlightFilters"
-import "./Flights.css"
+import { useState, useEffect } from "react";
+import SearchBar from "../../components/SearchBar/SearchBar";
+import FlightResults from "../../components/FlightResults/FlightResults";
+import FlightFilters from "../../components/FlightFilters/FlightFilters";
+import "./Flights.css";
 
 const Flights = () => {
-  const flights = [
-    {
-      id: 1,
-      airline: "Aerolineas Arg.",
-      departureTime: "8:20",
-      arrivalTime: "16:55",
-      departureAirport: "ROS Fisherton",
-      arrivalAirport: "BSB Presidente",
-      duration: "8h 35m",
-      returnDepartureTime: "6:20",
-      returnArrivalTime: "17:20",
-      returnDepartureAirport: "BSB Presidente",
-      returnArrivalAirport: "Ros Fisherton",
-      returnDuration: "11h 20m",
-      price: "1.344.559",
-    },
-    {
-      id: 2,
-      airline: "Emirates",
-      departureTime: "8:20",
-      arrivalTime: "16:55",
-      departureAirport: "ROS Fisherton",
-      arrivalAirport: "BSB Presidente",
-      duration: "8h 35m",
-      returnDepartureTime: "6:20",
-      returnArrivalTime: "17:20",
-      returnDepartureAirport: "BSB Presidente",
-      returnArrivalAirport: "Ros Fisherton",
-      returnDuration: "11h 20m",
-      price: "1.044.559",
-    },
-  ]
+  const [flights, setFlights] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchFlights = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/flights");
+        if (!response.ok) {
+          throw new Error("Error al cargar los vuelos");
+        }
+        const data = await response.json();
+        setFlights(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFlights();
+  }, []);
+
+  const formatTime = (timeString) => {
+    if (!timeString) return "00:00";
+    return timeString.length === 4 ? `0${timeString}` : timeString;
+  };
+
+  const calculateDuration = (departure, arrival) => {
+    // Implementación simplificada
+    return "8h 35m";
+  };
+
+  const mapFlightData = (flight) => ({
+    id: flight.id,
+    airline: flight.airline,
+    departureTime: formatTime(flight.departureTime),
+    arrivalTime: formatTime(flight.arrivalTime),
+    departureAirport: flight.origin,
+    arrivalAirport: flight.destination,
+    duration: calculateDuration(flight.departureTime, flight.arrivalTime),
+    returnDepartureTime: formatTime(flight.departureTime),
+    returnArrivalTime: formatTime(flight.arrivalTime),
+    returnDepartureAirport: flight.destination,
+    returnArrivalAirport: flight.origin,
+    returnDuration: calculateDuration(flight.departureTime, flight.arrivalTime),
+    price: flight.basePrice.toLocaleString(),
+  });
+
+  if (loading) return <div className="loading">Cargando vuelos...</div>;
+  if (error) return <div className="error">Error: {error}</div>;
 
   return (
     <div className="flights-container">
@@ -58,14 +78,14 @@ const Flights = () => {
             <FlightFilters />
             <div className="flights-list">
               {flights.map((flight) => (
-                <FlightResults key={flight.id} flight={flight} />
+                <FlightResults key={flight.id} flight={mapFlightData(flight)} />
               ))}
             </div>
           </div>
         </div>
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default Flights
+export default Flights;
