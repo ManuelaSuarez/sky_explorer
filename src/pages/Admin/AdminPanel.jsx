@@ -4,11 +4,12 @@ import { useNavigate, useLocation } from "react-router-dom"
 import { FaLock } from "react-icons/fa"
 import { jwtDecode } from "jwt-decode"
 import FlightManagement from "../FlightManagement/FlightManagement"
-import AccountManagement from "../AccountManagement/AccountManagement"
+import AirlineManagement from "../AirlineManagement/AirlineManagement.jsx"
 import "./AdminPanel.css"
 
+
 const AdminPanel = () => {
-  const [isAuthorized, setIsAuthorized] = useState(false)
+  const [userRole, setUserRole] = useState(null) 
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
   const location = useLocation()
@@ -17,32 +18,27 @@ const AdminPanel = () => {
   const currentPath = location.pathname
   const activeSection = currentPath.includes("/accounts") ? "accounts" : "flights"
 
-  // Función para verificar permisos de administrador
-  const checkAdminPermission = () => {
+  // Función para verificar permisos del usuario
+  const checkUserPermissions = () => {
     try {
       const token = localStorage.getItem("token")
 
       if (!token) {
-        setIsAuthorized(false)
+        setUserRole(null)
         setLoading(false)
         return
       }
 
       try {
         const payload = jwtDecode(token)
-
-        if (payload.role === "admin") {
-          setIsAuthorized(true)
-        } else {
-          setIsAuthorized(false)
-        }
+        setUserRole(payload.role) 
       } catch (error) {
-        console.error("Error al decodificar el token:", error)
-        setIsAuthorized(false)
+        console.error("Error al decodificar el token en AdminPanel:", error)
+        setUserRole(null)
       }
     } catch (error) {
-      console.error("Error al verificar permisos:", error)
-      setIsAuthorized(false)
+      console.error("Error al verificar permisos en AdminPanel:", error)
+      setUserRole(null)
     } finally {
       setLoading(false)
     }
@@ -50,18 +46,18 @@ const AdminPanel = () => {
 
   // Verificar permisos al cargar el componente
   useEffect(() => {
-    checkAdminPermission()
+    checkUserPermissions()
   }, [])
 
-  // Verificar permisos cuando cambia la URL (por si el usuario navega manualmente)
+  // Verificar permisos cuando cambia la URL o el localStorage
   useEffect(() => {
-    checkAdminPermission()
-  }, [location.pathname])
+    checkUserPermissions()
+  }, [location.pathname]) 
 
   // Escuchar cambios en localStorage (para detectar inicio/cierre de sesión)
   useEffect(() => {
     const handleStorageChange = () => {
-      checkAdminPermission()
+      checkUserPermissions()
     }
 
     window.addEventListener("storage", handleStorageChange)
@@ -76,15 +72,33 @@ const AdminPanel = () => {
     return <div className="loading-container">Verificando permisos...</div>
   }
 
-  // Mostrar mensaje de acceso denegado si no está autorizado
-  if (!isAuthorized) {
+  // Lógica de autorización basada en el rol y la sección activa
+  let hasPermission = false;
+  if (activeSection === "flights") {
+    // Para la gestión de vuelos, se necesita 'admin' o 'airline'
+    if (userRole === "admin" || userRole === "airline") {
+      hasPermission = true;
+    }
+  } else if (activeSection === "accounts") {
+    // Para la gestión de cuentas, solo se necesita 'admin'
+    if (userRole === "admin") {
+      hasPermission = true;
+    }
+  }
+
+  // Mostrar mensaje de acceso denegado si no tiene los permisos necesarios para la sección
+  if (!hasPermission) {
     return (
       <div className="access-denied-container">
         <div className="access-denied-content">
           <FaLock className="access-denied-icon" />
           <h2>Acceso Denegado</h2>
           <p>No tienes permisos para acceder a esta página.</p>
-          <p>Esta sección está reservada para administradores.</p>
+          {activeSection === "accounts" ? (
+            <p>Esta sección está reservada para administradores.</p>
+          ) : (
+            <p>Esta sección está reservada para administradores o aerolíneas.</p>
+          )}
           <button className="back-button" onClick={() => navigate("/")}>
             Volver al inicio
           </button>
@@ -95,9 +109,10 @@ const AdminPanel = () => {
 
   return (
     <div className="admin-panel-container">
-      {/* Contenido */}
-      {activeSection === "flights" && <FlightManagement />}
-      {activeSection === "accounts" && <AccountManagement />}
+      <div className="admin-panel-content">
+        {activeSection === "flights" && <FlightManagement />}
+        {activeSection === "accounts" && <AirlineManagement />}
+      </div>
     </div>
   )
 }

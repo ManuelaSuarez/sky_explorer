@@ -1,60 +1,60 @@
-"use client"
+"use client" // Esto es solo un indicador, no es un import de React
 
 import "./Header.css"
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import { useEffect } from "react"
+import { useEffect } from "react" // Asegúrate de importar useEffect
 
 const Header = ({ modalVisible, user, onLogout }) => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  // Verificar si el usuario es administrador
-  const isAdmin = user && user.role === "admin"
+  // NUEVO: Definir si el usuario tiene acceso a la sección de administración/aerolínea
+  const hasAdminAirlineAccess = user && (user.role === "admin" || user.role === "airline");
 
-  // Efecto para redirigir a los administradores si intentan acceder a páginas de usuario
+  // Verificar si el usuario es estrictamente administrador (para la sección "Cuentas")
+  const isAdmin = user && user.role === "admin";
+
+  // Efecto para redirigir a los usuarios con acceso de admin/aerolínea
+  // si intentan acceder a páginas de usuario, o a la página principal.
   useEffect(() => {
-    if (isAdmin) {
-      // Lista de rutas exclusivas para usuarios normales
-      const userOnlyRoutes = ["/favorites", "/myFlights", "/flights", "/checkout"]
+    if (hasAdminAirlineAccess) {
+      // Lista de rutas exclusivas para usuarios normales que no deberían ver admin/airline
+      const userOnlyRoutes = ["/favorites", "/myFlights", "/checkout"]; // Dejo /flights porque puede ser vista por todos
 
-      // Si el admin está en la página principal (home), redirigir a la sección de admin
-      if (location.pathname === "/") {
-        navigate("/admin/flights")
-      }
-
-      // Si el admin está en alguna ruta exclusiva de usuario, redirigir a la sección de admin
-      if (userOnlyRoutes.some((route) => location.pathname.startsWith(route))) {
-        navigate("/admin/flights")
+      // Si el usuario con acceso especial está en la página principal (home)
+      // o en alguna ruta exclusiva de usuario, redirigir a la sección de vuelos de admin/aerolínea
+      if (location.pathname === "/" || userOnlyRoutes.some((route) => location.pathname.startsWith(route))) {
+        navigate("/admin/flights");
       }
     }
-  }, [isAdmin, location.pathname, navigate])
+  }, [hasAdminAirlineAccess, location.pathname, navigate]); // Dependencias para el useEffect
 
   const handleAuthClick = () => {
     if (user) {
       // Ejecutar la función de cierre de sesión
-      onLogout()
+      onLogout();
 
       // Si el usuario está en la página de administración, redirigir a la página principal
       if (location.pathname.includes("/admin")) {
-        navigate("/")
+        navigate("/");
       } else {
-        // En otras páginas, simplemente recargar para actualizar el estado
-        window.location.reload()
+        // En otras páginas, simplemente recargar para actualizar el estado (menos ideal pero funciona)
+        window.location.reload();
       }
     } else {
-      modalVisible("login")
+      modalVisible("login");
     }
-  }
+  };
 
   // Manejar el clic en el logo
   const handleLogoClick = (e) => {
-    e.preventDefault()
-    if (isAdmin) {
-      navigate("/admin/flights") // Redirigir a la sección de vuelos por defecto
+    e.preventDefault(); // Evitar el comportamiento predeterminado del Link
+    if (hasAdminAirlineAccess) { // Ahora usa la nueva variable
+      navigate("/admin/flights"); // Redirigir a la sección de vuelos por defecto
     } else {
-      navigate("/")
+      navigate("/");
     }
-  }
+  };
 
   return (
     <>
@@ -66,8 +66,8 @@ const Header = ({ modalVisible, user, onLogout }) => {
         </div>
 
         <ul className="header_list">
-          {isAdmin ? (
-            // Menú para administradores
+          {hasAdminAirlineAccess ? ( // Usa la nueva variable aquí también
+            // Menú para administradores y aerolíneas
             <>
               <li>
                 <Link to="/admin/flights" className="header_link">
@@ -75,19 +75,22 @@ const Header = ({ modalVisible, user, onLogout }) => {
                   <span>Vuelos</span>
                 </Link>
               </li>
-              <li>
-                <Link to="/admin/accounts" className="header_link">
-                  <i className="fa-solid fa-user-cog"></i>
-                  <span>Cuentas</span>
-                </Link>
-              </li>
+              {isAdmin && ( // "Cuentas" solo si es estrictamente 'admin'
+                <li>
+                  <Link to="/admin/accounts" className="header_link">
+                    <i className="fa-solid fa-user-cog"></i>
+                    <span>Cuentas</span>
+                  </Link>
+                </li>
+              )}
             </>
           ) : (
-            // Menú para usuarios normales
+            // Menú para usuarios normales (o si no tiene acceso de admin/aerolínea)
             <>
               <li>
-                  <i className="fa-solid fa-compass"></i>
-                  <span>Destinos</span>
+                {/* Puedes mantener este como un Link a /flights o si es un icono sin navegación, dejarlo como está */}
+                <i className="fa-solid fa-compass"></i>
+                <span>Destinos</span> {/* Si esto es solo un label, está bien. Si debe navegar, necesita un Link */}
               </li>
               <li>
                 <Link to="/favorites" className="header_link">
@@ -103,17 +106,26 @@ const Header = ({ modalVisible, user, onLogout }) => {
               </li>
             </>
           )}
+          {/* El enlace a "Vuelos" general puede ir fuera de la condición si es accesible para todos */}
+          {/* Ejemplo:
+          <li>
+            <Link to="/flights" className="header_link">
+              <i className="fa-solid fa-plane"></i>
+              <span>Buscar Vuelos</span>
+            </Link>
+          </li>
+          */}
         </ul>
 
         <div className="header_user">
-          {user && <span className="user-email">Hola, {user.name || user.username || "Usuario"}</span>}
+          {user && <span className="user-email">Hola, {user.name || "Usuario"}</span>}
           <button className="header_signIn" onClick={handleAuthClick}>
             {user ? "Cerrar Sesión" : "Iniciar Sesión"} <i className="fa-solid fa-user"></i>
           </button>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
