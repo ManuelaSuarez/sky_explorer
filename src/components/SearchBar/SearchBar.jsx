@@ -1,20 +1,84 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt, FaCalendarAlt, FaExchangeAlt } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import es from 'date-fns/locale/es';
+import es from "date-fns/locale/es";
 import "./SearchBar.css";
 
 const SearchBar = ({ buttonText }) => {
-  const [departureDate, setDepartureDate] = useState(new Date("2024/09/11"));
-  const [returnDate, setReturnDate] = useState(new Date("2024/09/21"));
-  
-  // Formato para mostrar la fecha como DD/MM/YYYY
-  const formatDate = (date) => {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+  const navigate = useNavigate();
+
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
+  const [passengers, setPassengers] = useState("1");
+  const [departureDate, setDepartureDate] = useState(new Date());
+  const [returnDate, setReturnDate] = useState(new Date());
+
+  // Lista de ciudades/aeropuertos disponibles
+  const airports = [
+    "Bahía Blanca (BHI)",
+    "Bariloche (BRC)",
+    "Buenos Aires (AEP)",
+    "Catamarca (CTC)",
+    "Comodoro Rivadavia (CRD)",
+    "Corrientes (CNQ)",
+    "Córdoba (COR)",
+    "El Calafate (FTE)",
+    "El Palomar (EPA)",
+    "Ezeiza (EZE)",
+    "Formosa (FMA)",
+    "Jujuy (JUJ)",
+    "Junín (JNI)",
+    "La Plata (LPG)",
+    "La Rioja (IRJ)",
+    "Mar del Plata (MDQ)",
+    "Mendoza (MDZ)",
+    "Morón (MOR)",
+    "Necochea (NEC)",
+    "Neuquén (NQN)",
+    "Olavarría (OVR)",
+    "Paraná (PRA)",
+    "Posadas (PSS)",
+    "Puerto Iguazú (IGR)",
+    "Resistencia (RES)",
+    "Río Cuarto (RCU)",
+    "Río Gallegos (RGL)",
+    "Río Grande (RGA)",
+    "Rosario (ROS)",
+    "Salta (SLA)",
+    "San Fernando (FDO)",
+    "San Juan (UAQ)",
+    "San Luis (LUQ)",
+    "San Rafael (AFA)",
+    "Santa Rosa (RSA)",
+    "Santa Teresita (STT)",
+    "Santiago del Estero (SDE)",
+    "Tandil (TDL)",
+    "Trelew (REL)",
+    "Tucumán (TUC)",
+    "Ushuaia (USH)",
+    "Villa Gesell (VLG)",
+  ];
+
+  const handleExchange = () => {
+    const tempOrigin = origin;
+    setOrigin(destination);
+    setDestination(tempOrigin);
+  };
+
+  const handleSearch = () => {
+    // Crear parámetros de búsqueda
+    const searchParams = new URLSearchParams({
+      origin: origin,
+      destination: destination,
+      departureDate: departureDate.toISOString().split("T")[0],
+      returnDate: returnDate.toISOString().split("T")[0],
+      passengers: passengers,
+    });
+
+    // Navegar a la página de vuelos con los parámetros
+    navigate(`/flights?${searchParams.toString()}`);
   };
 
   return (
@@ -27,11 +91,14 @@ const SearchBar = ({ buttonText }) => {
           </div>
           <div className="passengers-dropdown">
             <p>Cantidad pasajeros</p>
-            <select>
-              <option value="one">1</option>
-              <option value="two">2</option>
-              <option value="three">3</option>
-              <option value="four">4</option>
+            <select
+              value={passengers}
+              onChange={(e) => setPassengers(e.target.value)}
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
             </select>
           </div>
         </div>
@@ -40,11 +107,25 @@ const SearchBar = ({ buttonText }) => {
             <label className="field-label">Origen*</label>
             <div className="input-with-icon">
               <FaMapMarkerAlt className="field-icon" />
-              <input type="text" value="Buenos Aires (BUE)" readOnly />
+              <select
+                value={origin}
+                onChange={(e) => setOrigin(e.target.value)}
+                className="airport-select"
+              >
+                {airports.map((airport) => (
+                  <option key={airport} value={airport}>
+                    {airport}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           <div className="exchange-button-container">
-            <button className="exchange-button">
+            <button
+              className="exchange-button"
+              onClick={handleExchange}
+              type="button"
+            >
               <FaExchangeAlt />
             </button>
           </div>
@@ -52,7 +133,17 @@ const SearchBar = ({ buttonText }) => {
             <label className="field-label">Destino*</label>
             <div className="input-with-icon">
               <FaMapMarkerAlt className="field-icon" />
-              <input type="text" value="Catamarca (CTC)" readOnly />
+              <select
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                className="airport-select"
+              >
+                {airports.map((airport) => (
+                  <option key={airport} value={airport}>
+                    {airport}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           <div className="field-group">
@@ -63,16 +154,16 @@ const SearchBar = ({ buttonText }) => {
                 selected={departureDate}
                 onChange={(date) => {
                   setDepartureDate(date);
-                  // Si la fecha de regreso es anterior a la nueva fecha de salida, actualiza la fecha de regreso
                   if (returnDate < date) {
-                    setReturnDate(new Date(date.getTime() + 24 * 60 * 60 * 1000)); // día siguiente
+                    setReturnDate(
+                      new Date(date.getTime() + 24 * 60 * 60 * 1000)
+                    );
                   }
                 }}
                 dateFormat="dd/MM/yyyy"
                 locale={es}
                 minDate={new Date()}
                 className="datepicker-input"
-
               />
             </div>
           </div>
@@ -87,11 +178,16 @@ const SearchBar = ({ buttonText }) => {
                 locale={es}
                 minDate={departureDate || new Date()}
                 className="datepicker-input"
-
               />
             </div>
           </div>
-          <button className="search-button">{buttonText}</button>
+          <button
+            className="search-button"
+            onClick={handleSearch}
+            type="button"
+          >
+            {buttonText}
+          </button>
         </div>
       </div>
     </div>
