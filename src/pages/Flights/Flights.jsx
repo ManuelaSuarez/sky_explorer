@@ -45,7 +45,7 @@ const Flights = () => {
     setChosenAirlines([]); // Limpiar filtros
   };
 
-  // PASO 6: Mostrar solo vuelos que coinciden con la búsqueda
+  // PASO 6: Mostrar solo vuelos que coinciden con la búsqueda - CORREGIDO
   const getMatchingFlights = () => {
     let flights = [...allFlights];
 
@@ -61,6 +61,37 @@ const Flights = () => {
       flights = flights.filter(flight => 
         flight.destination.toLowerCase().includes(searchTo.toLowerCase())
       );
+    }
+
+    // NUEVO: Filtrar por fecha de salida
+    if (departureDate) {
+      flights = flights.filter(flight => {
+        // Basándome en la imagen, parece que el campo se llama 'date'
+        // Ajusta este nombre según tu estructura de datos real
+        const flightDate = flight.date || flight.departureDate;
+        if (flightDate) {
+          // Convertir ambas fechas a formato comparable (YYYY-MM-DD)
+          const searchDate = new Date(departureDate).toISOString().split('T')[0];
+          const flightDateFormatted = new Date(flightDate).toISOString().split('T')[0];
+          return flightDateFormatted === searchDate;
+        }
+        return false;
+      });
+    }
+
+    // NUEVO: Filtrar por fecha de regreso (si aplica)
+    if (returnDate) {
+      flights = flights.filter(flight => {
+        // Si tienes un campo específico para fecha de regreso
+        const flightReturnDate = flight.returnDate;
+        if (flightReturnDate) {
+          const searchReturn = new Date(returnDate).toISOString().split('T')[0];
+          const flightReturnFormatted = new Date(flightReturnDate).toISOString().split('T')[0];
+          return flightReturnFormatted === searchReturn;
+        }
+        // Si no tienes fecha de regreso específica, no filtrar por esta condición
+        return true;
+      });
     }
 
     // ¿Eligió aerolíneas específicas?
@@ -126,7 +157,7 @@ const Flights = () => {
 
   // PASO 11: ¿Hay búsqueda activa?
   const isSearching = () => {
-    return searchFrom || searchTo || chosenAirlines.length > 0;
+    return searchFrom || searchTo || departureDate || returnDate || chosenAirlines.length > 0;
   };
 
   // PASO 12: Cargar vuelos cuando se abre la página
