@@ -1,4 +1,3 @@
-// AirlineManagement.jsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -33,7 +32,8 @@ const AirlineManagement = () => {
         throw new Error("No autenticado. Por favor inicie sesión.");
       }
 
-      const response = await fetch("http://localhost:3000/api/airlines", { // Ruta directa
+      const response = await fetch("http://localhost:3000/api/airlines", {
+        // Ruta directa
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -92,7 +92,8 @@ const AirlineManagement = () => {
         throw new Error("No autenticado. Por favor inicie sesión.");
       }
 
-      const response = await fetch("http://localhost:3000/api/airlines", { // Ruta directa
+      const response = await fetch("http://localhost:3000/api/airlines", {
+        // Ruta directa
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -124,7 +125,8 @@ const AirlineManagement = () => {
         throw new Error("No autenticado. Por favor inicie sesión.");
       }
 
-      const response = await fetch(`http://localhost:3000/api/airlines/${id}`, { // Ruta directa
+      const response = await fetch(`http://localhost:3000/api/airlines/${id}`, {
+        // Ruta directa
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -177,19 +179,23 @@ const AirlineManagement = () => {
         throw new Error("No autenticado. Por favor inicie sesión.");
       }
 
-      const response = await fetch(`http://localhost:3000/api/airlines/${editingAirlineId}`, { // Ruta directa
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: newAirline.name,
-          code: newAirline.code,
-          cuit: newAirline.cuit,
-          email: newAirline.email,
-        }), // No se envía la contraseña al actualizar, solo los campos editables
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/airlines/${editingAirlineId}`,
+        {
+          // Ruta directa
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: newAirline.name,
+            code: newAirline.code,
+            cuit: newAirline.cuit,
+            email: newAirline.email,
+          }), // No se envía la contraseña al actualizar, solo los campos editables
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -215,14 +221,20 @@ const AirlineManagement = () => {
   };
 
   if (loading) {
-    return <div className="airline-management-container">Cargando aerolíneas...</div>;
+    return (
+      <div className="airline-management-container">Cargando aerolíneas...</div>
+    );
   }
 
   if (error) {
-    return <div className="airline-management-container error-message">Error: {error}</div>;
+    return (
+      <div className="airline-management-container error-message">
+        Error: {error}
+      </div>
+    );
   }
 
- return (
+  return (
     <div className="airline-management-container">
       <h2>Administración de Aerolíneas</h2>
 

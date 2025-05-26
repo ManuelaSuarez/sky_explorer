@@ -142,7 +142,8 @@
   margin-bottom: 5px;
 }
 
-.form-group input {
+.form-group input,
+select {
   width: 100%;
   padding: 8px 10px;
   border: none;
@@ -172,8 +173,6 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 25px;
 }
-
-
 
 .input-with-icon {
   position: relative;
