@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt, FaCalendarAlt, FaExchangeAlt } from "react-icons/fa";
 import DatePicker from "react-datepicker";
@@ -6,7 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
 import "./SearchBar.css";
 
-const SearchBar = ({ buttonText }) => {
+const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
   const navigate = useNavigate();
 
   const [origin, setOrigin] = useState("");
@@ -15,11 +15,84 @@ const SearchBar = ({ buttonText }) => {
   const [departureDate, setDepartureDate] = useState(new Date());
   const [returnDate, setReturnDate] = useState(new Date());
 
-  // Lista de ciudades/aeropuertos disponibles
+  // Función auxiliar para comparar fechas por su valor en YYYY-MM-DD
+  const dateEquals = (date1, date2) => {
+    if (!date1 && !date2) return true;
+    if (!date1 || !date2) return false;
+    return date1.toISOString().split('T')[0] === date2.toISOString().split('T')[0];
+  };
+
+  // --- Depuración: Log de initialSearchParams al renderizar ---
+  console.log("SearchBar Render: initialSearchParams =", initialSearchParams);
+  console.log("SearchBar Render: Current internal state =", { origin, destination, departureDate, returnDate, passengers });
+
+
+  // --- useEffect para inicializar los estados cuando `initialSearchParams` cambie ---
+  useEffect(() => {
+    console.log("SearchBar useEffect (initialSearchParams): Triggered. initialSearchParams =", initialSearchParams);
+
+    if (initialSearchParams) {
+      // Origen
+      // Solo actualiza si la prop es diferente al estado interno
+      if (initialSearchParams.origin !== origin) {
+        console.log(`SearchBar useEffect: Updating origin from '${origin}' to '${initialSearchParams.origin || ""}'`);
+        setOrigin(initialSearchParams.origin || ""); // Si es null/undefined, setear a ""
+      }
+      
+      // Destino
+      if (initialSearchParams.destination !== destination) {
+        console.log(`SearchBar useEffect: Updating destination from '${destination}' to '${initialSearchParams.destination || ""}'`);
+        setDestination(initialSearchParams.destination || "");
+      }
+
+      // Pasajeros
+      if (initialSearchParams.passengers !== passengers) {
+        console.log(`SearchBar useEffect: Updating passengers from '${passengers}' to '${initialSearchParams.passengers || "1"}'`);
+        setPassengers(initialSearchParams.passengers || "1");
+      }
+
+      // Fechas
+      let newDepartureDate = null;
+      if (initialSearchParams.departureDate) {
+        newDepartureDate = new Date(initialSearchParams.departureDate + 'T00:00:00');
+      } else {
+        newDepartureDate = new Date();
+      }
+      if (!dateEquals(departureDate, newDepartureDate)) {
+        console.log(`SearchBar useEffect: Updating departureDate from '${departureDate}' to '${newDepartureDate}'`);
+        setDepartureDate(newDepartureDate);
+      }
+
+      let newReturnDate = null;
+      if (initialSearchParams.returnDate) {
+        newReturnDate = new Date(initialSearchParams.returnDate + 'T00:00:00');
+      } else {
+        newReturnDate = new Date(newDepartureDate.getTime() + 24 * 60 * 60 * 1000);
+      }
+      if (!dateEquals(returnDate, newReturnDate)) {
+        console.log(`SearchBar useEffect: Updating returnDate from '${returnDate}' to '${newReturnDate}'`);
+        setReturnDate(newReturnDate);
+      }
+
+    } else {
+      console.log("SearchBar useEffect: initialSearchParams is null/empty. Ensuring default states.");
+      // Si initialSearchParams es nulo, resetear los estados internos a sus valores por defecto si no lo están ya.
+      if (origin !== "") setOrigin("");
+      if (destination !== "") setDestination("");
+      if (passengers !== "1") setPassengers("1");
+      
+      const today = new Date();
+      if (!dateEquals(departureDate, today)) setDepartureDate(today);
+      if (!dateEquals(returnDate, new Date(today.getTime() + 24 * 60 * 60 * 1000))) {
+        setReturnDate(new Date(today.getTime() + 24 * 60 * 60 * 1000));
+      }
+    }
+  }, [initialSearchParams]); // LA ÚNICA DEPENDENCIA ES initialSearchParams.
+
   const airports = [
     "Bahía Blanca (BHI)",
     "Bariloche (BRC)",
-    "Buenos Aires (AEP)",
+    "Buenos Aires (BUE)",
     "Catamarca (CTC)",
     "Comodoro Rivadavia (CRD)",
     "Corrientes (CNQ)",
@@ -67,18 +140,29 @@ const SearchBar = ({ buttonText }) => {
     setDestination(tempOrigin);
   };
 
-  const handleSearch = () => {
-    // Crear parámetros de búsqueda
-    const searchParams = new URLSearchParams({
+  const handleSubmit = () => {
+    const formatDateToYYYYMMDD = (date) => {
+      if (!date) return '';
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    const newSearchParams = {
       origin: origin,
       destination: destination,
-      departureDate: departureDate.toISOString().split("T")[0],
-      returnDate: returnDate.toISOString().split("T")[0],
+      departureDate: formatDateToYYYYMMDD(departureDate),
+      returnDate: formatDateToYYYYMMDD(returnDate),
       passengers: passengers,
-    });
+    };
 
-    // Navegar a la página de vuelos con los parámetros
-    navigate(`/flights?${searchParams.toString()}`);
+    if (onSearch) {
+      onSearch(newSearchParams);
+    } else {
+      const urlSearchParams = new URLSearchParams(newSearchParams);
+      navigate(`/flights?${urlSearchParams.toString()}`);
+    }
   };
 
   return (
@@ -109,9 +193,13 @@ const SearchBar = ({ buttonText }) => {
               <FaMapMarkerAlt className="field-icon" />
               <select
                 value={origin}
-                onChange={(e) => setOrigin(e.target.value)}
+                onChange={(e) => {
+                  console.log("SearchBar: Origin select changed to", e.target.value);
+                  setOrigin(e.target.value);
+                }}
                 className="airport-select"
               >
+                <option value="">Seleccione Origen</option>
                 {airports.map((airport) => (
                   <option key={airport} value={airport}>
                     {airport}
@@ -135,9 +223,13 @@ const SearchBar = ({ buttonText }) => {
               <FaMapMarkerAlt className="field-icon" />
               <select
                 value={destination}
-                onChange={(e) => setDestination(e.target.value)}
+                onChange={(e) => {
+                  console.log("SearchBar: Destination select changed to", e.target.value);
+                  setDestination(e.target.value);
+                }}
                 className="airport-select"
               >
+                <option value="">Seleccione Destino</option>
                 {airports.map((airport) => (
                   <option key={airport} value={airport}>
                     {airport}
@@ -154,10 +246,8 @@ const SearchBar = ({ buttonText }) => {
                 selected={departureDate}
                 onChange={(date) => {
                   setDepartureDate(date);
-                  if (returnDate < date) {
-                    setReturnDate(
-                      new Date(date.getTime() + 24 * 60 * 60 * 1000)
-                    );
+                  if (returnDate && date && returnDate < date) {
+                    setReturnDate(new Date(date.getTime() + 24 * 60 * 60 * 1000));
                   }
                 }}
                 dateFormat="dd/MM/yyyy"
@@ -183,7 +273,7 @@ const SearchBar = ({ buttonText }) => {
           </div>
           <button
             className="search-button"
-            onClick={handleSearch}
+            onClick={handleSubmit}
             type="button"
           >
             {buttonText}
