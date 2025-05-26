@@ -1,187 +1,202 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import SearchBar from "../../components/SearchBar/SearchBar.jsx";
 import FlightResults from "../../components/FlightResults/FlightResults.jsx";
 import FlightFilters from "../../components/FlightFilters/FlightFilters.jsx";
 import "./Flights.css";
 
 const Flights = () => {
-  const [flights, setFlights] = useState([]);
-  const [filteredFlights, setFilteredFlights] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [searchParams, setSearchParams] = useState({});
+  // PASO 1: Variables que guardamos
+  const [allFlights, setAllFlights] = useState([]); // Todos los vuelos
+  const [loading, setLoading] = useState(true); // ¿Estamos cargando?
+  const [error, setError] = useState(""); // ¿Hay algún error?
+  
+  // PASO 2: Lo que busca el usuario
+  const [searchFrom, setSearchFrom] = useState(""); // Desde dónde
+  const [searchTo, setSearchTo] = useState(""); // Hacia dónde
+  const [departureDate, setDepartureDate] = useState(""); // Fecha ida
+  const [returnDate, setReturnDate] = useState(""); // Fecha vuelta
+  const [passengers, setPassengers] = useState(""); // Pasajeros
+  
+  // PASO 3: Filtros adicionales
+  const [chosenAirlines, setChosenAirlines] = useState([]); // Aerolíneas elegidas
+  const [priceOrder, setPriceOrder] = useState("low-to-high"); // Orden precios
 
-  const location = useLocation();
+  // PASO 4: Traer vuelos del servidor
+  const getFlights = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:3000/api/flights");
+      const flights = await response.json();
+      setAllFlights(flights);
+      setError("");
+    } catch (err) {
+      setError("No se pudieron cargar los vuelos");
+    }
+    setLoading(false);
+  };
 
-  useEffect(() => {
-    // Extraer parámetros de búsqueda de la URL
-    const urlParams = new URLSearchParams(location.search);
-    const params = {
-      origin: urlParams.get("origin"),
-      destination: urlParams.get("destination"),
-      departureDate: urlParams.get("departureDate"),
-      returnDate: urlParams.get("returnDate"),
-      passengers: urlParams.get("passengers"),
-    };
-    setSearchParams(params);
-  }, [location.search]);
+  // PASO 5: Cuando el usuario busca algo nuevo
+  const handleSearch = (searchData) => {
+    setSearchFrom(searchData.origin || "");
+    setSearchTo(searchData.destination || "");
+    setDepartureDate(searchData.departureDate || "");
+    setReturnDate(searchData.returnDate || "");
+    setPassengers(searchData.passengers || "");
+    setChosenAirlines([]); // Limpiar filtros
+  };
 
-  useEffect(() => {
-    const fetchFlights = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("http://localhost:3000/api/flights");
-        if (!response.ok) {
-          throw new Error("Error al cargar los vuelos");
-        }
-        const data = await response.json();
-        setFlights(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // PASO 6: Mostrar solo vuelos que coinciden con la búsqueda
+  const getMatchingFlights = () => {
+    let flights = [...allFlights];
 
-    fetchFlights();
-  }, []);
+    // ¿Busca desde algún lugar específico?
+    if (searchFrom) {
+      flights = flights.filter(flight => 
+        flight.origin.toLowerCase().includes(searchFrom.toLowerCase())
+      );
+    }
 
-  useEffect(() => {
-    // Filtrar vuelos basado en los parámetros de búsqueda
-    if (flights.length > 0) {
-      let filtered = [...flights];
+    // ¿Busca hacia algún lugar específico?
+    if (searchTo) {
+      flights = flights.filter(flight => 
+        flight.destination.toLowerCase().includes(searchTo.toLowerCase())
+      );
+    }
 
-      // Filtrar por origen
-      if (searchParams.origin) {
-        const originSearch = searchParams.origin.toLowerCase();
-        filtered = filtered.filter(
-          (flight) =>
-            flight.origin.toLowerCase().includes(originSearch) ||
-            originSearch.includes(flight.origin.toLowerCase())
-        );
-      }
+    // ¿Eligió aerolíneas específicas?
+    if (chosenAirlines.length > 0) {
+      flights = flights.filter(flight => 
+        chosenAirlines.includes(flight.airline)
+      );
+    }
 
-      // Filtrar por destino
-      if (searchParams.destination) {
-        const destinationSearch = searchParams.destination.toLowerCase();
-        filtered = filtered.filter(
-          (flight) =>
-            flight.destination.toLowerCase().includes(destinationSearch) ||
-            destinationSearch.includes(flight.destination.toLowerCase())
-        );
-      }
-
-      setFilteredFlights(filtered);
+    // Ordenar por precio
+    if (priceOrder === "low-to-high") {
+      flights.sort((a, b) => a.basePrice - b.basePrice); // Baratos primero
     } else {
-      setFilteredFlights([]);
+      flights.sort((a, b) => b.basePrice - a.basePrice); // Caros primero
     }
-  }, [flights, searchParams]);
 
-  const formatTime = (timeString) => {
-    if (!timeString) return "00:00";
-    return timeString.length === 4 ? `0${timeString}` : timeString;
+    return flights;
   };
 
-  const calculateDuration = (departure, arrival) => {
-    return "8h 35m";
+  // PASO 7: Preparar vuelo para mostrar en pantalla
+  const prepareFlightData = (flight) => {
+    return {
+      id: flight.id,
+      airline: flight.airline,
+      departureTime: flight.departureTime || "00:00",
+      arrivalTime: flight.arrivalTime || "00:00",
+      departureAirport: flight.origin,
+      arrivalAirport: flight.destination,
+      duration: "8h 35m",
+      returnDepartureTime: flight.departureTime || "00:00",
+      returnArrivalTime: flight.arrivalTime || "00:00",
+      returnDepartureAirport: flight.destination,
+      returnArrivalAirport: flight.origin,
+      returnDuration: "8h 35m",
+      price: flight.basePrice.toLocaleString(),
+      originalPrice: flight.basePrice
+    };
   };
 
-  const mapFlightData = (flight) => ({
-    id: flight.id,
-    airline: flight.airline,
-    departureTime: formatTime(flight.departureTime),
-    arrivalTime: formatTime(flight.arrivalTime),
-    departureAirport: flight.origin,
-    arrivalAirport: flight.destination,
-    duration: calculateDuration(flight.departureTime, flight.arrivalTime),
-    returnDepartureTime: formatTime(flight.departureTime),
-    returnArrivalTime: formatTime(flight.arrivalTime),
-    returnDepartureAirport: flight.destination,
-    returnArrivalAirport: flight.origin,
-    returnDuration: calculateDuration(flight.departureTime, flight.arrivalTime),
-    price: flight.basePrice.toLocaleString(),
-  });
-
-  if (loading) return <div className="loading">Cargando vuelos...</div>;
-  if (error) return <div className="error">Error: {error}</div>;
-
-  // Usar vuelos filtrados si hay parámetros de búsqueda, sino mostrar todos
-  const displayFlights = Object.values(searchParams).some((param) => param)
-    ? filteredFlights
-    : flights;
-
-  // Generar título dinámico
+  // PASO 8: Crear título de la página
   const getTitle = () => {
-    if (searchParams.origin && searchParams.destination) {
-      const originName = searchParams.origin.split(" (")[0];
-      const destinationName = searchParams.destination.split(" (")[0];
-      return `Vuelos de ${originName} a ${destinationName}`;
+    if (searchFrom && searchTo) {
+      return `Vuelos de ${searchFrom} a ${searchTo}`;
     }
-    return "Vuelos";
+    return "Todos los vuelos";
   };
 
-  // Generar información de búsqueda
+  // PASO 9: Crear información de la búsqueda
   const getSearchInfo = () => {
     const info = [];
-    if (searchParams.departureDate) {
-      info.push(
-        `Salida: ${new Date(
-          `${searchParams.departureDate}T00:00:00-03:00`
-        ).toLocaleDateString("es-ES")}`
-      );
-    }
-    if (searchParams.returnDate) {
-      info.push(
-        `Regreso: ${new Date(
-          `${searchParams.returnDate}T00:00:00-03:00`
-        ).toLocaleDateString("es-ES")}`
-      );
-    }
-    if (searchParams.passengers) {
-      info.push(`Pasajeros: ${searchParams.passengers}`);
-    }
+    if (departureDate) info.push(`Salida: ${departureDate}`);
+    if (returnDate) info.push(`Regreso: ${returnDate}`);
+    if (passengers) info.push(`Pasajeros: ${passengers}`);
     return info.join(" | ");
   };
 
+  // PASO 10: Obtener aerolíneas disponibles
+  const getAirlines = () => {
+    const airlines = allFlights.map(flight => flight.airline);
+    const uniqueAirlines = [...new Set(airlines)]; // Eliminar duplicados
+    return uniqueAirlines.sort(); // Ordenar alfabéticamente
+  };
+
+  // PASO 11: ¿Hay búsqueda activa?
+  const isSearching = () => {
+    return searchFrom || searchTo || chosenAirlines.length > 0;
+  };
+
+  // PASO 12: Cargar vuelos cuando se abre la página
+  useEffect(() => {
+    getFlights();
+  }, []);
+
+  // PASO 13: ¿Qué mostramos?
+  if (loading) return <div className="loading">Cargando vuelos...</div>;
+  if (error) return <div className="error">{error}</div>;
+
+  // PASO 14: Decidir qué vuelos mostrar
+  const flightsToShow = isSearching() ? getMatchingFlights() : allFlights;
+  const noResults = flightsToShow.length === 0 && isSearching();
+
+  // PASO 15: Mostrar la página
   return (
     <div className="flights-container">
       <main className="main-content">
-        <SearchBar buttonText="Actualizar búsqueda" />
+        {/* Barra de búsqueda */}
+        <SearchBar 
+          buttonText="Buscar vuelos" 
+          onSearch={handleSearch}
+        />
 
         <div className="flights-results-container">
+          {/* Título y información */}
           <div className="flights-header">
             <h2 className="flights-title">{getTitle()}</h2>
             {getSearchInfo() && (
               <div className="search-info">{getSearchInfo()}</div>
             )}
+            
+            {/* Ordenar por precio */}
             <div className="flights-sort">
-              <span className="sort-label">Ordenar por</span>
-              <div className="sort-dropdown">
-                <span>Mayor precio</span>
-                <span className="dropdown-arrow">▼</span>
-              </div>
+              <span className="sort-label">Ordenar por precio:</span>
+              <select 
+                value={priceOrder} 
+                onChange={(e) => setPriceOrder(e.target.value)}
+                className="sort-select"
+              >
+                <option value="low-to-high">Menor a mayor</option>
+                <option value="high-to-low">Mayor a menor</option>
+              </select>
             </div>
           </div>
 
           <div className="flights-content">
-            <FlightFilters />
+            {/* Filtros de aerolíneas */}
+            <FlightFilters 
+              onAirlineFilterChange={setChosenAirlines}
+              availableAirlines={getAirlines()}
+            />
+            
+            {/* Lista de vuelos */}
             <div className="flights-list">
-              {displayFlights.length > 0
-                ? displayFlights.map((flight) => (
-                    <FlightResults
-                      key={flight.id}
-                      flight={mapFlightData(flight)}
-                    />
-                  ))
-                : Object.values(searchParams).some((param) => param) && (
-                    <div className="no-flights">
-                      <p>
-                        No se encontraron vuelos que coincidan con tu búsqueda.
-                      </p>
-                      <p>Intenta modificar los criterios de búsqueda.</p>
-                    </div>
-                  )}
+              {flightsToShow.map(flight => (
+                <FlightResults
+                  key={flight.id}
+                  flight={prepareFlightData(flight)}
+                />
+              ))}
+              
+              {/* Si no hay resultados */}
+              {noResults && (
+                <div className="no-flights">
+                  <p>No encontramos vuelos con esos criterios.</p>
+                  <p>Intenta cambiar tu búsqueda.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
