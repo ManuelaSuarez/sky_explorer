@@ -1,25 +1,47 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import SearchBar from "../../components/SearchBar/SearchBar.jsx";
 import FlightResults from "../../components/FlightResults/FlightResults.jsx";
 import FlightFilters from "../../components/FlightFilters/FlightFilters.jsx";
 import "./Flights.css";
 
 const Flights = () => {
+  const location = useLocation();
+
   // PASO 1: Variables que guardamos
   const [allFlights, setAllFlights] = useState([]); // Todos los vuelos
-  const [loading, setLoading] = useState(true); // ¿Estamos cargando?
-  const [error, setError] = useState(""); // ¿Hay algún error?
-  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   // PASO 2: Lo que busca el usuario
   const [searchFrom, setSearchFrom] = useState(""); // Desde dónde
   const [searchTo, setSearchTo] = useState(""); // Hacia dónde
   const [departureDate, setDepartureDate] = useState(""); // Fecha ida
   const [returnDate, setReturnDate] = useState(""); // Fecha vuelta
   const [passengers, setPassengers] = useState(""); // Pasajeros
-  
+
   // PASO 3: Filtros adicionales
   const [chosenAirlines, setChosenAirlines] = useState([]); // Aerolíneas elegidas
   const [priceOrder, setPriceOrder] = useState("low-to-high"); // Orden precios
+
+  // Leer filtros desde URL si existen (al entrar)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+
+    const initialSearch = {
+      origin: params.get("origin") || "",
+      destination: params.get("destination") || "",
+      departureDate: params.get("departureDate") || "",
+      returnDate: params.get("returnDate") || "",
+      passengers: params.get("passengers") || "",
+    };
+
+    setSearchFrom(initialSearch.origin);
+    setSearchTo(initialSearch.destination);
+    setDepartureDate(initialSearch.departureDate);
+    setReturnDate(initialSearch.returnDate);
+    setPassengers(initialSearch.passengers);
+  }, [location.search]);
 
   // PASO 4: Traer vuelos del servidor
   const getFlights = async () => {
@@ -51,28 +73,29 @@ const Flights = () => {
 
     // ¿Busca desde algún lugar específico?
     if (searchFrom) {
-      flights = flights.filter(flight => 
+      flights = flights.filter((flight) =>
         flight.origin.toLowerCase().includes(searchFrom.toLowerCase())
       );
     }
 
-    // ¿Busca hacia algún lugar específico?
     if (searchTo) {
-      flights = flights.filter(flight => 
+      flights = flights.filter((flight) =>
         flight.destination.toLowerCase().includes(searchTo.toLowerCase())
       );
     }
 
     // NUEVO: Filtrar por fecha de salida
     if (departureDate) {
-      flights = flights.filter(flight => {
-        // Basándome en la imagen, parece que el campo se llama 'date'
-        // Ajusta este nombre según tu estructura de datos real
+      flights = flights.filter((flight) => {
         const flightDate = flight.date || flight.departureDate;
         if (flightDate) {
           // Convertir ambas fechas a formato comparable (YYYY-MM-DD)
-          const searchDate = new Date(departureDate).toISOString().split('T')[0];
-          const flightDateFormatted = new Date(flightDate).toISOString().split('T')[0];
+          const searchDate = new Date(departureDate)
+            .toISOString()
+            .split("T")[0];
+          const flightDateFormatted = new Date(flightDate)
+            .toISOString()
+            .split("T")[0];
           return flightDateFormatted === searchDate;
         }
         return false;
@@ -81,12 +104,14 @@ const Flights = () => {
 
     // NUEVO: Filtrar por fecha de regreso (si aplica)
     if (returnDate) {
-      flights = flights.filter(flight => {
+      flights = flights.filter((flight) => {
         // Si tienes un campo específico para fecha de regreso
         const flightReturnDate = flight.returnDate;
         if (flightReturnDate) {
-          const searchReturn = new Date(returnDate).toISOString().split('T')[0];
-          const flightReturnFormatted = new Date(flightReturnDate).toISOString().split('T')[0];
+          const searchReturn = new Date(returnDate).toISOString().split("T")[0];
+          const flightReturnFormatted = new Date(flightReturnDate)
+            .toISOString()
+            .split("T")[0];
           return flightReturnFormatted === searchReturn;
         }
         // Si no tienes fecha de regreso específica, no filtrar por esta condición
@@ -94,14 +119,14 @@ const Flights = () => {
       });
     }
 
-    // ¿Eligió aerolíneas específicas?
+    // Filtra por aerolíneas específicas
     if (chosenAirlines.length > 0) {
-      flights = flights.filter(flight => 
+      flights = flights.filter((flight) =>
         chosenAirlines.includes(flight.airline)
       );
     }
 
-    // SIEMPRE ordenar por precio (ESTA ES LA CLAVE DEL FIX)
+    // Siempre ordena por precio
     if (priceOrder === "low-to-high") {
       flights.sort((a, b) => a.basePrice - b.basePrice); // Baratos primero
     } else {
@@ -127,7 +152,7 @@ const Flights = () => {
       returnArrivalAirport: flight.origin,
       returnDuration: "8h 35m",
       price: flight.basePrice.toLocaleString(),
-      originalPrice: flight.basePrice
+      originalPrice: flight.basePrice,
     };
   };
 
@@ -150,14 +175,20 @@ const Flights = () => {
 
   // PASO 10: Obtener aerolíneas disponibles
   const getAirlines = () => {
-    const airlines = allFlights.map(flight => flight.airline);
+    const airlines = allFlights.map((flight) => flight.airline);
     const uniqueAirlines = [...new Set(airlines)]; // Eliminar duplicados
     return uniqueAirlines.sort(); // Ordenar alfabéticamente
   };
 
-  // PASO 11: ¿Hay búsqueda activa? - MODIFICADO
+  // PASO 11: Si hay búsqueda activa
   const isSearching = () => {
-    return searchFrom || searchTo || departureDate || returnDate || chosenAirlines.length > 0;
+    return (
+      searchFrom ||
+      searchTo ||
+      departureDate ||
+      returnDate ||
+      chosenAirlines.length > 0
+    );
   };
 
   // PASO 12: Cargar vuelos cuando se abre la página
@@ -165,23 +196,28 @@ const Flights = () => {
     getFlights();
   }, []);
 
-  // PASO 13: ¿Qué mostramos?
   if (loading) return <div className="loading">Cargando vuelos...</div>;
   if (error) return <div className="error">{error}</div>;
 
-  // PASO 14: Decidir qué vuelos mostrar - AQUÍ ESTÁ EL CAMBIO PRINCIPAL
-  // SIEMPRE usar getMatchingFlights() para que se aplique el ordenamiento
+  // PASO 13: Decidir qué vuelos mostrar
   const flightsToShow = getMatchingFlights();
   const noResults = flightsToShow.length === 0 && isSearching();
 
-  // PASO 15: Mostrar la página
+  // Mostrar la página
   return (
     <div className="flights-container">
       <main className="main-content">
         {/* Barra de búsqueda */}
-        <SearchBar 
-          buttonText="Buscar vuelos" 
+        <SearchBar
+          buttonText="Buscar vuelos"
           onSearch={handleSearch}
+          initialSearchParams={{
+            origin: searchFrom,
+            destination: searchTo,
+            departureDate,
+            returnDate,
+            passengers,
+          }}
         />
 
         <div className="flights-results-container">
@@ -191,12 +227,12 @@ const Flights = () => {
             {getSearchInfo() && (
               <div className="search-info">{getSearchInfo()}</div>
             )}
-            
+
             {/* Ordenar por precio */}
             <div className="flights-sort">
               <span className="sort-label">Ordenar por precio:</span>
-              <select 
-                value={priceOrder} 
+              <select
+                value={priceOrder}
                 onChange={(e) => setPriceOrder(e.target.value)}
                 className="sort-select"
               >
@@ -208,20 +244,20 @@ const Flights = () => {
 
           <div className="flights-content">
             {/* Filtros de aerolíneas */}
-            <FlightFilters 
+            <FlightFilters
               onAirlineFilterChange={setChosenAirlines}
               availableAirlines={getAirlines()}
             />
-            
+
             {/* Lista de vuelos */}
             <div className="flights-list">
-              {flightsToShow.map(flight => (
+              {flightsToShow.map((flight) => (
                 <FlightResults
                   key={flight.id}
                   flight={prepareFlightData(flight)}
                 />
               ))}
-              
+
               {/* Si no hay resultados */}
               {noResults && (
                 <div className="no-flights">
