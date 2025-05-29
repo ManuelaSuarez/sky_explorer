@@ -41,7 +41,8 @@ const FlightResults = ({ flight }) => {
                   {flight.returnDepartureTime} - {flight.returnArrivalTime}
                 </span>
                 <span className="flight-airports">
-                  {flight.returnDepartureAirport} - {flight.returnArrivalAirport}
+                  {flight.returnDepartureAirport} -{" "}
+                  {flight.returnArrivalAirport}
                 </span>
               </div>
               <div className="flight-duration">{flight.returnDuration}</div>
@@ -55,6 +56,11 @@ const FlightResults = ({ flight }) => {
           <div className="flight-price">
             <span className="price-symbol">$</span>
             <span className="price-value">{flight.price}</span>
+          </div>
+          <div className="unit-price">
+            <small>
+              Precio por persona: ${flight.originalPrice.toLocaleString()}
+            </small>
           </div>
           <button className="buy-button">Comprar</button>
         </div>

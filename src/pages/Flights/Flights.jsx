@@ -84,7 +84,7 @@ const Flights = () => {
       );
     }
 
-    // NUEVO: Filtrar por fecha de salida
+    // Filtrar por fecha de salida
     if (departureDate) {
       flights = flights.filter((flight) => {
         const flightDate = flight.date || flight.departureDate;
@@ -102,7 +102,7 @@ const Flights = () => {
       });
     }
 
-    // NUEVO: Filtrar por fecha de regreso (si aplica)
+    // Filtrar por fecha de regreso (si aplica)
     if (returnDate) {
       flights = flights.filter((flight) => {
         // Si tienes un campo específico para fecha de regreso
@@ -138,6 +138,9 @@ const Flights = () => {
 
   // PASO 7: Preparar vuelo para mostrar en pantalla
   const prepareFlightData = (flight) => {
+    const passengersCount = parseInt(passengers) || 1;
+    const totalPrice = flight.basePrice * passengersCount;
+
     return {
       id: flight.id,
       airline: flight.airline,
@@ -151,7 +154,7 @@ const Flights = () => {
       returnDepartureAirport: flight.destination,
       returnArrivalAirport: flight.origin,
       returnDuration: "8h 35m",
-      price: flight.basePrice.toLocaleString(),
+      price: totalPrice.toLocaleString(),
       originalPrice: flight.basePrice,
     };
   };
