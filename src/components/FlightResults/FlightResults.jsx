@@ -1,7 +1,19 @@
 import { FaHeart, FaPlane } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import "./FlightResults.css";
 
-const FlightResults = ({ flight }) => {
+const FlightResults = ({ flight, passengers }) => {
+  const navigate = useNavigate();
+
+  // Se ejecuta cuando el usuario toca "Comprar"
+  const handleBuyClick = () => {
+    navigate("/checkout", {
+      state: {
+        flight, // ⬅ Pasamos el vuelo seleccionado
+        passengers: passengers, // ⬅ Pasamos la cantidad de pasajeros
+      },
+    });
+  };
   return (
     <div className="flight-card">
       <div className="flight-header">
@@ -62,7 +74,10 @@ const FlightResults = ({ flight }) => {
               Precio por persona: ${flight.originalPrice.toLocaleString()}
             </small>
           </div>
-          <button className="buy-button">Comprar</button>
+          {/* Botón con redirección al checkout */}
+          <button className="buy-button" onClick={handleBuyClick}>
+            Comprar
+          </button>
         </div>
       </div>
     </div>

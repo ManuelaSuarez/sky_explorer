@@ -258,6 +258,7 @@ const Flights = () => {
                 <FlightResults
                   key={flight.id}
                   flight={prepareFlightData(flight)}
+                  passengers={parseInt(passengers) || 1} // Se pasa cantidad de pasajeros al componente
                 />
               ))}
 

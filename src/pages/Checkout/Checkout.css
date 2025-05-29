@@ -54,7 +54,7 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
-  width:500px
+  width: 500px;
 }
 
 .passenger-info-form {
@@ -227,7 +227,6 @@
   color: #323255;
 }
 
-/* Estilos actualizados para los detalles del vuelo según la imagen 4 */
 .info-card.flight-details {
   padding: 20px;
   background-color: #fdfbf6;
@@ -296,6 +295,13 @@
   font-size: 16px;
   color: #323255;
   font-weight: 500;
+}
+
+/* Estilo para los mensajes de error debajo de cada input */
+.error {
+  color: red;
+  font-size: 12px;
+  margin-bottom: 8px;
 }
 
 @media (max-width: 900px) {
