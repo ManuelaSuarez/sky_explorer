@@ -101,7 +101,7 @@ const Flights = () => {
       );
     }
 
-    // Ordenar por precio
+    // SIEMPRE ordenar por precio (ESTA ES LA CLAVE DEL FIX)
     if (priceOrder === "low-to-high") {
       flights.sort((a, b) => a.basePrice - b.basePrice); // Baratos primero
     } else {
@@ -155,7 +155,7 @@ const Flights = () => {
     return uniqueAirlines.sort(); // Ordenar alfabéticamente
   };
 
-  // PASO 11: ¿Hay búsqueda activa?
+  // PASO 11: ¿Hay búsqueda activa? - MODIFICADO
   const isSearching = () => {
     return searchFrom || searchTo || departureDate || returnDate || chosenAirlines.length > 0;
   };
@@ -169,8 +169,9 @@ const Flights = () => {
   if (loading) return <div className="loading">Cargando vuelos...</div>;
   if (error) return <div className="error">{error}</div>;
 
-  // PASO 14: Decidir qué vuelos mostrar
-  const flightsToShow = isSearching() ? getMatchingFlights() : allFlights;
+  // PASO 14: Decidir qué vuelos mostrar - AQUÍ ESTÁ EL CAMBIO PRINCIPAL
+  // SIEMPRE usar getMatchingFlights() para que se aplique el ordenamiento
+  const flightsToShow = getMatchingFlights();
   const noResults = flightsToShow.length === 0 && isSearching();
 
   // PASO 15: Mostrar la página
