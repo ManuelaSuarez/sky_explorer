@@ -71,10 +71,10 @@ const FlightManagement = () => {
   // Manejar cambios en el formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewFlight({
-      ...newFlight,
+    setNewFlight((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
   // Manejar cambio de fecha
@@ -95,10 +95,18 @@ const FlightManagement = () => {
   };*/
 
   // Manejar intercambio de origen y destino
-  const handleExchangeLocations = () => {
+  /*const handleExchangeLocations = () => {
     const tempOrigin = origin;
     setOrigin(destination);
     setDestination(tempOrigin);
+  };*/
+
+  const handleExchangeLocations = () => {
+    setNewFlight((prev) => ({
+      ...prev,
+      origin: prev.destination,
+      destination: prev.origin,
+    }));
   };
 
   // Añadir esta función para cargar los vuelos
@@ -354,8 +362,12 @@ const FlightManagement = () => {
         if (flight.id === selectedFlightId) {
           return {
             ...flight,
-            ...newFlight,
+            airline: newFlight.airline,
+            origin: newFlight.origin,
+            destination: newFlight.destination,
             date: newFlight.date.toISOString().split("T")[0],
+            departureTime: newFlight.departureTime,
+            arrivalTime: newFlight.arrivalTime,
             capacity: Number(newFlight.capacity),
             basePrice: Number(newFlight.basePrice),
           };
@@ -606,14 +618,9 @@ const FlightManagement = () => {
                   <div className="input-with-icon">
                     <FaMapMarkerAlt className="field-icon" />
                     <select
-                      value={origin}
-                      onChange={(e) => {
-                        console.log(
-                          "SearchBar: Origin select changed to",
-                          e.target.value
-                        );
-                        setOrigin(e.target.value);
-                      }}
+                      name="origin"
+                      value={newFlight.origin}
+                      onChange={handleInputChange}
                       className="airport-select"
                     >
                       <option value="">Seleccione Origen</option>
@@ -639,14 +646,9 @@ const FlightManagement = () => {
                   <div className="input-with-icon">
                     <FaMapMarkerAlt className="field-icon" />
                     <select
-                      value={destination}
-                      onChange={(e) => {
-                        console.log(
-                          "SearchBar: Destination select changed to",
-                          e.target.value
-                        );
-                        setDestination(e.target.value);
-                      }}
+                      name="destination"
+                      value={newFlight.destination}
+                      onChange={handleInputChange}
                       className="airport-select"
                     >
                       <option value="">Seleccione Destino</option>
