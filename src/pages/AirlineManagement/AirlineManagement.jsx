@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import "./AirlineManagement.css";
 import { FaUser, FaGlobe, FaIdCard, FaTrash, FaCog } from "react-icons/fa";

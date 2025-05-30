@@ -1,6 +1,3 @@
-// Checkout.jsx - Versión con autenticación
-"use client";
-
 import { useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaPlane } from "react-icons/fa";
