@@ -1,7 +1,8 @@
+// Checkout.jsx - Versión con autenticación
 "use client";
 
 import { useState } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaPlane } from "react-icons/fa";
 import Validations from "../../components/Validations/Validations.jsx";
 import "./Checkout.css";
@@ -10,24 +11,27 @@ const Checkout = () => {
   // Recuperar los datos pasados por navigate
   const { state } = useLocation();
   const { flight, passengers } = state || {};
+  const navigate = useNavigate();
 
-  // Plantilla de un pasajero vacío para clonar múltiples formularios
-  const initialPassenger = {
-    nombre: "",
-    apellido: "",
-    nacionalidad: "",
-    dni: "",
-    fechaNacimiento: "",
-    email: "",
-  };
-
-  // Array con tantos formularios como pasajeros seleccionados
+  // Estados existentes
   const [formData, setFormData] = useState(
-    Array.from({ length: passengers }, () => ({ ...initialPassenger }))
+    Array.from({ length: passengers }, () => ({
+      nombre: "",
+      apellido: "",
+      nacionalidad: "",
+      dni: "",
+      fechaNacimiento: "",
+      email: "",
+    }))
   );
 
-  // Estado para guardar errores por cada pasajero
   const [errores, setErrores] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Función para obtener el token del usuario
+  const getAuthToken = () => {
+    return localStorage.getItem('token'); // Asume que guardas el token en localStorage
+  };
 
   // Manejador que actualiza el valor de un campo específico de un pasajero
   const handleChange = (index, e) => {
@@ -37,19 +41,96 @@ const Checkout = () => {
     setFormData(updated);
   };
 
+  // Función para guardar la reserva en el backend con autenticación
+  const saveBookingToBackend = async (bookingData) => {
+    try {
+      const token = getAuthToken();
+      
+      if (!token) {
+        throw new Error("No estás autenticado. Por favor, inicia sesión.");
+      }
+
+      const response = await fetch("http://localhost:3000/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // Incluir el token en los headers
+        },
+        body: JSON.stringify(bookingData),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Sesión expirada. Por favor, inicia sesión nuevamente.");
+        }
+        throw new Error("Error al guardar la reserva");
+      }
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error("Error al comunicarse con el servidor:", error);
+      throw error;
+    }
+  };
+
   // Validamos todos los formularios al enviar
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsProcessing(true);
+
     const erroresValidados = Validations(formData);
     setErrores(erroresValidados);
 
     const tieneErrores = erroresValidados.some(
       (error) => Object.keys(error).length > 0
     );
+
     if (!tieneErrores) {
-      alert("Compra realizada con éxito");
-      console.log("Formulario:", formData);
+      try {
+        // Verificar que el usuario esté autenticado
+        const token = getAuthToken();
+        if (!token) {
+          alert("Debes iniciar sesión para realizar la compra.");
+          navigate("/login"); // Redirigir al login
+          return;
+        }
+
+        // Calcular el precio total
+        const totalBase = flight?.originalPrice * passengers;
+        const taxes = totalBase * 0.2;
+        const totalFinal = totalBase + taxes;
+
+        // Preparar datos para enviar al backend (sin userId, se obtiene del token)
+        const bookingData = {
+          flightId: flight.id,
+          passengers: formData,
+          totalPrice: totalFinal,
+          // Removemos userId porque se obtiene del token en el backend
+        };
+
+        // Guardar en el backend
+        const savedBooking = await saveBookingToBackend(bookingData);
+
+        alert("¡Compra realizada con éxito!");
+        
+        console.log("Reserva guardada:", savedBooking);
+
+        // Redirigir al panel de vuelos o a una página de confirmación
+        navigate("/flights-panel");
+
+      } catch (error) {
+        if (error.message.includes("autenticado") || error.message.includes("Sesión expirada")) {
+          alert(error.message);
+          navigate("/login");
+        } else {
+          alert("Hubo un error al procesar tu compra. Por favor, intenta nuevamente.");
+        }
+        console.error("Error en la compra:", error);
+      }
     }
+
+    setIsProcessing(false);
   };
 
   // Calcular los valores del resumen de pago
@@ -89,6 +170,7 @@ const Checkout = () => {
                     onChange={(e) => handleChange(i, e)}
                     placeholder="Nombre"
                     required
+                    disabled={isProcessing}
                   />
                   {errores[i]?.nombre && (
                     <div className="error">{errores[i].nombre}</div>
@@ -104,6 +186,7 @@ const Checkout = () => {
                     onChange={(e) => handleChange(i, e)}
                     placeholder="Apellido"
                     required
+                    disabled={isProcessing}
                   />
                   {errores[i]?.apellido && (
                     <div className="error">{errores[i].apellido}</div>
@@ -119,6 +202,7 @@ const Checkout = () => {
                     onChange={(e) => handleChange(i, e)}
                     placeholder="Nacionalidad"
                     required
+                    disabled={isProcessing}
                   />
                   {errores[i]?.nacionalidad && (
                     <div className="error">{errores[i].nacionalidad}</div>
@@ -134,6 +218,7 @@ const Checkout = () => {
                     onChange={(e) => handleChange(i, e)}
                     placeholder="00000000"
                     required
+                    disabled={isProcessing}
                   />
                   {errores[i]?.dni && (
                     <div className="error">{errores[i].dni}</div>
@@ -148,6 +233,7 @@ const Checkout = () => {
                     value={p.fechaNacimiento}
                     onChange={(e) => handleChange(i, e)}
                     required
+                    disabled={isProcessing}
                   />
                   {errores[i]?.fechaNacimiento && (
                     <div className="error">{errores[i].fechaNacimiento}</div>
@@ -163,6 +249,7 @@ const Checkout = () => {
                     onChange={(e) => handleChange(i, e)}
                     placeholder="ejemplo@gmail.com"
                     required
+                    disabled={isProcessing}
                   />
                   {errores[i]?.email && (
                     <div className="error">{errores[i].email}</div>
@@ -171,8 +258,13 @@ const Checkout = () => {
               </div>
             ))}
 
-            <button type="submit" className="buy-button" onClick={handleSubmit}>
-              Comprar
+            <button 
+              type="submit" 
+              className="buy-button" 
+              onClick={handleSubmit}
+              disabled={isProcessing}
+            >
+              {isProcessing ? "Procesando..." : "Comprar"}
             </button>
           </div>
 
