@@ -1,15 +1,16 @@
 // FlightPanel.jsx - Versión sin código de reserva
 import React, { useState, useEffect } from "react";
 import "./FlightPanel.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Se conserva useNavigate
 
-const FlightPanel = () => {
+// Accept setModalVisible as a prop
+const FlightPanel = ({ setModalVisible }) => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate= useNavigate()
+  const navigate = useNavigate(); // Se conserva la inicialización de useNavigate
 
-   // Función para obtener el token del usuario
+  // Función para obtener el token del usuario
   const getAuthToken = () => {
     return localStorage.getItem('token');
   };
@@ -18,8 +19,9 @@ const FlightPanel = () => {
   const fetchUserBookings = async () => {
     try {
       const token = getAuthToken();
-      
+
       if (!token) {
+        // If no token, throw an error to trigger the catch block
         throw new Error("No estás autenticado. Por favor, inicia sesión.");
       }
 
@@ -45,17 +47,17 @@ const FlightPanel = () => {
     } catch (error) {
       console.error("Error al obtener reservas:", error);
       setError(error.message);
-      
-      // Si el error es de autenticación, redirigir al login
+
+      // If the error is due to authentication, open the login modal
       if (error.message.includes("autenticado") || error.message.includes("Sesión expirada")) {
-        navigate("/login");
+        if (setModalVisible) { // Ensure setModalVisible is provided as a prop
+          setModalVisible("login");
+        }
       }
     } finally {
       setLoading(false);
     }
   };
-
-
 
   // Función para formatear la fecha
   const formatDate = (dateString) => {
@@ -71,7 +73,7 @@ const FlightPanel = () => {
   const getFlightStatus = (booking) => {
     const today = new Date();
     const flightDate = new Date(booking.flight.date);
-    
+
     // Si ya pasó la fecha de salida, es Inactivo
     if (flightDate < today) {
       return 'Inactivo';
@@ -94,16 +96,16 @@ const FlightPanel = () => {
 
   // Cargar las reservas cuando el componente se monta
   useEffect(() => {
-    fetchUserBookings();
-  }, []);
-
-  // Verificar autenticación al cargar el componente
-  useEffect(() => {
+    // Check for token on mount and open modal if not present
     const token = getAuthToken();
     if (!token) {
-      navigate("/login");
+      if (setModalVisible) {
+        setModalVisible("login");
+      }
+    } else {
+      fetchUserBookings();
     }
-  }, [navigate]);
+  }, [setModalVisible]); // Add setModalVisible to dependency array
 
   if (loading) {
     return (
@@ -139,7 +141,8 @@ const FlightPanel = () => {
         <div className="no-bookings">
           <p>No tienes vuelos reservados aún.</p>
           <p>¡Encuentra tu próximo destino!</p>
-          <button onClick={() => navigate("/flights")} className="search-flights-button">
+          {/* This button uses useNavigate to go to the home page */}
+          <button onClick={() => navigate("/")} className="search-flights-button">
             Buscar Vuelos
           </button>
         </div>
@@ -151,7 +154,7 @@ const FlightPanel = () => {
               <th>Origen</th>
               <th>Destino</th>
               <th>Fecha de Salida</th>
-              <th>Hora de Salida</th> 
+              <th>Hora de Salida</th>
               <th>Hora de Llegada</th>
               <th>Pasajeros</th>
               <th>Total Pagado</th>

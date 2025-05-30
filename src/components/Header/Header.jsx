@@ -1,5 +1,3 @@
-"use client" // Esto es solo un indicador, no es un import de React
-
 import "./Header.css"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useEffect } from "react" // Asegúrate de importar useEffect

@@ -1,4 +1,3 @@
-"use client"
 import { useState, useEffect } from "react"
 import { FaChevronUp, FaChevronDown } from "react-icons/fa"
 import "./FlightFilters.css"

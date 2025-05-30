@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FaTrash,
@@ -16,6 +14,7 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./FlightManagement.css";
+import { jwtDecode } from "jwt-decode"; // Import jwtDecode
 
 const FlightManagement = () => {
   const navigate = useNavigate();
@@ -26,13 +25,14 @@ const FlightManagement = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedFlightId, setSelectedFlightId] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [airlineName, setAirlineName] = useState(""); // Nuevo estado para el nombre de la aerolínea
   const [isAuthorized, setIsAuthorized] = useState(true);
   const [origin, setOrigin] = useState(""); // Para el select
   const [destination, setDestination] = useState("");
 
   // Estado para el formulario de creación de vuelo
   const [newFlight, setNewFlight] = useState({
-    airline: "Aerolineas Argentina",
+    airline: "", // Se inicializará dinámicamente
     origin: "Buenos Aires (BUE)",
     destination: "Catamarca (CTC)",
     date: new Date(),
@@ -42,7 +42,7 @@ const FlightManagement = () => {
     arrivalTime: "10:15",
   });
 
-  // Verificar si el usuario está autenticado y es administrador
+  // Verificar si el usuario está autenticado y es administrador/aerolínea
   useEffect(() => {
     const checkUserRole = async () => {
       try {
@@ -52,21 +52,48 @@ const FlightManagement = () => {
           console.log("No hay token disponible");
           setIsAuthorized(false);
           setUserRole(null);
-          // Quitamos el alert que bloquea
-          navigate("/");
+          navigate("/"); // Redirigir si no hay token
           return;
         }
 
-        setIsAuthorized(true);
-        setUserRole("admin");
+        const decodedToken = jwtDecode(token);
+        const role = decodedToken.role;
+        const name = decodedToken.name; // Asumiendo que el nombre de la aerolínea está en 'name' en el token
+
+        setUserRole(role);
+        setAirlineName(name); // Guarda el nombre de la aerolínea
+
+        // Si el rol es 'airline', establece el nombre de la aerolínea en el formulario
+        if (role === "airline") {
+          setNewFlight((prev) => ({
+            ...prev,
+            airline: name,
+          }));
+        } else {
+          // Para otros roles (ej. admin), puedes decidir si el campo es editable o no
+          // Por ahora, lo dejamos editable por defecto si no es "airline"
+          setNewFlight((prev) => ({
+            ...prev,
+            airline: "", // O un valor por defecto si el admin puede elegir
+          }));
+        }
+
+        // Verificar si el usuario tiene rol de 'airline' o 'admin' para acceder a esta página
+        if (role === "airline" || role === "admin") {
+          setIsAuthorized(true);
+        } else {
+          setIsAuthorized(false);
+          navigate("/"); // Redirigir si no tiene el rol adecuado
+        }
       } catch (error) {
         console.error("Error al verificar el rol del usuario:", error);
         setIsAuthorized(false);
+        navigate("/"); // Redirigir en caso de error de token o decodificación
       }
     };
 
     checkUserRole();
-  }, [navigate]);
+  }, [navigate]); // Dependencia de navigate
 
   // Manejar cambios en el formulario
   const handleInputChange = (e) => {
@@ -84,22 +111,6 @@ const FlightManagement = () => {
       date: date,
     });
   };
-
-  // Habría que ver que función es la que cambia correctamente
-  /*const handleExchangeLocations = () => {
-    setNewFlight({
-      ...newFlight,
-      origin: newFlight.destination,
-      destination: newFlight.origin,
-    });
-  };*/
-
-  // Manejar intercambio de origen y destino
-  /*const handleExchangeLocations = () => {
-    const tempOrigin = origin;
-    setOrigin(destination);
-    setDestination(tempOrigin);
-  };*/
 
   const handleExchangeLocations = () => {
     setNewFlight((prev) => ({
@@ -147,8 +158,11 @@ const FlightManagement = () => {
 
   // Añadir este useEffect para cargar los vuelos al montar el componente
   useEffect(() => {
-    fetchFlights();
-  }, [isAuthorized]);
+    // Solo cargar vuelos si el usuario está autorizado
+    if (isAuthorized) {
+      fetchFlights();
+    }
+  }, [isAuthorized]); // Dependencia de isAuthorized
 
   // Crear nuevo vuelo
   const handleCreateFlight = async () => {
@@ -170,7 +184,7 @@ const FlightManagement = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Debes iniciar sesión como administrador");
+        alert("Debes iniciar sesión como administrador o aerolínea");
         navigate("/");
         return;
       }
@@ -203,9 +217,9 @@ const FlightManagement = () => {
       // Vuelo creado exitosamente
       alert("Vuelo creado con éxito");
 
-      // Limpiar el formulario
-      setNewFlight({
-        airline: "Aerolineas Argentina",
+      // Limpiar el formulario, manteniendo el nombre de la aerolínea si es rol 'airline'
+      setNewFlight((prev) => ({
+        airline: userRole === "airline" ? airlineName : "", // Mantener si es aerolínea, sino limpiar
         origin: "Buenos Aires (BUE)",
         destination: "Catamarca (CTC)",
         date: new Date(),
@@ -213,7 +227,7 @@ const FlightManagement = () => {
         basePrice: "85000",
         departureTime: "08:30",
         arrivalTime: "10:15",
-      });
+      }));
 
       // Recargar la lista de vuelos
       fetchFlights();
@@ -301,7 +315,7 @@ const FlightManagement = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Debes iniciar sesión como administrador");
+        alert("Debes iniciar sesión como administrador o aerolínea");
         navigate("/");
         return;
       }
@@ -337,9 +351,9 @@ const FlightManagement = () => {
       // Vuelo actualizado exitosamente
       alert("Vuelo actualizado con éxito");
 
-      // Limpiar el formulario y salir del modo edición
-      setNewFlight({
-        airline: "Aerolineas Argentina",
+      // Limpiar el formulario y salir del modo edición, manteniendo el nombre de la aerolínea
+      setNewFlight((prev) => ({
+        airline: userRole === "airline" ? airlineName : "", // Mantener si es aerolínea, sino limpiar
         origin: "Buenos Aires (BUE)",
         destination: "Catamarca (CTC)",
         date: new Date(),
@@ -347,7 +361,7 @@ const FlightManagement = () => {
         basePrice: "85000",
         departureTime: "08:30",
         arrivalTime: "10:15",
-      });
+      }));
       setEditMode(false);
       setSelectedFlightId(null);
 
@@ -382,9 +396,9 @@ const FlightManagement = () => {
 
   // Cancelar edición
   const handleCancelEdit = () => {
-    // Limpiar el formulario y salir del modo edición
-    setNewFlight({
-      airline: "Aerolineas Argentina",
+    // Limpiar el formulario y salir del modo edición, manteniendo el nombre de la aerolínea
+    setNewFlight((prev) => ({
+      airline: userRole === "airline" ? airlineName : "", // Mantener si es aerolínea, sino limpiar
       origin: "Buenos Aires (BUE)",
       destination: "Catamarca (CTC)",
       date: new Date(),
@@ -392,7 +406,7 @@ const FlightManagement = () => {
       basePrice: "85000",
       departureTime: "08:30",
       arrivalTime: "10:15",
-    });
+    }));
     setEditMode(false);
     setSelectedFlightId(null);
   };
@@ -403,7 +417,7 @@ const FlightManagement = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          alert("Debes iniciar sesión como administrador");
+          alert("Debes iniciar sesión como administrador o aerolínea");
           navigate("/");
           return;
         }
@@ -609,6 +623,9 @@ const FlightManagement = () => {
                       value={newFlight.airline}
                       onChange={handleInputChange}
                       placeholder="Nombre de la aerolínea"
+                      readOnly={userRole === "airline"} // Deshabilita si el rol es 'airline'
+                      disabled={userRole === "airline"} // Deshabilita si el rol es 'airline'
+                      style={userRole === "airline" ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}} // Estilo para indicar que está deshabilitado
                     />
                   </div>
                 </div>
