@@ -1,108 +1,61 @@
 import { useState, useEffect } from "react";
-import "./App.css";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import Header from "./components/Header/Header.jsx";
 import Footer from "./components/Footer/Footer.jsx";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import Home from "./pages/Home/Home.jsx";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Flights from "./pages/Flights/Flights";
 import Checkout from "./pages/Checkout/Checkout.jsx";
-import MyFlights from "./pages/MyFlights/MyFlights.jsx"; 
-import AdminPanel from "./pages/Admin/AdminPanel.jsx"; 
-
-import ModalLogin from "./components/ModalLogin/ModalLogin.jsx"; 
-import ModalRegister from "./components/ModalRegister/ModalRegister.jsx"; 
-
-import { jwtDecode } from "jwt-decode";
-
-// Componente para proteger rutas de usuario (accesibles para 'user' y 'admin')
-const UserRoute = ({ children, user, setModalVisible }) => { 
-  const isUserOrAdmin = user && (user.role === "user" || user.role === "admin");
-
-  if (!isUserOrAdmin) {
-
-    useEffect(() => {
-      setModalVisible("login");
-    }, [setModalVisible]);
-    return <Navigate to="/" replace />; 
-  }
-
-  return children;
-};
-
-// Componente para proteger rutas de administrador (solo accesibles para 'admin')
-const AdminRoute = ({ children, user, setModalVisible }) => { 
-  const isAdmin = user && user.role === "admin";
-
-  if (!isAdmin) {
-
-    useEffect(() => {
-      setModalVisible("login");
-    }, [setModalVisible]);
-    return <Navigate to="/" replace />; 
-  }
-
-  return children;
-};
-
-// Componente para proteger rutas de Aerolínea/Admin (accesibles para 'airline' y 'admin')
-const AirlineAdminRoute = ({ children, user, setModalVisible }) => { 
-  const isAirline = user && user.role === "airline";
-  const isAdmin = user && user.role === "admin";
-
-  console.log("DEBUG App.jsx AirlineAdminRoute: User:", user); 
-  console.log("DEBUG App.jsx AirlineAdminRoute: isAirline:", isAirline); 
-  console.log("DEBUG App.jsx AirlineAdminRoute: isAdmin:", isAdmin); 
-
-  if (!isAirline && !isAdmin) {
-
-    useEffect(() => {
-      setModalVisible("login");
-    }, [setModalVisible]);
-    return <Navigate to="/" replace />; 
-  }
-  return children;
-};
-
+import MyFlights from "./pages/MyFlights/MyFlights.jsx";
+import AdminPanel from "./pages/Admin/AdminPanel.jsx";
+import ModalLogin from "./components/ModalLogin/ModalLogin.jsx";
+import ModalRegister from "./components/ModalRegister/ModalRegister.jsx";
+import UserRoute from "./components/ProtectedRoutes/UserRoute.jsx";
+import AdminRoute from "./components/ProtectedRoutes/AminRoute.jsx";
+import AirlineAdminRoute from "./components/ProtectedRoutes/AirlineAdmin.jsx";
+import "./App.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
-  const [modalVisible, setModalVisible] = useState(""); 
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Seteo de estados
+  const [modalVisible, setModalVisible] = useState(""); // Visualización del modal login o register
+  const [user, setUser] = useState(null); // Inicializado en null ya que aún no se ha inicado sesión
+  const [loading, setLoading] = useState(true); // No renderiza hasta que haya una sesión activa
 
-//Efecto para la Carga Inicial (Verificación del Token)
+  // Verificación del token al iniciar App
   useEffect(() => {
     const token = localStorage.getItem("token");
+
+    // Si lo encuentra lo decodifica, si es inválido lo borra
     if (token) {
       try {
         const decoded = jwtDecode(token);
         setUser(decoded);
-        console.log("DEBUG App.jsx useEffect: Decoded User:", decoded); 
       } catch (error) {
-        console.error("Token inválido:", error);
         localStorage.removeItem("token");
       }
     }
-    setLoading(false);
+    setLoading(false); // Renderiza el contenido
   }, []);
 
   const closeModal = () => setModalVisible("");
 
-
   // Función que se ejecuta cuando el inicio de sesión es exitoso
-  const handleLoginSuccess = ({ token }) => { 
+  const handleLoginSuccess = ({ token }) => {
     try {
       localStorage.setItem("token", token);
       const decoded = jwtDecode(token);
       setUser(decoded);
-      console.log("DEBUG App.jsx handleLoginSuccess: Decoded User:", decoded); 
-    } catch (error) {
-      console.error("Error al decodificar el token:", error);
-    }
+    } catch (error) {}
     closeModal();
   };
 
-   // Función para cerrar la sesión del usuario
+  // Función para cerrar la sesión del usuario
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
@@ -116,22 +69,26 @@ function App() {
 
   // Función para actualizar la información del usuario
   const handleUserUpdate = (updatedUser) => {
-  setUser(updatedUser);
-};
-
+    setUser(updatedUser);
+  };
 
   return (
     <div className="app">
       <Router>
-        <Header modalVisible={setModalVisible} user={user} onLogout={handleLogout}  onUserUpdate={handleUserUpdate} />
+        <Header
+          modalVisible={setModalVisible}
+          user={user}
+          onLogout={handleLogout}
+          onUserUpdate={handleUserUpdate}
+        />
         <Routes>
-          <Route path="/" element={<Home />} /> 
-          <Route path="/flights" element={<Flights />} /> 
+          <Route path="/" element={<Home />} />
+          <Route path="/flights" element={<Flights />} />
 
           <Route
             path="/checkout"
             element={
-              <UserRoute user={user} setModalVisible={setModalVisible}> 
+              <UserRoute user={user} setModalVisible={setModalVisible}>
                 <Checkout />
               </UserRoute>
             }
@@ -139,15 +96,15 @@ function App() {
           <Route
             path="/myFlights"
             element={
-              <UserRoute user={user} setModalVisible={setModalVisible}> 
-                <MyFlights setModalVisible={setModalVisible} /> 
+              <UserRoute user={user} setModalVisible={setModalVisible}>
+                <MyFlights setModalVisible={setModalVisible} />
               </UserRoute>
             }
           />
           <Route
             path="/favorites"
             element={
-              <UserRoute user={user} setModalVisible={setModalVisible}> 
+              <UserRoute user={user} setModalVisible={setModalVisible}>
                 <div className="page-container">
                   <h1>Mis Favoritos</h1>
                   <p>Esta página está en construcción</p>
@@ -157,9 +114,9 @@ function App() {
           />
 
           <Route
-            path="/admin" 
+            path="/admin"
             element={
-              <AirlineAdminRoute user={user} setModalVisible={setModalVisible}> 
+              <AirlineAdminRoute user={user} setModalVisible={setModalVisible}>
                 <Navigate to="/admin/flights" replace />
               </AirlineAdminRoute>
             }
@@ -167,7 +124,7 @@ function App() {
           <Route
             path="/admin/flights"
             element={
-              <AirlineAdminRoute user={user} setModalVisible={setModalVisible}> 
+              <AirlineAdminRoute user={user} setModalVisible={setModalVisible}>
                 <AdminPanel />
               </AirlineAdminRoute>
             }
@@ -176,7 +133,7 @@ function App() {
           <Route
             path="/admin/accounts"
             element={
-              <AdminRoute user={user} setModalVisible={setModalVisible}> 
+              <AdminRoute user={user} setModalVisible={setModalVisible}>
                 <AdminPanel />
               </AdminRoute>
             }
@@ -186,9 +143,15 @@ function App() {
         </Routes>
         <Footer />
         {modalVisible === "login" && (
-          <ModalLogin closeModal={closeModal} openRegister={setModalVisible} onSubmit={handleLoginSuccess} />
+          <ModalLogin
+            closeModal={closeModal}
+            openRegister={setModalVisible}
+            onSubmit={handleLoginSuccess}
+          />
         )}
-        {modalVisible === "register" && <ModalRegister closeModal={closeModal} openLogin={setModalVisible} />}
+        {modalVisible === "register" && (
+          <ModalRegister closeModal={closeModal} openLogin={setModalVisible} />
+        )}
       </Router>
     </div>
   );
