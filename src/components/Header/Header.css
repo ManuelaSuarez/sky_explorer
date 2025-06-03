@@ -44,16 +44,62 @@
   margin-right: 5%;
 }
 
+/* Nuevos estilos para la sección de usuario */
+.header_user-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-profile-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-greeting {
+  color: #428780;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #428780;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-avatar:hover {
+  transform: scale(1.1);
+  background-color: #3a7670;
+}
+
+.avatar-initials {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
 .header_signIn {
   background-color: #428780;
   color: #fff;
-  padding: 1%;
+  padding: 8px 15px;
   border-radius: 5px;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
 .header_signIn:hover {
-  transform: scale(1.05);
   background-color: #3a7670;
+  transform: scale(1.05);
 }
