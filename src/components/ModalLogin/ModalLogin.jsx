@@ -1,5 +1,6 @@
 import { useState, useRef } from "react"
 import "./ModalLogin.css"
+
 const ModalLogin = ({ closeModal, openRegister, onSubmit }) => {
   const [formData, setFormData] = useState({
     email: "",

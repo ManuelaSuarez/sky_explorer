@@ -1,5 +1,6 @@
 import { useState } from "react"
 import "./ModalRegister.css"
+
 const ModalRegister = ({ openLogin, closeModal }) => {
   const [formData, setFormData] = useState({
     name: "",

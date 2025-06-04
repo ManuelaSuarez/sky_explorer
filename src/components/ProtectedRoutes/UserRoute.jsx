@@ -1,22 +1,21 @@
-// Componente para proteger rutas de Usuarios
 import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 
 const UserRoute = ({ children, user, setModalVisible }) => {
-  const isUser = user && user.role === "user"; /*|| user.role === "admin"*/
-
-  // Si no es user abre el modal de login y redirige a /
-  useEffect(() => {
-    if (!isUser) {
-      setModalVisible("login");
-    }
-  }, [isUser, setModalVisible]);
+  const isUser = user && user.role === "user"; 
 
   if (!isUser) {
+    // Si no hay usuario logueado en absoluto, entonces mostramos el modal de login.
+    // Si hay user pero el rol no es "user", no mostramos el modal (ya está logueado).
+    if (!user) { // Esta condición verifica específicamente si no hay usuario.
+      useEffect(() => {
+        setModalVisible("login");
+      }, [setModalVisible]);
+    }
     return <Navigate to="/" replace />;
   }
 
-  // Si es user, retorna
+  // Si es user, permite el acceso
   return children;
 };
 
