@@ -12,7 +12,8 @@ import Home from "./pages/Home/Home.jsx";
 import Flights from "./pages/Flights/Flights";
 import Checkout from "./pages/Checkout/Checkout.jsx";
 import MyFlights from "./pages/MyFlights/MyFlights.jsx";
-import AdminPanel from "./pages/Admin/AdminPanel.jsx";
+import FlightManagement from "./pages/FlightManagement/FlightManagement.jsx";
+import AirlineManagement from "./pages/AirlineManagement/AirlineManagement.jsx";
 import ModalLogin from "./components/ModalLogin/ModalLogin.jsx";
 import ModalRegister from "./components/ModalRegister/ModalRegister.jsx";
 import UserRoute from "./components/ProtectedRoutes/UserRoute.jsx";
@@ -22,16 +23,15 @@ import "./App.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
-  // Seteo de estados
-  const [modalVisible, setModalVisible] = useState(""); // Visualización del modal login o register
-  const [user, setUser] = useState(null); // Inicializado en null ya que aún no se ha inicado sesión
-  const [loading, setLoading] = useState(true); // No renderiza hasta que haya una sesión activa
+  // Estados
+  const [modalVisible, setModalVisible] = useState("");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Verificación del token al iniciar App
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    // Si lo encuentra lo decodifica, si es inválido lo borra
     if (token) {
       try {
         const decoded = jwtDecode(token);
@@ -40,7 +40,7 @@ function App() {
         localStorage.removeItem("token");
       }
     }
-    setLoading(false); // Renderiza el contenido
+    setLoading(false);
   }, []);
 
   const closeModal = () => setModalVisible("");
@@ -51,7 +51,9 @@ function App() {
       localStorage.setItem("token", token);
       const decoded = jwtDecode(token);
       setUser(decoded);
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error al decodificar token:", error);
+    }
     closeModal();
   };
 
@@ -63,14 +65,14 @@ function App() {
     closeModal();
   };
 
-  if (loading) {
-    return <div className="loading-container">Cargando...</div>;
-  }
-
   // Función para actualizar la información del usuario
   const handleUserUpdate = (updatedUser) => {
     setUser(updatedUser);
   };
+
+  if (loading) {
+    return <div className="loading-container">Cargando...</div>;
+  }
 
   return (
     <div className="app">
@@ -82,9 +84,11 @@ function App() {
           onUserUpdate={handleUserUpdate}
         />
         <Routes>
+          {/* Rutas públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/flights" element={<Flights />} />
 
+          {/* Rutas protegidas para usuarios */}
           <Route
             path="/checkout"
             element={
@@ -113,6 +117,7 @@ function App() {
             }
           />
 
+          {/* Rutas administrativas - Gestión de vuelos (Admin + Airline) */}
           <Route
             path="/admin"
             element={
@@ -125,23 +130,28 @@ function App() {
             path="/admin/flights"
             element={
               <AirlineAdminRoute user={user} setModalVisible={setModalVisible}>
-                <AdminPanel />
+                <FlightManagement />
               </AirlineAdminRoute>
             }
           />
 
+          {/* Rutas administrativas - Gestión de aerolíneas (Solo Admin) */}
           <Route
             path="/admin/accounts"
             element={
               <AdminRoute user={user} setModalVisible={setModalVisible}>
-                <AdminPanel />
+                <AirlineManagement />
               </AdminRoute>
             }
           />
 
+          {/* Ruta por defecto */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+
         <Footer />
+
+        {/* Modales */}
         {modalVisible === "login" && (
           <ModalLogin
             closeModal={closeModal}

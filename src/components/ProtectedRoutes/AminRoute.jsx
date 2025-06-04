@@ -1,19 +1,25 @@
-// Componente para proteger rutas de Admin
-import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
+import { useEffect } from "react"; 
 
 const AdminRoute = ({ children, user, setModalVisible }) => {
   const isAdmin = user && user.role === "admin";
+  const isAuthenticated = !!user; // true si hay un usuario logueado
 
-  // Si no es admin abre el modal de login y redirige a /
-  if (!isAdmin) {
+  // Si no hay usuario logueado en absoluto, necesitamos que inicie sesión.
+  if (!isAuthenticated) {
     useEffect(() => {
       setModalVisible("login");
     }, [setModalVisible]);
     return <Navigate to="/" replace />;
   }
 
-  // si es admin, retorna
+  // Si el usuario está logueado pero NO es admin,
+  // solo lo redirigimos sin mostrar el modal de login.
+  if (!isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Si es admin, permite el acceso
   return children;
 };
 
