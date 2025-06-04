@@ -19,7 +19,6 @@ import ModalRegister from "./components/ModalRegister/ModalRegister.jsx";
 import UserRoute from "./components/ProtectedRoutes/UserRoute.jsx";
 import AdminRoute from "./components/ProtectedRoutes/AminRoute.jsx";
 import AirlineAdminRoute from "./components/ProtectedRoutes/AirlineAdmin.jsx";
-import "./App.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
