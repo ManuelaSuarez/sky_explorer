@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaPlane } from "react-icons/fa";
-import Validations from "../../components/Validations/Validations.jsx";
+import ValidationsCheckout from "../../components/ValidationsCheckout/ValidationsCheckout";
 import "./Checkout.css";
 
 const Checkout = () => {
@@ -27,7 +27,7 @@ const Checkout = () => {
 
   // Función para obtener el token del usuario
   const getAuthToken = () => {
-    return localStorage.getItem('token'); // Asume que guardas el token en localStorage
+    return localStorage.getItem("token"); // Asume que guardas el token en localStorage
   };
 
   // Manejador que actualiza el valor de un campo específico de un pasajero
@@ -42,7 +42,7 @@ const Checkout = () => {
   const saveBookingToBackend = async (bookingData) => {
     try {
       const token = getAuthToken();
-      
+
       if (!token) {
         throw new Error("No estás autenticado. Por favor, inicia sesión.");
       }
@@ -51,14 +51,16 @@ const Checkout = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` // Incluir el token en los headers
+          Authorization: `Bearer ${token}`, // Incluir el token en los headers
         },
         body: JSON.stringify(bookingData),
       });
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error("Sesión expirada. Por favor, inicia sesión nuevamente.");
+          throw new Error(
+            "Sesión expirada. Por favor, inicia sesión nuevamente."
+          );
         }
         throw new Error("Error al guardar la reserva");
       }
@@ -76,7 +78,7 @@ const Checkout = () => {
     e.preventDefault();
     setIsProcessing(true);
 
-    const erroresValidados = Validations(formData);
+    const erroresValidados = ValidationsCheckout(formData);
     setErrores(erroresValidados);
 
     const tieneErrores = erroresValidados.some(
@@ -110,18 +112,22 @@ const Checkout = () => {
         const savedBooking = await saveBookingToBackend(bookingData);
 
         alert("¡Compra realizada con éxito!");
-        
+
         console.log("Reserva guardada:", savedBooking);
 
         // Redirigir al panel de vuelos o a una página de confirmación
         navigate("/flights-panel");
-
       } catch (error) {
-        if (error.message.includes("autenticado") || error.message.includes("Sesión expirada")) {
+        if (
+          error.message.includes("autenticado") ||
+          error.message.includes("Sesión expirada")
+        ) {
           alert(error.message);
           navigate("/login");
         } else {
-          alert("Hubo un error al procesar tu compra. Por favor, intenta nuevamente.");
+          alert(
+            "Hubo un error al procesar tu compra. Por favor, intenta nuevamente."
+          );
         }
         console.error("Error en la compra:", error);
       }
@@ -255,9 +261,9 @@ const Checkout = () => {
               </div>
             ))}
 
-            <button 
-              type="submit" 
-              className="buy-button" 
+            <button
+              type="submit"
+              className="buy-button"
               onClick={handleSubmit}
               disabled={isProcessing}
             >

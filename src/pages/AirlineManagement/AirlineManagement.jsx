@@ -84,6 +84,11 @@ const AirlineManagement = () => {
       return;
     }
 
+    if (newAirline.password.length < 7) {
+      alert("La contraseña debe tener al menos 7 caracteres.");
+      return;
+    }
+
     try {
       const token = getToken();
       if (!token) {
@@ -168,6 +173,11 @@ const AirlineManagement = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newAirline.email)) {
       alert("El formato del email no es válido");
+      return;
+    }
+
+    if (newAirline.password.length < 7) {
+      alert("La contraseña debe tener al menos 7 caracteres.");
       return;
     }
 

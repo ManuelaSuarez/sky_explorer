@@ -22,17 +22,48 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
 
   // Lista de aeropuertos
   const airports = [
-    "Bahía Blanca (BHI)", "Bariloche (BRC)", "Buenos Aires (BUE)", "Catamarca (CTC)",
-    "Comodoro Rivadavia (CRD)", "Corrientes (CNQ)", "Córdoba (COR)", "El Calafate (FTE)",
-    "El Palomar (EPA)", "Ezeiza (EZE)", "Formosa (FMA)", "Jujuy (JUJ)",
-    "Junín (JNI)", "La Plata (LPG)", "La Rioja (IRJ)", "Mar del Plata (MDQ)",
-    "Mendoza (MDZ)", "Morón (MOR)", "Necochea (NEC)", "Neuquén (NQN)",
-    "Olavarría (OVR)", "Paraná (PRA)", "Posadas (PSS)", "Puerto Iguazú (IGR)",
-    "Resistencia (RES)", "Río Cuarto (RCU)", "Río Gallegos (RGL)", "Río Grande (RGA)",
-    "Rosario (ROS)", "Salta (SLA)", "San Fernando (FDO)", "San Juan (UAQ)",
-    "San Luis (LUQ)", "San Rafael (AFA)", "Santa Rosa (RSA)", "Santa Teresita (STT)",
-    "Santiago del Estero (SDE)", "Tandil (TDL)", "Trelew (REL)", "Tucumán (TUC)",
-    "Ushuaia (USH)", "Villa Gesell (VLG)",
+    "Bahía Blanca (BHI)",
+    "Bariloche (BRC)",
+    "Buenos Aires (BUE)",
+    "Catamarca (CTC)",
+    "Comodoro Rivadavia (CRD)",
+    "Corrientes (CNQ)",
+    "Córdoba (COR)",
+    "El Calafate (FTE)",
+    "El Palomar (EPA)",
+    "Ezeiza (EZE)",
+    "Formosa (FMA)",
+    "Jujuy (JUJ)",
+    "Junín (JNI)",
+    "La Plata (LPG)",
+    "La Rioja (IRJ)",
+    "Mar del Plata (MDQ)",
+    "Mendoza (MDZ)",
+    "Morón (MOR)",
+    "Necochea (NEC)",
+    "Neuquén (NQN)",
+    "Olavarría (OVR)",
+    "Paraná (PRA)",
+    "Posadas (PSS)",
+    "Puerto Iguazú (IGR)",
+    "Resistencia (RES)",
+    "Río Cuarto (RCU)",
+    "Río Gallegos (RGL)",
+    "Río Grande (RGA)",
+    "Rosario (ROS)",
+    "Salta (SLA)",
+    "San Fernando (FDO)",
+    "San Juan (UAQ)",
+    "San Luis (LUQ)",
+    "San Rafael (AFA)",
+    "Santa Rosa (RSA)",
+    "Santa Teresita (STT)",
+    "Santiago del Estero (SDE)",
+    "Tandil (TDL)",
+    "Trelew (REL)",
+    "Tucumán (TUC)",
+    "Ushuaia (USH)",
+    "Villa Gesell (VLG)",
   ];
 
   // Función para crear fecha desde string YYYY-MM-DD
@@ -54,10 +85,13 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
       setOrigin(initialSearchParams.origin || "");
       setDestination(initialSearchParams.destination || "");
       setPassengers(initialSearchParams.passengers || "1");
-      
-      const newDepartureDate = createDateFromString(initialSearchParams.departureDate) || new Date();
-      const newReturnDate = createDateFromString(initialSearchParams.returnDate) || getTomorrow(newDepartureDate);
-      
+
+      const newDepartureDate =
+        createDateFromString(initialSearchParams.departureDate) || new Date();
+      const newReturnDate =
+        createDateFromString(initialSearchParams.returnDate) ||
+        getTomorrow(newDepartureDate);
+
       setDepartureDate(newDepartureDate);
       setReturnDate(newReturnDate);
     }
@@ -81,6 +115,11 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
 
   // Enviar búsqueda
   const handleSubmit = () => {
+    if (origin === destination) {
+      alert("El origen y el destino no pueden ser iguales.");
+      return;
+    }
+
     const formatDate = (date) => date?.toISOString().split("T")[0] || "";
 
     const searchParams = {
@@ -109,9 +148,14 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
           </div>
           <div className="passengers-dropdown">
             <p>Cantidad pasajeros</p>
-            <select value={passengers} onChange={(e) => setPassengers(e.target.value)}>
-              {[1, 2, 3, 4].map(num => (
-                <option key={num} value={num.toString()}>{num}</option>
+            <select
+              value={passengers}
+              onChange={(e) => setPassengers(e.target.value)}
+            >
+              {[1, 2, 3, 4].map((num) => (
+                <option key={num} value={num.toString()}>
+                  {num}
+                </option>
               ))}
             </select>
           </div>
@@ -130,7 +174,9 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
               >
                 <option value="">Seleccione Origen</option>
                 {airports.map((airport) => (
-                  <option key={airport} value={airport}>{airport}</option>
+                  <option key={airport} value={airport}>
+                    {airport}
+                  </option>
                 ))}
               </select>
             </div>
@@ -138,7 +184,11 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
 
           {/* Botón intercambiar */}
           <div className="exchange-button-container">
-            <button className="exchange-button" onClick={handleExchange} type="button">
+            <button
+              className="exchange-button"
+              onClick={handleExchange}
+              type="button"
+            >
               <FaExchangeAlt />
             </button>
           </div>
@@ -155,7 +205,9 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
               >
                 <option value="">Seleccione Destino</option>
                 {airports.map((airport) => (
-                  <option key={airport} value={airport}>{airport}</option>
+                  <option key={airport} value={airport}>
+                    {airport}
+                  </option>
                 ))}
               </select>
             </div>
@@ -194,7 +246,11 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
           </div>
 
           {/* Botón buscar */}
-          <button className="search-button" onClick={handleSubmit} type="button">
+          <button
+            className="search-button"
+            onClick={handleSubmit}
+            type="button"
+          >
             {buttonText}
           </button>
         </div>
