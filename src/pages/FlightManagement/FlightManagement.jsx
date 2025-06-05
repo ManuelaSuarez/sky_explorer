@@ -22,6 +22,7 @@ const FlightManagement = () => {
   const [selectedFlightId, setSelectedFlightId] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [airlineName, setAirlineName] = useState("");
+  const [airlines, setAirlines] = useState([]);
 
   // Estado para el formulario
   const [newFlight, setNewFlight] = useState({
@@ -37,41 +38,92 @@ const FlightManagement = () => {
 
   // Lista de aeropuertos
   const airports = [
-    "Bahía Blanca (BHI)", "Bariloche (BRC)", "Buenos Aires (BUE)", "Catamarca (CTC)", 
-    "Comodoro Rivadavia (CRD)", "Corrientes (CNQ)", "Córdoba (COR)", "El Calafate (FTE)", 
-    "El Palomar (EPA)", "Ezeiza (EZE)", "Formosa (FMA)", "Jujuy (JUJ)", "Junín (JNI)", 
-    "La Plata (LPG)", "La Rioja (IRJ)", "Mar del Plata (MDQ)", "Mendoza (MDZ)", 
-    "Morón (MOR)", "Necochea (NEC)", "Neuquén (NQN)", "Olavarría (OVR)", "Paraná (PRA)", 
-    "Posadas (PSS)", "Puerto Iguazú (IGR)", "Resistencia (RES)", "Río Cuarto (RCU)", 
-    "Río Gallegos (RGL)", "Río Grande (RGA)", "Rosario (ROS)", "Salta (SLA)", 
-    "San Fernando (FDO)", "San Juan (UAQ)", "San Luis (LUQ)", "San Rafael (AFA)", 
-    "Santa Rosa (RSA)", "Santa Teresita (STT)", "Santiago del Estero (SDE)", 
-    "Tandil (TDL)", "Trelew (REL)", "Tucumán (TUC)", "Ushuaia (USH)", "Villa Gesell (VLG)"
+    "Bahía Blanca (BHI)",
+    "Bariloche (BRC)",
+    "Buenos Aires (BUE)",
+    "Catamarca (CTC)",
+    "Comodoro Rivadavia (CRD)",
+    "Corrientes (CNQ)",
+    "Córdoba (COR)",
+    "El Calafate (FTE)",
+    "El Palomar (EPA)",
+    "Ezeiza (EZE)",
+    "Formosa (FMA)",
+    "Jujuy (JUJ)",
+    "Junín (JNI)",
+    "La Plata (LPG)",
+    "La Rioja (IRJ)",
+    "Mar del Plata (MDQ)",
+    "Mendoza (MDZ)",
+    "Morón (MOR)",
+    "Necochea (NEC)",
+    "Neuquén (NQN)",
+    "Olavarría (OVR)",
+    "Paraná (PRA)",
+    "Posadas (PSS)",
+    "Puerto Iguazú (IGR)",
+    "Resistencia (RES)",
+    "Río Cuarto (RCU)",
+    "Río Gallegos (RGL)",
+    "Río Grande (RGA)",
+    "Rosario (ROS)",
+    "Salta (SLA)",
+    "San Fernando (FDO)",
+    "San Juan (UAQ)",
+    "San Luis (LUQ)",
+    "San Rafael (AFA)",
+    "Santa Rosa (RSA)",
+    "Santa Teresita (STT)",
+    "Santiago del Estero (SDE)",
+    "Tandil (TDL)",
+    "Trelew (REL)",
+    "Tucumán (TUC)",
+    "Ushuaia (USH)",
+    "Villa Gesell (VLG)",
   ];
 
-  // SIMPLIFICADO: Solo obtener datos del usuario una vez
+  // Obtener datos del usuario aerolínea
   useEffect(() => {
-    const initializeUser = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
       try {
-        const token = localStorage.getItem("token");
-        if (token) {
-          const decodedToken = jwtDecode(token);
-          setUserRole(decodedToken.role);
-          setAirlineName(decodedToken.name);
+        const decodedToken = jwtDecode(token);
+        setUserRole(decodedToken.role);
+        setAirlineName(decodedToken.name);
 
-          // Si es aerolínea, precargar su nombre
-          if (decodedToken.role === "airline") {
-            setNewFlight(prev => ({ ...prev, airline: decodedToken.name }));
-          }
+        if (decodedToken.role === "airline") {
+          setNewFlight((prev) => ({ ...prev, airline: decodedToken.name }));
         }
       } catch (error) {
-        console.error("Error al obtener datos del usuario:", error);
+        console.error("Error al decodificar token:", error);
+      }
+    }
+
+    fetchFlights();
+  }, []);
+
+  // Cargar nombres de aerolíneas si el user es admin
+  useEffect(() => {
+    const fetchAirlines = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:3000/api/airlines", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) throw new Error("Error al obtener aerolíneas");
+        const data = await res.json();
+        setAirlines(data);
+      } catch (error) {
+        console.error("Error cargando aerolíneas:", error);
       }
     };
 
-    initializeUser();
-    fetchFlights();
-  }, []);
+    if (userRole === "admin") {
+      fetchAirlines();
+    }
+  }, [userRole]);
 
   // Cargar vuelos
   const fetchFlights = async () => {
@@ -114,8 +166,27 @@ const FlightManagement = () => {
 
   // Validar formulario
   const validateForm = () => {
-    const required = ['airline', 'origin', 'destination', 'date', 'departureTime', 'arrivalTime', 'capacity', 'basePrice'];
-    return required.every(field => newFlight[field]);
+    const required = [
+      "airline",
+      "origin",
+      "destination",
+      "date",
+      "departureTime",
+      "arrivalTime",
+      "capacity",
+      "basePrice",
+    ];
+    const allFieldsFilled = required.every((field) => newFlight[field]);
+
+    if (!allFieldsFilled) return false;
+
+    // Validar que origen y destino no sean iguales
+    if (newFlight.origin === newFlight.destination) {
+      alert("El origen y el destino no pueden ser iguales");
+      return false;
+    }
+
+    return true;
   };
 
   // Preparar datos del vuelo
@@ -164,7 +235,7 @@ const FlightManagement = () => {
 
   // Editar vuelo
   const handleEdit = (id) => {
-    const flightToEdit = flights.find(flight => flight.id === id);
+    const flightToEdit = flights.find((flight) => flight.id === id);
     if (!flightToEdit) {
       alert("No se encontró el vuelo seleccionado");
       return;
@@ -183,7 +254,9 @@ const FlightManagement = () => {
 
     setEditMode(true);
     setSelectedFlightId(id);
-    document.querySelector(".create-flight-section")?.scrollIntoView({ behavior: "smooth" });
+    document
+      .querySelector(".create-flight-section")
+      ?.scrollIntoView({ behavior: "smooth" });
   };
 
   // Guardar cambios
@@ -195,14 +268,17 @@ const FlightManagement = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:3000/api/flights/${selectedFlightId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(prepareFlightData()),
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/flights/${selectedFlightId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(prepareFlightData()),
+        }
+      );
 
       if (response.ok) {
         alert("Vuelo actualizado con éxito");
@@ -245,15 +321,15 @@ const FlightManagement = () => {
   // Manejo de cambios en el formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewFlight(prev => ({ ...prev, [name]: value }));
+    setNewFlight((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleDateChange = (date) => {
-    setNewFlight(prev => ({ ...prev, date }));
+    setNewFlight((prev) => ({ ...prev, date }));
   };
 
   const handleExchangeLocations = () => {
-    setNewFlight(prev => ({
+    setNewFlight((prev) => ({
       ...prev,
       origin: prev.destination,
       destination: prev.origin,
@@ -298,7 +374,14 @@ const FlightManagement = () => {
                   </tr>
                 ) : (
                   flights.map((flight) => (
-                    <tr key={flight.id} className={flight.status === "Activo" ? "active-row" : "inactive-row"}>
+                    <tr
+                      key={flight.id}
+                      className={
+                        flight.status === "Activo"
+                          ? "active-row"
+                          : "inactive-row"
+                      }
+                    >
                       <td>{flight.id}</td>
                       <td>{flight.airline}</td>
                       <td>{flight.origin}</td>
@@ -306,18 +389,30 @@ const FlightManagement = () => {
                       <td>{flight.date}</td>
                       <td>{flight.departureTime}</td>
                       <td>{flight.arrivalTime}</td>
-                      <td className={flight.status === "Activo" ? "status-active" : "status-inactive"}>
+                      <td
+                        className={
+                          flight.status === "Activo"
+                            ? "status-active"
+                            : "status-inactive"
+                        }
+                      >
                         {flight.status}
                       </td>
                       <td>
-                        {flight.status === "Activo" && ( 
-                          <button className="edit-button" onClick={() => handleEdit(flight.id)}>
+                        {flight.status === "Activo" && (
+                          <button
+                            className="edit-button"
+                            onClick={() => handleEdit(flight.id)}
+                          >
                             Editar
                           </button>
                         )}
                       </td>
                       <td>
-                        <button className="delete-button" onClick={() => handleDelete(flight.id)}>
+                        <button
+                          className="delete-button"
+                          onClick={() => handleDelete(flight.id)}
+                        >
                           <FaTrash />
                         </button>
                       </td>
@@ -343,16 +438,33 @@ const FlightManagement = () => {
                   <label>Nombre Empresa*</label>
                   <div className="input-with-icon">
                     <FaBuilding className="input-icon" />
-                    <input
-                      type="text"
-                      name="airline"
-                      value={newFlight.airline}
-                      onChange={handleInputChange}
-                      placeholder="Nombre de la aerolínea"
-                      readOnly={userRole === "airline"}
-                      disabled={userRole === "airline"}
-                      style={userRole === "airline" ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
-                    />
+                    {userRole === "admin" ? (
+                      <select
+                        name="airline"
+                        value={newFlight.airline}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="">Seleccione una aerolínea</option>
+                        {airlines.map((airline) => (
+                          <option key={airline.id} value={airline.name}>
+                            {airline.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        name="airline"
+                        value={newFlight.airline}
+                        readOnly
+                        disabled
+                        style={{
+                          backgroundColor: "#f0f0f0",
+                          cursor: "not-allowed",
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -360,16 +472,27 @@ const FlightManagement = () => {
                   <label>Origen*</label>
                   <div className="input-with-icon">
                     <FaMapMarkerAlt className="field-icon" />
-                    <select name="origin" value={newFlight.origin} onChange={handleInputChange} className="airport-select">
+                    <select
+                      name="origin"
+                      value={newFlight.origin}
+                      onChange={handleInputChange}
+                      className="airport-select"
+                    >
                       <option value="">Seleccione Origen</option>
                       {airports.map((airport) => (
-                        <option key={airport} value={airport}>{airport}</option>
+                        <option key={airport} value={airport}>
+                          {airport}
+                        </option>
                       ))}
                     </select>
                   </div>
                 </div>
 
-                <button type="button" className="exchange-button" onClick={handleExchangeLocations}>
+                <button
+                  type="button"
+                  className="exchange-button"
+                  onClick={handleExchangeLocations}
+                >
                   <FaExchangeAlt />
                 </button>
 
@@ -377,10 +500,17 @@ const FlightManagement = () => {
                   <label>Destino*</label>
                   <div className="input-with-icon">
                     <FaMapMarkerAlt className="field-icon" />
-                    <select name="destination" value={newFlight.destination} onChange={handleInputChange} className="airport-select">
+                    <select
+                      name="destination"
+                      value={newFlight.destination}
+                      onChange={handleInputChange}
+                      className="airport-select"
+                    >
                       <option value="">Seleccione Destino</option>
                       {airports.map((airport) => (
-                        <option key={airport} value={airport}>{airport}</option>
+                        <option key={airport} value={airport}>
+                          {airport}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -463,15 +593,27 @@ const FlightManagement = () => {
               <div className="create-button-container">
                 {editMode ? (
                   <>
-                    <button type="button" className="cancel-button" onClick={resetForm}>
+                    <button
+                      type="button"
+                      className="cancel-button"
+                      onClick={resetForm}
+                    >
                       Cancelar
                     </button>
-                    <button type="button" className="create-button" onClick={handleSaveChanges}>
+                    <button
+                      type="button"
+                      className="create-button"
+                      onClick={handleSaveChanges}
+                    >
                       Guardar cambios
                     </button>
                   </>
                 ) : (
-                  <button type="button" className="create-button" onClick={handleCreateFlight}>
+                  <button
+                    type="button"
+                    className="create-button"
+                    onClick={handleCreateFlight}
+                  >
                     Crear
                   </button>
                 )}
