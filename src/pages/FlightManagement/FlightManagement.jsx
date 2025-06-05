@@ -373,51 +373,56 @@ const FlightManagement = () => {
                     </td>
                   </tr>
                 ) : (
-                  flights.map((flight) => (
-                    <tr
-                      key={flight.id}
-                      className={
-                        flight.status === "Activo"
-                          ? "active-row"
-                          : "inactive-row"
-                      }
-                    >
-                      <td>{flight.id}</td>
-                      <td>{flight.airline}</td>
-                      <td>{flight.origin}</td>
-                      <td>{flight.destination}</td>
-                      <td>{flight.date}</td>
-                      <td>{flight.departureTime}</td>
-                      <td>{flight.arrivalTime}</td>
-                      <td
+                  flights
+                    .filter(
+                      (flight) =>
+                        userRole === "admin" || flight.airline === airlineName
+                    )
+                    .map((flight) => (
+                      <tr
+                        key={flight.id}
                         className={
                           flight.status === "Activo"
-                            ? "status-active"
-                            : "status-inactive"
+                            ? "active-row"
+                            : "inactive-row"
                         }
                       >
-                        {flight.status}
-                      </td>
-                      <td>
-                        {flight.status === "Activo" && (
-                          <button
-                            className="edit-button"
-                            onClick={() => handleEdit(flight.id)}
-                          >
-                            Editar
-                          </button>
-                        )}
-                      </td>
-                      <td>
-                        <button
-                          className="delete-button"
-                          onClick={() => handleDelete(flight.id)}
+                        <td>{flight.id}</td>
+                        <td>{flight.airline}</td>
+                        <td>{flight.origin}</td>
+                        <td>{flight.destination}</td>
+                        <td>{flight.date}</td>
+                        <td>{flight.departureTime}</td>
+                        <td>{flight.arrivalTime}</td>
+                        <td
+                          className={
+                            flight.status === "Activo"
+                              ? "status-active"
+                              : "status-inactive"
+                          }
                         >
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                          {flight.status}
+                        </td>
+                        <td>
+                          {flight.status === "Activo" && (
+                            <button
+                              className="edit-button"
+                              onClick={() => handleEdit(flight.id)}
+                            >
+                              Editar
+                            </button>
+                          )}
+                        </td>
+                        <td>
+                          <button
+                            className="delete-button"
+                            onClick={() => handleDelete(flight.id)}
+                          >
+                            <FaTrash />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
                 )}
               </tbody>
             </table>
