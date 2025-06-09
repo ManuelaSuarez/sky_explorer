@@ -1,11 +1,11 @@
 import { Navigate } from "react-router-dom";
-import { useEffect } from "react"; 
+import { useEffect } from "react";
 
 const AdminRoute = ({ children, user, setModalVisible }) => {
   const isAdmin = user && user.role === "admin";
   const isAuthenticated = !!user; // true si hay un usuario logueado
 
-  // Si no hay usuario logueado en absoluto, necesitamos que inicie sesión.
+  // Si no hay usuario logueado pide que inicie sesión.
   if (!isAuthenticated) {
     useEffect(() => {
       setModalVisible("login");
@@ -13,13 +13,12 @@ const AdminRoute = ({ children, user, setModalVisible }) => {
     return <Navigate to="/" replace />;
   }
 
-  // Si el usuario está logueado pero NO es admin,
-  // solo lo redirigimos sin mostrar el modal de login.
+  // Si el usuario logueado no es admin redirige
   if (!isAdmin) {
     return <Navigate to="/" replace />;
   }
 
-  // Si es admin, permite el acceso
+  // Si es admin renderiza lo que corresponda
   return children;
 };
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./FlightPanel.css";
-import { useNavigate } from "react-router-dom"; // Se conserva useNavigate
+import { useNavigate } from "react-router-dom";
 
 const FlightPanel = ({ setModalVisible }) => {
   // Seteo de estados
-  const [bookings, setBookings] = useState([]); // Guarda la lista de reservas del usuario
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -23,14 +23,14 @@ const FlightPanel = ({ setModalVisible }) => {
         throw new Error("No estás autenticado. Por favor, inicia sesión.");
       }
 
-      // Usar la nueva ruta para obtener las reservas del usuario autenticado
+      // Obtiene las reservas del usuario autenticado
       const response = await fetch(
         "http://localhost:3000/api/bookings/my-bookings",
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Incluir el token
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -51,13 +51,12 @@ const FlightPanel = ({ setModalVisible }) => {
       console.error("Error al obtener reservas:", error);
       setError(error.message);
 
-      // If the error is due to authentication, open the login modal
+      // Si el error es por autenticación, abre el modal
       if (
         error.message.includes("autenticado") ||
         error.message.includes("Sesión expirada")
       ) {
         if (setModalVisible) {
-          // Ensure setModalVisible is provided as a prop
           setModalVisible("login");
         }
       }

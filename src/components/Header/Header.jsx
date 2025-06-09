@@ -1,4 +1,4 @@
-import "./Header.css"; // Asegúrate de tener este archivo CSS con los estilos
+import "./Header.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import UserProfileModal from "../UserProfileModal/UserProfileModal";
@@ -8,14 +8,18 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
   const navigate = useNavigate();
   const [showProfileModal, setShowProfileModal] = useState(false);
 
-  const hasAdminAirlineAccess = user && (user.role === "admin" || user.role === "airline");
+  const hasAdminAirlineAccess =
+    user && (user.role === "admin" || user.role === "airline");
   const isAdmin = user && user.role === "admin";
 
   // Efecto para redirigir a usuarios con roles específicos
   useEffect(() => {
     if (hasAdminAirlineAccess) {
       const userOnlyRoutes = ["/favorites", "/myFlights", "/checkout"];
-      if (location.pathname === "/" || userOnlyRoutes.some((route) => location.pathname.startsWith(route))) {
+      if (
+        location.pathname === "/" ||
+        userOnlyRoutes.some((route) => location.pathname.startsWith(route))
+      ) {
         navigate("/admin/flights");
       }
     }
@@ -36,9 +40,9 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
     }
   };
 
-  // Función para manejar el clic en el logo (redirige según el rol)
+  // Función para redirigir al tocar el logo
   const handleLogoClick = (e) => {
-    e.preventDefault(); // Evita el comportamiento por defecto del link
+    e.preventDefault();
     if (hasAdminAirlineAccess) {
       navigate("/admin/flights"); // Admins/Aerolíneas van a vuelos de admin
     } else {
@@ -46,17 +50,20 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
     }
   };
 
-  // Función para actualizar el perfil del usuario (llamada desde UserProfileModal)
+  // Función para actualizar el perfil del usuario (en UserProfileModal)
   const handleUpdateProfile = async (updateData) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/users/profile/me`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}` // Envía el token de autenticación
-        },
-        body: JSON.stringify(updateData) // Envía los datos del formulario
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/users/profile/me`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Envía el token de autenticación
+          },
+          body: JSON.stringify(updateData), // Envía los datos del formulario
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -65,12 +72,12 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
 
       const updatedUserResponse = await response.json();
 
-      // Si el backend envía un nuevo token (ej. si el email cambió), lo guarda
+      // Si el backend envía un nuevo token, lo guarda
       if (updatedUserResponse.token) {
         localStorage.setItem("token", updatedUserResponse.token);
       }
 
-      // Actualiza el estado del usuario en el componente padre (App.js)
+      // Actualiza el estado del usuario en el app
       if (onUserUpdate && updatedUserResponse.user) {
         onUserUpdate(updatedUserResponse.user);
       }
@@ -78,19 +85,22 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
       setShowProfileModal(false); // Cierra el modal de perfil
       return updatedUserResponse;
     } catch (error) {
-      throw error; // Propaga el error para que el modal lo muestre
+      throw error;
     }
   };
 
-  // Función para eliminar la cuenta del usuario (llamada desde UserProfileModal)
+  // Función para eliminar la cuenta del usuario (en UserProfileModal)
   const handleDeleteAccount = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/users/profile/me/with-bookings`, {
-        method: "DELETE",
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token")}` // Envía el token de autenticación
+      const response = await fetch(
+        `http://localhost:3000/api/users/profile/me/with-bookings`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Envía el token de autenticación
+          },
         }
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -100,21 +110,28 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
       setShowProfileModal(false); // Cierra el modal de perfil
       onLogout(); // Cierra la sesión del usuario
     } catch (error) {
-      throw error; // Propaga el error para que el modal lo muestre
+      throw error;
     }
   };
 
-  // Función para obtener las iniciales del nombre del usuario para el avatar
+  // Función para mostrar las iniciales del usuario en el avatar
   const getInitials = () => {
-    if (!user?.name) return "US"; // Si no hay nombre, muestra "US"
+    if (!user?.name) return "US"; // Si no hay nombre, muestra US
     const names = user.name.split(" "); // Divide el nombre por espacios
-    return names.map(name => name[0]).join("").toUpperCase(); // Toma la primera letra de cada palabra y las une
+    return names
+      .map((name) => name[0])
+      .join("")
+      .toUpperCase(); // Toma la primera letra de cada palabra y las une
   };
 
   return (
     <>
       <div className="header_container">
-        <div className="header_logo" onClick={handleLogoClick} style={{ cursor: "pointer" }}>
+        <div
+          className="header_logo"
+          onClick={handleLogoClick}
+          style={{ cursor: "pointer" }}
+        >
           <i className="fa-solid fa-globe"></i>
           <h1 className="header_title">Sky Explorer</h1>
         </div>
@@ -164,7 +181,9 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
         <div className="header_user-section">
           {user && ( // Sección de usuario si hay un usuario logueado
             <div className="user-profile-container">
-              <span className="user-greeting">Hola, {user.name || "Usuario"}</span>
+              <span className="user-greeting">
+                Hola, {user.name || "Usuario"}
+              </span>
               <div
                 className="user-avatar"
                 onClick={() => setShowProfileModal(true)} // Abre el modal de perfil al hacer clic
@@ -194,7 +213,7 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
             onClose={() => setShowProfileModal(false)} // Función para cerrar el modal
             onUpdate={handleUpdateProfile} // Función para actualizar el perfil
             onDelete={handleDeleteAccount} // Función para eliminar la cuenta
-            isAdmin={isAdmin} // Pasa si es admin (aunque no se usa directamente en este modal)
+            isAdmin={isAdmin} // Pasa si es admin
           />
         )}
       </div>

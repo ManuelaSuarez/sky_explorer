@@ -1,27 +1,26 @@
 import { Navigate } from "react-router-dom";
-import { useEffect } from "react"; 
+import { useEffect } from "react";
 
 const AirlineAdminRoute = ({ children, user, setModalVisible }) => {
   const isAirline = user && user.role === "airline";
   const isAdmin = user && user.role === "admin";
   const isAuthenticated = !!user; // true si hay un usuario logueado
 
-  // Si no hay usuario logueado en absoluto, necesitamos que inicie sesión.
+  // Si no hay usuario logueado pide que inice sesión
   if (!isAuthenticated) {
-    // useEffect para asegurar que setModalVisible se llama una vez y no en cada render.
+    // useEffect para que el modal se llame una vez
     useEffect(() => {
       setModalVisible("login");
-    }, [setModalVisible]); // Dependencia para que se ejecute si setModalVisible cambia 
+    }, [setModalVisible]);
     return <Navigate to="/" replace />;
   }
 
-  // Si el usuario está logueado pero no tiene el rol de Airline ni Admin,
-  // solo lo redirigimos sin mostrar el modal de login.
+  // Si el usuario está logueado pero no tiene es Airline ni Admin se redirige a la home
   if (!isAirline && !isAdmin) {
     return <Navigate to="/" replace />;
   }
 
-  // Si el usuario es Airline o Admin, permite el acceso
+  // Si el usuario es Airline o Admin renderiza lo que corresponda
   return children;
 };
 

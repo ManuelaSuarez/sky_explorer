@@ -22,12 +22,11 @@ import AirlineAdminRoute from "./components/ProtectedRoutes/AirlineAdmin.jsx";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
-  // Estados
   const [modalVisible, setModalVisible] = useState("");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Verificación del token al iniciar App
+  // Verificación del token al iniciar
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -44,7 +43,7 @@ function App() {
 
   const closeModal = () => setModalVisible("");
 
-  // Función que se ejecuta cuando el inicio de sesión es exitoso
+  // guarda el token y decodifica al usuario si el inicio de sesión es exitoso
   const handleLoginSuccess = ({ token }) => {
     try {
       localStorage.setItem("token", token);
@@ -56,7 +55,7 @@ function App() {
     closeModal();
   };
 
-  // Función para cerrar la sesión del usuario
+  // Función para cerrar la sesión del usuario, eliminando el token
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
@@ -64,7 +63,7 @@ function App() {
     closeModal();
   };
 
-  // Función para actualizar la información del usuario
+  // Función para actualizar la información del usuario  cuando se edita el perfil desde el modal
   const handleUserUpdate = (updatedUser) => {
     setUser(updatedUser);
   };
@@ -116,7 +115,7 @@ function App() {
             }
           />
 
-          {/* Rutas administrativas - Gestión de vuelos (Admin + Airline) */}
+          {/* Rutas administrativas (Admin + Airline) */}
           <Route
             path="/admin"
             element={
@@ -134,7 +133,7 @@ function App() {
             }
           />
 
-          {/* Rutas administrativas - Gestión de aerolíneas (Solo Admin) */}
+          {/* Rutas administrativas (Admin) */}
           <Route
             path="/admin/accounts"
             element={

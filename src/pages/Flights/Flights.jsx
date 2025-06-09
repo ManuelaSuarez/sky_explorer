@@ -7,24 +7,24 @@ import "./Flights.css";
 
 const Flights = () => {
   const location = useLocation();
+  // Vuelos del backend
+  const [allFlights, setAllFlights] = useState([]);
 
-  // PASO 1: Variables que guardamos
-  const [allFlights, setAllFlights] = useState([]); // Todos los vuelos
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // PASO 2: Lo que busca el usuario
-  const [searchFrom, setSearchFrom] = useState(""); // Desde dónde
-  const [searchTo, setSearchTo] = useState(""); // Hacia dónde
-  const [departureDate, setDepartureDate] = useState(""); // Fecha ida
-  const [returnDate, setReturnDate] = useState(""); // Fecha vuelta
-  const [passengers, setPassengers] = useState(""); // Pasajeros
+  // Datos de la búsqueda del usuario
+  const [searchFrom, setSearchFrom] = useState("");
+  const [searchTo, setSearchTo] = useState("");
+  const [departureDate, setDepartureDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
+  const [passengers, setPassengers] = useState("");
 
-  // PASO 3: Filtros adicionales
-  const [chosenAirlines, setChosenAirlines] = useState([]); // Aerolíneas elegidas
-  const [priceOrder, setPriceOrder] = useState("low-to-high"); // Orden precios
+  // Filtros adicionales
+  const [chosenAirlines, setChosenAirlines] = useState([]);
+  const [priceOrder, setPriceOrder] = useState("low-to-high");
 
-  // Leer filtros desde URL si existen (al entrar)
+  // Carga la primera búsqueda
   useEffect(() => {
     const params = new URLSearchParams(location.search);
 
@@ -43,7 +43,7 @@ const Flights = () => {
     setPassengers(initialSearch.passengers);
   }, [location.search]);
 
-  // PASO 4: Traer vuelos del servidor
+  // Función que trae vuelos del servidor
   const getFlights = async () => {
     setLoading(true);
     try {
@@ -57,7 +57,7 @@ const Flights = () => {
     setLoading(false);
   };
 
-  // PASO 5: Cuando el usuario busca algo nuevo
+  // Actualiza los datos en una nueva búsqueda
   const handleSearch = (searchData) => {
     setSearchFrom(searchData.origin || "");
     setSearchTo(searchData.destination || "");
@@ -67,11 +67,10 @@ const Flights = () => {
     setChosenAirlines([]); // Limpiar filtros
   };
 
-  // PASO 6: Mostrar solo vuelos que coinciden con la búsqueda - CORREGIDO
+  // Muestra los vuelos que coinciden con la búsqueda
   const getMatchingFlights = () => {
     let flights = [...allFlights];
 
-    // ¿Busca desde algún lugar específico?
     if (searchFrom) {
       flights = flights.filter((flight) =>
         flight.origin.toLowerCase().includes(searchFrom.toLowerCase())
@@ -89,7 +88,7 @@ const Flights = () => {
       flights = flights.filter((flight) => {
         const flightDate = flight.date || flight.departureDate;
         if (flightDate) {
-          // Convertir ambas fechas a formato comparable (YYYY-MM-DD)
+          // Convertir ambas fechas a formato YYYY-MM-DD
           const searchDate = new Date(departureDate)
             .toISOString()
             .split("T")[0];
@@ -105,7 +104,6 @@ const Flights = () => {
     // Filtrar por fecha de regreso (si aplica)
     if (returnDate) {
       flights = flights.filter((flight) => {
-        // Si tienes un campo específico para fecha de regreso
         const flightReturnDate = flight.returnDate;
         if (flightReturnDate) {
           const searchReturn = new Date(returnDate).toISOString().split("T")[0];
@@ -114,7 +112,6 @@ const Flights = () => {
             .split("T")[0];
           return flightReturnFormatted === searchReturn;
         }
-        // Si no tienes fecha de regreso específica, no filtrar por esta condición
         return true;
       });
     }
@@ -126,17 +123,17 @@ const Flights = () => {
       );
     }
 
-    // Siempre ordena por precio
+    // Ordena por precio
     if (priceOrder === "low-to-high") {
-      flights.sort((a, b) => a.basePrice - b.basePrice); // Baratos primero
+      flights.sort((a, b) => a.basePrice - b.basePrice);
     } else {
-      flights.sort((a, b) => b.basePrice - a.basePrice); // Caros primero
+      flights.sort((a, b) => b.basePrice - a.basePrice);
     }
 
     return flights;
   };
 
-  // PASO 7: Preparar vuelo para mostrar en pantalla
+  // Prepara vuelo para mostrar en pantalla
   const prepareFlightData = (flight) => {
     const passengersCount = parseInt(passengers) || 1;
     const totalPrice = flight.basePrice * passengersCount;
@@ -159,7 +156,7 @@ const Flights = () => {
     };
   };
 
-  // PASO 8: Crear título de la página
+  // Título dinámico de resultados
   const getTitle = () => {
     if (searchFrom && searchTo) {
       return `Vuelos de ${searchFrom} a ${searchTo}`;
@@ -167,7 +164,7 @@ const Flights = () => {
     return "Todos los vuelos";
   };
 
-  // PASO 9: Crear información de la búsqueda
+  // Resumen dinámico de los resultados
   const getSearchInfo = () => {
     const info = [];
     if (departureDate) info.push(`Salida: ${departureDate}`);
@@ -176,14 +173,13 @@ const Flights = () => {
     return info.join(" | ");
   };
 
-  // PASO 10: Obtener aerolíneas disponibles
+  // Obtener aerolíneas disponibles para el filtrado
   const getAirlines = () => {
     const airlines = allFlights.map((flight) => flight.airline);
     const uniqueAirlines = [...new Set(airlines)]; // Eliminar duplicados
     return uniqueAirlines.sort(); // Ordenar alfabéticamente
   };
 
-  // PASO 11: Si hay búsqueda activa
   const isSearching = () => {
     return (
       searchFrom ||
@@ -194,7 +190,7 @@ const Flights = () => {
     );
   };
 
-  // PASO 12: Cargar vuelos cuando se abre la página
+  // Cargar vuelos cuando se abre la página
   useEffect(() => {
     getFlights();
   }, []);
@@ -202,8 +198,10 @@ const Flights = () => {
   if (loading) return <div className="loading">Cargando vuelos...</div>;
   if (error) return <div className="error">{error}</div>;
 
-  // PASO 13: Decidir qué vuelos mostrar
+  // Muestra los vuelos que coinciden
   const flightsToShow = getMatchingFlights();
+
+  // Muestra si no hay resultados
   const noResults = flightsToShow.length === 0 && isSearching();
 
   // Mostrar la página

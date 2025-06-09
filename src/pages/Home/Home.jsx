@@ -6,6 +6,7 @@ import mendoza from "../../utils/images/mendoza.jpg";
 import rosario from "../../utils/images/rosario.webp";
 
 const Home = () => {
+  // Ofertas no dinámicas
   const offers = [
     {
       id: 1,
@@ -21,7 +22,7 @@ const Home = () => {
       origin: "Buenos Aires",
       price: "650000",
     },
-        {
+    {
       id: 3,
       image: rosario,
       destination: "Rosario",
@@ -32,8 +33,9 @@ const Home = () => {
 
   return (
     <div className="home-container">
+      // Barra de búsqueda
       <SearchBar buttonText="Buscar" />
-
+      // Ofertas
       <div className="offers-container">
         {offers.map((offer) => (
           <OfferBox
