@@ -33,9 +33,7 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      // Barra de búsqueda
       <SearchBar buttonText="Buscar" />
-      // Ofertas
       <div className="offers-container">
         {offers.map((offer) => (
           <OfferBox
