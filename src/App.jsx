@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+// App.jsx
+import { useState, useEffect, useCallback } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -22,40 +23,71 @@ import AirlineAdminRoute from "./components/ProtectedRoutes/AirlineAdmin.jsx";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
+  // Estados
   const [modalVisible, setModalVisible] = useState("");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Verificación del token al iniciar
-  useEffect(() => {
+  // Función para obtener el perfil del usuario desde el backend
+  const fetchUserProfile = useCallback(async () => {
     const token = localStorage.getItem("token");
-
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUser(decoded);
-      } catch (error) {
-        localStorage.removeItem("token");
-      }
+    if (!token) {
+      setUser(null);
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    try {
+      // Intenta obtener la información del perfil del servidor usando el token
+      const response = await fetch("http://localhost:3000/api/users/profile/me", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        // Construir la URL completa de la imagen antes de guardar en el estado
+        const userWithFullImageUrl = {
+          ...userData,
+          profileImageUrl: userData.profilePicture 
+            ? `http://localhost:3000/uploads/profile-pictures/${userData.profilePicture}`
+            : null,
+        };
+        setUser(userWithFullImageUrl);
+      } else {
+        // Si el token no es válido, lo eliminamos
+        console.error("Token inválido o expirado. Vuelve a iniciar sesión.");
+        localStorage.removeItem("token");
+        setUser(null);
+      }
+    } catch (error) {
+      console.error("Error al obtener el perfil del usuario:", error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  // Carga la información del usuario al montar el componente
+  useEffect(() => {
+    fetchUserProfile();
+  }, [fetchUserProfile]);
 
   const closeModal = () => setModalVisible("");
 
-  // guarda el token y decodifica al usuario si el inicio de sesión es exitoso
-  const handleLoginSuccess = ({ token }) => {
+  // Función que se ejecuta cuando el inicio de sesión es exitoso
+  const handleLoginSuccess = async ({ token }) => {
     try {
       localStorage.setItem("token", token);
-      const decoded = jwtDecode(token);
-      setUser(decoded);
+      await fetchUserProfile(); // Llama a la función para obtener el perfil completo después del login
     } catch (error) {
-      console.error("Error al decodificar token:", error);
+      console.error("Error al decodificar token o obtener perfil:", error);
     }
     closeModal();
   };
 
-  // Función para cerrar la sesión del usuario, eliminando el token
+  // Función para cerrar la sesión del usuario
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
@@ -63,8 +95,9 @@ function App() {
     closeModal();
   };
 
-  // Función para actualizar la información del usuario  cuando se edita el perfil desde el modal
+  // Función para actualizar la información del usuario en el estado
   const handleUserUpdate = (updatedUser) => {
+    // La función que sube la foto ya devuelve la URL completa, la pasamos directamente
     setUser(updatedUser);
   };
 
@@ -115,7 +148,7 @@ function App() {
             }
           />
 
-          {/* Rutas administrativas (Admin + Airline) */}
+          {/* Rutas administrativas - Gestión de vuelos (Admin + Airline) */}
           <Route
             path="/admin"
             element={
@@ -133,7 +166,7 @@ function App() {
             }
           />
 
-          {/* Rutas administrativas (Admin) */}
+          {/* Rutas administrativas - Gestión de aerolíneas (Solo Admin) */}
           <Route
             path="/admin/accounts"
             element={
