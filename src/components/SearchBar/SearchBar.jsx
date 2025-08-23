@@ -9,7 +9,7 @@ import "./SearchBar.css";
 const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
   const navigate = useNavigate();
 
-  // Estados del formulario
+  // Estados de los inputs del form
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [passengers, setPassengers] = useState("1");
@@ -20,7 +20,7 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
     return tomorrow;
   });
 
-  // Lista de aeropuertos
+  // Lista de aeropuertos para el select
   const airports = [
     "Bahía Blanca (BHI)",
     "Bariloche (BRC)",
@@ -66,28 +66,31 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
     "Villa Gesell (VLG)",
   ];
 
-  // Función para crear fecha desde string YYYY-MM-DD
+  // Función para pasar de string a fecha YYYY-MM-DD
   const createDateFromString = (dateString) => {
     if (!dateString) return null;
     return new Date(dateString + "T00:00:00");
   };
 
-  // Función para obtener mañana
+  // Función para obtener el día siguiente
   const getTomorrow = (fromDate = new Date()) => {
     const tomorrow = new Date(fromDate);
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow;
   };
 
-  // Sincronizar con parámetros iniciales
+  // Se ejecuta al inicio y cada vez que cambian los parámetros de búsqueda
   useEffect(() => {
     if (initialSearchParams) {
       setOrigin(initialSearchParams.origin || "");
       setDestination(initialSearchParams.destination || "");
       setPassengers(initialSearchParams.passengers || "1");
 
+      // Convierte la fecha de string a Date, si no existe usa la de hoy
       const newDepartureDate =
         createDateFromString(initialSearchParams.departureDate) || new Date();
+
+      // Convierte la fecha de string a Date, si no existe usa la de mañana
       const newReturnDate =
         createDateFromString(initialSearchParams.returnDate) ||
         getTomorrow(newDepartureDate);
@@ -104,24 +107,27 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
     setDestination(tempOrigin);
   };
 
-  // Manejar cambio de fecha de salida
+  // Actualiza la fecha de salida
   const handleDepartureChange = (date) => {
     setDepartureDate(date);
-    // Si la fecha de regreso es anterior a la nueva fecha de salida, ajustarla
+    // Si la fecha de regreso es anterior a la nueva fecha de salida, la cambia por el día siguiente
     if (returnDate && date && returnDate < date) {
       setReturnDate(getTomorrow(date));
     }
   };
 
-  // Enviar búsqueda
+  // Maneja el envío del form
   const handleSubmit = () => {
+    // Si el origen y el destino son iguales muestra una alerta
     if (origin === destination) {
       alert("El origen y el destino no pueden ser iguales.");
       return;
     }
 
+    // Convierte la fecha Date a string para la base de datos
     const formatDate = (date) => date?.toISOString().split("T")[0] || "";
 
+    // Crea un objeto con los datos del form
     const searchParams = {
       origin,
       destination,

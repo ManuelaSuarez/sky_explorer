@@ -5,12 +5,12 @@ import ValidationsCheckout from "../../components/ValidationsCheckout/Validation
 import "./Checkout.css";
 
 const Checkout = () => {
-  // Recuperar los datos pasados por navigate
+  // Recupera el vuelo elegido y la cantidad de pasajeros pasados por navigate
   const { state } = useLocation();
   const { flight, passengers } = state || {};
   const navigate = useNavigate();
 
-  // Estados existentes
+  // Estado para los datos del form según cuántos pasajeros son
   const [formData, setFormData] = useState(
     Array.from({ length: passengers }, () => ({
       nombre: "",
@@ -25,12 +25,11 @@ const Checkout = () => {
   const [errores, setErrores] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Función para obtener el token del usuario
   const getAuthToken = () => {
-    return localStorage.getItem("token"); // Asume que guardas el token en localStorage
+    return localStorage.getItem("token");
   };
 
-  // Manejador que actualiza el valor de un campo específico de un pasajero
+  // Maneja cambios en el formulario
   const handleChange = (index, e) => {
     const { name, value } = e.target;
     const updated = [...formData];
@@ -38,9 +37,10 @@ const Checkout = () => {
     setFormData(updated);
   };
 
-  // Función para guardar la reserva en el backend con autenticación
+  // Función para guardar la reserva en el backend
   const saveBookingToBackend = async (bookingData) => {
     try {
+      // token para asociar la reserva al usuario
       const token = getAuthToken();
 
       if (!token) {
@@ -51,7 +51,7 @@ const Checkout = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Incluir el token en los headers
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(bookingData),
       });
@@ -73,7 +73,7 @@ const Checkout = () => {
     }
   };
 
-  // Validamos todos los formularios al enviar
+  // Gestiona el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
@@ -105,7 +105,6 @@ const Checkout = () => {
           flightId: flight.id,
           passengers: formData,
           totalPrice: totalFinal,
-          // Removemos userId porque se obtiene del token en el backend
         };
 
         // Guardar en el backend
@@ -158,6 +157,7 @@ const Checkout = () => {
 
         <div className="checkout-main">
           <div className="checkout-form-section">
+            // formulario de pasajero, aparece tantas veces como pasajeros sean
             {formData.map((p, i) => (
               <div className="passenger-info-form" key={i}>
                 <div className="form-header">
@@ -260,7 +260,6 @@ const Checkout = () => {
                 </div>
               </div>
             ))}
-
             <button
               type="submit"
               className="buy-button"

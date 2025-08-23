@@ -9,18 +9,17 @@ const AirlineManagement = () => {
     code: "",
     cuit: "",
     email: "",
-    password: "", // Añadir campo de contraseña para la creación
+    password: "",
   });
   const [editingAirlineId, setEditingAirlineId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Función para obtener el token del localStorage
   const getToken = () => {
-    return localStorage.getItem("token"); // Asumiendo que guardas el token aquí
+    return localStorage.getItem("token");
   };
 
-  // Obtener aerolíneas
+  // Obtener aerolíneas EXPLICAR
   const fetchAirlines = async () => {
     setLoading(true);
     setError(null);
@@ -31,7 +30,6 @@ const AirlineManagement = () => {
       }
 
       const response = await fetch("http://localhost:3000/api/airlines", {
-        // Ruta directa
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -55,35 +53,41 @@ const AirlineManagement = () => {
     fetchAirlines();
   }, []);
 
+  // Maneja cambios en el form
   const handleAirlineInputChange = (e) => {
     const { name, value } = e.target;
     setNewAirline({ ...newAirline, [name]: value });
   };
 
+  // Maneja la creación de aerolíneas
   const handleCreateAirline = async () => {
+    // Verifica que los campos estén completos
     if (
       !newAirline.name ||
       !newAirline.code ||
       !newAirline.cuit ||
       !newAirline.email ||
-      !newAirline.password // Validar la contraseña
+      !newAirline.password
     ) {
       alert("Por favor, complete todos los campos.");
       return;
     }
 
+    // Valida formato del CUIT
     const cuitRegex = /^\d{2}-\d{8}-\d{1}$/;
     if (!cuitRegex.test(newAirline.cuit)) {
       alert("El formato del CUIT debe ser XX-XXXXXXXX-X");
       return;
     }
 
+    // Valida formato del email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newAirline.email)) {
       alert("El formato del email no es válido");
       return;
     }
 
+    // Valida que la contraseña sea mayor a 7 caracteres
     if (newAirline.password.length < 7) {
       alert("La contraseña debe tener al menos 7 caracteres.");
       return;
@@ -96,7 +100,6 @@ const AirlineManagement = () => {
       }
 
       const response = await fetch("http://localhost:3000/api/airlines", {
-        // Ruta directa
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -118,6 +121,7 @@ const AirlineManagement = () => {
     }
   };
 
+  // Maneja la eliminación de aerolíneas
   const handleDeleteAirline = async (id) => {
     if (!window.confirm("¿Está seguro que desea eliminar esta aerolínea?")) {
       return;
@@ -129,7 +133,6 @@ const AirlineManagement = () => {
       }
 
       const response = await fetch(`http://localhost:3000/api/airlines/${id}`, {
-        // Ruta directa
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -147,13 +150,16 @@ const AirlineManagement = () => {
     }
   };
 
+  // Carga los campos en el form para la posterior edición
   const handleEditAirline = (id) => {
     setEditingAirlineId(id);
     const airlineToEdit = airlines.find((airline) => airline.id === id);
     setNewAirline({ ...airlineToEdit, password: "" }); // No cargar la contraseña para edición
   };
 
+  // Maneja la edición de aerolíneas
   const handleUpdateAirline = async () => {
+    // Valida los campos y sus formatos
     if (
       !newAirline.name ||
       !newAirline.code ||
@@ -190,7 +196,6 @@ const AirlineManagement = () => {
       const response = await fetch(
         `http://localhost:3000/api/airlines/${editingAirlineId}`,
         {
-          // Ruta directa
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -201,7 +206,7 @@ const AirlineManagement = () => {
             code: newAirline.code,
             cuit: newAirline.cuit,
             email: newAirline.email,
-          }), // No se envía la contraseña al actualizar, solo los campos editables
+          }), // No se envía la contraseña al actualizar
         }
       );
 
@@ -210,19 +215,25 @@ const AirlineManagement = () => {
         throw new Error(errorData.message || "Error al actualizar aerolínea.");
       }
 
+      // Reemplaza la aerolínea editada en airlines
       const updatedAirline = await response.json();
       setAirlines(
         airlines.map((airline) =>
           airline.id === editingAirlineId ? updatedAirline : airline
         )
       );
+
+      // Sale del modo edición.
       setEditingAirlineId(null);
+
+      // Limpia el formulario.
       setNewAirline({ name: "", code: "", cuit: "", email: "", password: "" }); // Limpiar formulario
     } catch (err) {
       alert(`Error: ${err.message}`);
     }
   };
 
+  // Sale del modo edición
   const handleCancelEdit = () => {
     setEditingAirlineId(null);
     setNewAirline({ name: "", code: "", cuit: "", email: "", password: "" });

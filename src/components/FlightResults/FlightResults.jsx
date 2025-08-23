@@ -10,8 +10,8 @@ const FlightResults = ({ flight, passengers }) => {
   const handleBuyClick = () => {
     navigate("/checkout", {
       state: {
-        flight, // ⬅ Pasamos el vuelo seleccionado
-        passengers: passengers, // ⬅ Pasamos la cantidad de pasajeros
+        flight, // Pasamos el vuelo seleccionado
+        passengers: passengers, // Pasamos la cantidad de pasajeros
       },
     });
   };

@@ -36,7 +36,7 @@ const FlightManagement = () => {
     arrivalTime: "10:15",
   });
 
-  // Lista de aeropuertos
+  // Lista de aeropuertos para el select
   const airports = [
     "Bahía Blanca (BHI)",
     "Bariloche (BRC)",
@@ -82,7 +82,7 @@ const FlightManagement = () => {
     "Villa Gesell (VLG)",
   ];
 
-  // Obtener datos del usuario aerolínea
+  // Obtener datos de la aerolínea o del admin
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -99,10 +99,11 @@ const FlightManagement = () => {
       }
     }
 
+    // carga los vuelos desde el backend
     fetchFlights();
   }, []);
 
-  // Cargar nombres de aerolíneas si el user es admin
+  // Cargar nombres de aerolíneas disponibles si el user es admin
   useEffect(() => {
     const fetchAirlines = async () => {
       try {
@@ -120,6 +121,7 @@ const FlightManagement = () => {
       }
     };
 
+    // si es admin trae todos los nombres disponibles de aerolíneas
     if (userRole === "admin") {
       fetchAirlines();
     }
@@ -164,7 +166,7 @@ const FlightManagement = () => {
     setSelectedFlightId(null);
   };
 
-  // Validar formulario
+  // Validación y armado del objeto vuelo
   const validateForm = () => {
     const required = [
       "airline",
@@ -176,6 +178,7 @@ const FlightManagement = () => {
       "capacity",
       "basePrice",
     ];
+
     const allFieldsFilled = required.every((field) => newFlight[field]);
 
     if (!allFieldsFilled) return false;
@@ -233,7 +236,7 @@ const FlightManagement = () => {
     }
   };
 
-  // Editar vuelo
+  // Carga los datos del vuelo para editarlo
   const handleEdit = (id) => {
     const flightToEdit = flights.find((flight) => flight.id === id);
     if (!flightToEdit) {
@@ -259,7 +262,7 @@ const FlightManagement = () => {
       ?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Guardar cambios
+  // Actualiza el vuelo
   const handleSaveChanges = async () => {
     if (!validateForm()) {
       alert("Por favor complete todos los campos obligatorios");
@@ -324,10 +327,12 @@ const FlightManagement = () => {
     setNewFlight((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Maneja fechas del calendario
   const handleDateChange = (date) => {
     setNewFlight((prev) => ({ ...prev, date }));
   };
 
+  // Intercambia el origen por el destino
   const handleExchangeLocations = () => {
     setNewFlight((prev) => ({
       ...prev,
@@ -373,6 +378,7 @@ const FlightManagement = () => {
                     </td>
                   </tr>
                 ) : (
+                  // Filtra solo los vuelos propios si es airline, si es admin muestra todos
                   flights
                     .filter(
                       (flight) =>
@@ -443,6 +449,7 @@ const FlightManagement = () => {
                   <label>Nombre Empresa*</label>
                   <div className="input-with-icon">
                     <FaBuilding className="input-icon" />
+                    // Si es admin muestra un select con las aerolíneas
                     {userRole === "admin" ? (
                       <select
                         name="airline"
@@ -458,6 +465,7 @@ const FlightManagement = () => {
                         ))}
                       </select>
                     ) : (
+                      // sino, es un input no modificable con con nombre de la aerolínea
                       <input
                         type="text"
                         name="airline"
