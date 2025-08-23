@@ -449,7 +449,7 @@ const FlightManagement = () => {
                   <label>Nombre Empresa*</label>
                   <div className="input-with-icon">
                     <FaBuilding className="input-icon" />
-                    // Si es admin muestra un select con las aerolíneas
+
                     {userRole === "admin" ? (
                       <select
                         name="airline"

@@ -18,7 +18,7 @@ import AirlineManagement from "./pages/AirlineManagement/AirlineManagement.jsx";
 import ModalLogin from "./components/ModalLogin/ModalLogin.jsx";
 import ModalRegister from "./components/ModalRegister/ModalRegister.jsx";
 import UserRoute from "./components/ProtectedRoutes/UserRoute.jsx";
-import AdminRoute from "./components/ProtectedRoutes/AminRoute.jsx";
+import AdminRoute from "./components/ProtectedRoutes/AdminRoute.jsx";
 import AirlineAdminRoute from "./components/ProtectedRoutes/AirlineAdmin.jsx";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 

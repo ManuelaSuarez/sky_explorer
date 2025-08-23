@@ -133,7 +133,7 @@ const ModalRegister = ({ openLogin, closeModal }) => {
           <p className="description">
             Crea tu cuenta y planifica tu próximo destino
           </p>
-          // Formulario de registro
+
           <form onSubmit={handleSubmit} noValidate>
             <div className="input-group">
               <i className="fa-solid fa-user"></i>
@@ -144,7 +144,7 @@ const ModalRegister = ({ openLogin, closeModal }) => {
                 value={formData.name}
                 onChange={handleChange}
               />
-              // Si hay errores en el nombre los muestra
+
               {errors.name && <p className="error-message">{errors.name}</p>}
             </div>
             <div className="input-group">
@@ -156,7 +156,7 @@ const ModalRegister = ({ openLogin, closeModal }) => {
                 value={formData.email}
                 onChange={handleChange}
               />
-              // Si hay errores en el email los muestra
+
               {errors.email && <p className="error-message">{errors.email}</p>}
             </div>
             <div className="input-group">
@@ -168,7 +168,7 @@ const ModalRegister = ({ openLogin, closeModal }) => {
                 value={formData.password}
                 onChange={handleChange}
               />
-              // Si hay errores en el password los muestra
+
               {errors.password && (
                 <p className="error-message">{errors.password}</p>
               )}
@@ -182,7 +182,7 @@ const ModalRegister = ({ openLogin, closeModal }) => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
               />
-              // Si hay errores al confirmar contraseña los muestra
+
               {errors.confirmPassword && (
                 <p className="error-message">{errors.confirmPassword}</p>
               )}
@@ -200,7 +200,7 @@ general-error"
             </button>
           </form>
         </div>
-        // Mensaje a la derecha para que el user se inicie sesión
+
         <div className="modal-side register-right">
           <div className="overlay-shape">
             <h2>¿Ya tienes un vuelo reservado?</h2>

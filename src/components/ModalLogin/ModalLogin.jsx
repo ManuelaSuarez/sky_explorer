@@ -124,7 +124,7 @@ const ModalLogin = ({ closeModal, openRegister, onSubmit }) => {
           <p className="description">
             Accede a tus viajes y experiencias personalizadas
           </p>
-          // Formulario de login
+ 
           <form onSubmit={handleSubmit} noValidate>
             <div className="input-group">
               <i className="fa-solid fa-envelope"></i>
@@ -136,7 +136,7 @@ const ModalLogin = ({ closeModal, openRegister, onSubmit }) => {
                 onChange={handleChange}
                 ref={emailRef}
               />
-              // Si hay errores en el email los muestra
+
               {errors.email && <p className="error-message">{errors.email}</p>}
             </div>
             <div className="input-group">
@@ -149,7 +149,7 @@ const ModalLogin = ({ closeModal, openRegister, onSubmit }) => {
                 onChange={handleChange}
                 ref={passwordRef}
               />
-              // Si hay errores en el password los muestra
+
               {errors.password && (
                 <p className="error-message">{errors.password}</p>
               )}
@@ -171,7 +171,7 @@ general-error"
             </button>
           </form>
         </div>
-        // Mensaje a la derecha para que el user se registre
+
         <div className="modal-side login-right">
           <div className="overlay-shape">
             <h2>¡Bienvenido a bordo!</h2>
