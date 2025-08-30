@@ -1,0 +1,117 @@
+.airline-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.star {
+  font-size: 1rem;
+  color: #ddd;
+}
+
+.star.filled {
+  color: #ffc107;
+}
+
+.star.empty {
+  color: #e0e0e0;
+}
+
+.star-container {
+  position: relative;
+  display: inline-block;
+}
+
+.star.half-filled {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #ffc107;
+  width: 50%;
+  overflow: hidden;
+}
+
+.rating-number {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.review-count {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.airline-rating.loading {
+  opacity: 0.6;
+}
+
+.rating-skeleton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.skeleton-stars {
+  width: 100px;
+  height: 16px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-text {
+  width: 60px;
+  height: 14px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.airline-rating.error .error-text,
+.airline-rating.no-reviews .no-reviews-text {
+  color: #666;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .rating-display {
+    gap: 6px;
+  }
+
+  .star {
+    font-size: 0.9rem;
+  }
+
+  .rating-number {
+    font-size: 0.9rem;
+  }
+
+  .review-count {
+    font-size: 0.8rem;
+  }
+}
