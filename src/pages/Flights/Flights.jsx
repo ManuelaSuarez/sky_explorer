@@ -243,12 +243,12 @@ const Flights = () => {
       arrivalTime: flight.arrivalTime || "00:00",
       departureAirport: flight.origin,
       arrivalAirport: flight.destination,
-      duration: "8h 35m",
+      duration: flight.duration || "—", // Viene del backend
       returnDepartureTime: flight.departureTime || "00:00",
       returnArrivalTime: flight.arrivalTime || "00:00",
       returnDepartureAirport: flight.destination,
       returnArrivalAirport: flight.origin,
-      returnDuration: "8h 35m",
+      returnDuration: flight.returnDuration || flight.duration || "—", // Viene del backend
       price: totalPrice.toLocaleString(),
       originalPrice: flight.basePrice,
     }
@@ -338,10 +338,7 @@ const Flights = () => {
             <div className="flights-list">
               {flightsToShow.map((flight) => (
                 <div key={flight.id} className="flight-with-rating">
-
-
-                    <AirlineRating airline={flight.airline} />
-
+                  <AirlineRating airline={flight.airline} />
                   <FlightResults flight={prepareFlightData(flight)} passengers={Number.parseInt(passengers) || 1} />
                 </div>
               ))}
