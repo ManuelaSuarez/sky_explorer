@@ -107,6 +107,26 @@ const Checkout = () => {
           totalPrice: totalFinal,
         };
 
+        // Crear preferencia de pago en el backend (Mercado Pago)
+        const response = await fetch("http://localhost:3000/api/payment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Enviar token para validar el user
+          },
+          body: JSON.stringify(bookingData),
+        });
+
+        const paymentData = await response.json();
+
+        // Redirigir al Checkout Pro de MercadoPago usando init_point
+        if (paymentData?.init_point) {
+          window.location.href = paymentData.init_point; 
+          return;
+        } else {
+          alert("Error al iniciar el pago con Mercado Pago");
+        }
+
         // Guardar en el backend
         const savedBooking = await saveBookingToBackend(bookingData);
 
@@ -133,6 +153,7 @@ const Checkout = () => {
     }
 
     setIsProcessing(false);
+
   };
 
   // Calcular los valores del resumen de pago
@@ -157,7 +178,6 @@ const Checkout = () => {
 
         <div className="checkout-main">
           <div className="checkout-form-section">
-            // formulario de pasajero, aparece tantas veces como pasajeros sean
             {formData.map((p, i) => (
               <div className="passenger-info-form" key={i}>
                 <div className="form-header">
