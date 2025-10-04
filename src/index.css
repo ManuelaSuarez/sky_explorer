@@ -12,6 +12,41 @@
   --white: #ffffff;
   --black: #000000;
   --gray: #c7c8ca;
+
+  /* Variables dinámicas para el tema */
+  --bg-primary: #b8dccc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f8f9fa;
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --text-tertiary: #666666;
+  --border-color: #e1e5e9;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --modal-bg: #ffffff;
+  --bg-form: #52a39b;
+  --right-bg: #428780; 
+  --text-inverse:#ffffff;
+  --bg-avatar:#52a39b;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #000000;
+  --bg-secondary: #16213e;
+  --bg-tertiary: #0f3460;
+  --text-primary: #e8e8e8;
+  --text-secondary: #d1d1d1;
+  --text-tertiary: #a8a8a8;
+  --border-color: #2d3748;
+  --card-bg: #16213e;
+  --input-bg: #0f3460;
+  --modal-bg: #16213e;
+  --mint: #2d4a45;
+  --teal-green: #5a9d95;
+  --white: #1a1a2e;
+  --bg-form: #0c0c1b;
+  --right-bg: #16213e; 
+  --bg-avatar:#0f3460;
 }
 
 * {
@@ -20,6 +55,7 @@
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
     "Helvetica Neue", sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body {
@@ -27,8 +63,8 @@ body {
   padding: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: var(--mint);
-  color: var(--black);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 /* Reset default styles from the template */
@@ -37,14 +73,9 @@ body {
   place-items: normal;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p {
+h1, h2, h3, h4, h5, h6, p {
   margin: 0;
+  color: var(--text-primary);
 }
 
 button {
@@ -57,4 +88,33 @@ button {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+/* Estilos para inputs y selects en modo oscuro */
+input, textarea {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Scrollbar personalizado para modo oscuro */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--teal-green);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--dark-green);
 }

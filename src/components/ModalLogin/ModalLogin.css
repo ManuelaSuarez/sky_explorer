@@ -63,7 +63,7 @@ h2 {
   margin-bottom: 30px;
 }
 
-input-group {
+.input-group {
   position: relative;
   margin-bottom: 20px;
 }
@@ -84,16 +84,16 @@ input-group {
   font-size: 16px;
 }
 
-login-button {
-  background-color: #428780;
-  color: white;
-  border: none;
+.login-button {
+  background-color: var(--teal-green);
+  color: #fff;
+  padding: 8px 15px;
   border-radius: 5px;
-  padding: 12px;
-  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  border: none;
   cursor: pointer;
-  width: 100%;
-  margin-top: 20px;
+  font-size: 0.9rem;
 }
 
 .overlay-shape {
@@ -139,4 +139,15 @@ login-button {
   text-align: center;
   margin-top: 10px;
   font-size: 14px;
+}
+
+.modal-side.login-right{
+  display: flex;
+  width: 800px;
+  height: 500px;
+  background-color: var(--right-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  color: var(--text-primary);
 }

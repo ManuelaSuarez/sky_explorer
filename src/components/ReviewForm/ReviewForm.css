@@ -1,5 +1,5 @@
 .review-form-container {
-  background: #52a39b;
+  background: var(--bg-form);
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -8,7 +8,7 @@
 
 .review-form-container h3 {
   margin: 0 0 20px 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.25rem;
   font-weight: 600;
 }
@@ -27,16 +27,18 @@
 
 .form-group label {
   font-weight: 500;
-  color: #555;
+  color: var(--text-primary);
   font-size: 0.9rem;
 }
 
 .form-group select,
 .form-group textarea {
-
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s ease;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .form-group select:focus,
@@ -46,7 +48,7 @@
 }
 
 .form-group select:disabled {
-  background-color: #f8f9fa;
+  background-color: var(--bg-tertiary);
   cursor: not-allowed;
 }
 
@@ -71,7 +73,7 @@
 .rating-text {
   margin-left: 12px;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-tertiary);
 }
 
 .error-message {
@@ -84,7 +86,7 @@
 }
 
 .submit-button {
-  background-color: #428780;
+  background-color: var(--teal-green);
   color: white;
   border: none;
   padding: 12px 24px;

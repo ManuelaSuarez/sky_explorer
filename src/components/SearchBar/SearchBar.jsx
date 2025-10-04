@@ -9,7 +9,6 @@ import "./SearchBar.css";
 const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
   const navigate = useNavigate();
 
-  // Estados de los inputs del form
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [passengers, setPassengers] = useState("1");
@@ -20,77 +19,41 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
     return tomorrow;
   });
 
-  // Lista de aeropuertos para el select
   const airports = [
-    "Bahía Blanca (BHI)",
-    "Bariloche (BRC)",
-    "Buenos Aires (BUE)",
-    "Catamarca (CTC)",
-    "Comodoro Rivadavia (CRD)",
-    "Corrientes (CNQ)",
-    "Córdoba (COR)",
-    "El Calafate (FTE)",
-    "El Palomar (EPA)",
-    "Ezeiza (EZE)",
-    "Formosa (FMA)",
-    "Jujuy (JUJ)",
-    "Junín (JNI)",
-    "La Plata (LPG)",
-    "La Rioja (IRJ)",
-    "Mar del Plata (MDQ)",
-    "Mendoza (MDZ)",
-    "Morón (MOR)",
-    "Necochea (NEC)",
-    "Neuquén (NQN)",
-    "Olavarría (OVR)",
-    "Paraná (PRA)",
-    "Posadas (PSS)",
-    "Puerto Iguazú (IGR)",
-    "Resistencia (RES)",
-    "Río Cuarto (RCU)",
-    "Río Gallegos (RGL)",
-    "Río Grande (RGA)",
-    "Rosario (ROS)",
-    "Salta (SLA)",
-    "San Fernando (FDO)",
-    "San Juan (UAQ)",
-    "San Luis (LUQ)",
-    "San Rafael (AFA)",
-    "Santa Rosa (RSA)",
-    "Santa Teresita (STT)",
-    "Santiago del Estero (SDE)",
-    "Tandil (TDL)",
-    "Trelew (REL)",
-    "Tucumán (TUC)",
-    "Ushuaia (USH)",
-    "Villa Gesell (VLG)",
+    "Bahía Blanca (BHI)", "Bariloche (BRC)", "Buenos Aires (BUE)",
+    "Catamarca (CTC)", "Comodoro Rivadavia (CRD)", "Corrientes (CNQ)",
+    "Córdoba (COR)", "El Calafate (FTE)", "El Palomar (EPA)",
+    "Ezeiza (EZE)", "Formosa (FMA)", "Jujuy (JUJ)", "Junín (JNI)",
+    "La Plata (LPG)", "La Rioja (IRJ)", "Mar del Plata (MDQ)",
+    "Mendoza (MDZ)", "Morón (MOR)", "Necochea (NEC)", "Neuquén (NQN)",
+    "Olavarría (OVR)", "Paraná (PRA)", "Posadas (PSS)",
+    "Puerto Iguazú (IGR)", "Resistencia (RES)", "Río Cuarto (RCU)",
+    "Río Gallegos (RGL)", "Río Grande (RGA)", "Rosario (ROS)",
+    "Salta (SLA)", "San Fernando (FDO)", "San Juan (UAQ)",
+    "San Luis (LUQ)", "San Rafael (AFA)", "Santa Rosa (RSA)",
+    "Santa Teresita (STT)", "Santiago del Estero (SDE)", "Tandil (TDL)",
+    "Trelew (REL)", "Tucumán (TUC)", "Ushuaia (USH)", "Villa Gesell (VLG)",
   ];
 
-  // Función para pasar de string a fecha YYYY-MM-DD
   const createDateFromString = (dateString) => {
     if (!dateString) return null;
     return new Date(dateString + "T00:00:00");
   };
 
-  // Función para obtener el día siguiente
   const getTomorrow = (fromDate = new Date()) => {
     const tomorrow = new Date(fromDate);
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow;
   };
 
-  // Se ejecuta al inicio y cada vez que cambian los parámetros de búsqueda
   useEffect(() => {
     if (initialSearchParams) {
       setOrigin(initialSearchParams.origin || "");
       setDestination(initialSearchParams.destination || "");
       setPassengers(initialSearchParams.passengers || "1");
 
-      // Convierte la fecha de string a Date, si no existe usa la de hoy
       const newDepartureDate =
         createDateFromString(initialSearchParams.departureDate) || new Date();
-
-      // Convierte la fecha de string a Date, si no existe usa la de mañana
       const newReturnDate =
         createDateFromString(initialSearchParams.returnDate) ||
         getTomorrow(newDepartureDate);
@@ -100,34 +63,27 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
     }
   }, [initialSearchParams]);
 
-  // Intercambiar origen y destino
   const handleExchange = () => {
     const tempOrigin = origin;
     setOrigin(destination);
     setDestination(tempOrigin);
   };
 
-  // Actualiza la fecha de salida
   const handleDepartureChange = (date) => {
     setDepartureDate(date);
-    // Si la fecha de regreso es anterior a la nueva fecha de salida, la cambia por el día siguiente
     if (returnDate && date && returnDate < date) {
       setReturnDate(getTomorrow(date));
     }
   };
 
-  // Maneja el envío del form
   const handleSubmit = () => {
-    // Si el origen y el destino son iguales muestra una alerta
     if (origin === destination) {
       alert("El origen y el destino no pueden ser iguales.");
       return;
     }
 
-    // Convierte la fecha Date a string para la base de datos
     const formatDate = (date) => date?.toISOString().split("T")[0] || "";
 
-    // Crea un objeto con los datos del form
     const searchParams = {
       origin,
       destination,
@@ -145,14 +101,14 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
   };
 
   return (
-    <div className="search-container">
-      <h2 className="search-title">Buscá el destino con el que más soñaste</h2>
-      <div className="search-bar">
-        <div className="search-options">
-          <div className="trip-type">
+    <div className="sb-container">
+      <h2 className="sb-title">Buscá el destino con el que más soñaste</h2>
+      <div className="sb-bar">
+        <div className="sb-options">
+          <div className="sb-trip-type">
             <p>Ida y vuelta</p>
           </div>
-          <div className="passengers-dropdown">
+          <div className="sb-passengers">
             <p>Cantidad pasajeros</p>
             <select
               value={passengers}
@@ -167,16 +123,15 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
           </div>
         </div>
 
-        <div className="search-fields">
-          {/* Origen */}
-          <div className="field-group">
-            <label className="field-label">Origen*</label>
-            <div className="input-with-icon">
-              <FaMapMarkerAlt className="field-icon" />
+        <div className="sb-fields">
+          <div className="sb-field-group">
+            <label className="sb-label">Origen*</label>
+            <div className="sb-input-wrapper">
+              <FaMapMarkerAlt className="sb-icon" />
               <select
                 value={origin}
                 onChange={(e) => setOrigin(e.target.value)}
-                className="airport-select"
+                className="sb-select"
               >
                 <option value="">Seleccione Origen</option>
                 {airports.map((airport) => (
@@ -188,10 +143,9 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
             </div>
           </div>
 
-          {/* Botón intercambiar */}
-          <div className="exchange-button-container">
+          <div className="sb-exchange-container">
             <button
-              className="exchange-button"
+              className="sb-exchange-btn"
               onClick={handleExchange}
               type="button"
             >
@@ -199,15 +153,14 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
             </button>
           </div>
 
-          {/* Destino */}
-          <div className="field-group">
-            <label className="field-label">Destino*</label>
-            <div className="input-with-icon">
-              <FaMapMarkerAlt className="field-icon" />
+          <div className="sb-field-group">
+            <label className="sb-label">Destino*</label>
+            <div className="sb-input-wrapper">
+              <FaMapMarkerAlt className="sb-icon" />
               <select
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                className="airport-select"
+                className="sb-select"
               >
                 <option value="">Seleccione Destino</option>
                 {airports.map((airport) => (
@@ -219,41 +172,38 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
             </div>
           </div>
 
-          {/* Fecha de salida */}
-          <div className="field-group">
-            <label className="field-label">Salida*</label>
-            <div className="input-with-icon date-input">
-              <FaCalendarAlt className="field-icon" />
+          <div className="sb-field-group">
+            <label className="sb-label">Salida*</label>
+            <div className="sb-input-wrapper sb-date">
+              <FaCalendarAlt className="sb-icon" />
               <DatePicker
                 selected={departureDate}
                 onChange={handleDepartureChange}
                 dateFormat="dd/MM/yyyy"
                 locale={es}
                 minDate={new Date()}
-                className="datepicker-input"
+                className="sb-datepicker"
               />
             </div>
           </div>
 
-          {/* Fecha de regreso */}
-          <div className="field-group">
-            <label className="field-label">Regreso*</label>
-            <div className="input-with-icon date-input">
-              <FaCalendarAlt className="field-icon" />
+          <div className="sb-field-group">
+            <label className="sb-label">Regreso*</label>
+            <div className="sb-input-wrapper sb-date">
+              <FaCalendarAlt className="sb-icon" />
               <DatePicker
                 selected={returnDate}
                 onChange={setReturnDate}
                 dateFormat="dd/MM/yyyy"
                 locale={es}
                 minDate={departureDate || new Date()}
-                className="datepicker-input"
+                className="sb-datepicker"
               />
             </div>
           </div>
 
-          {/* Botón buscar */}
           <button
-            className="search-button"
+            className="sb-search-btn"
             onClick={handleSubmit}
             type="button"
           >
