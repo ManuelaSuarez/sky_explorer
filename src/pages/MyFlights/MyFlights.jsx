@@ -10,7 +10,6 @@ const MyFlights = ({ setModalVisible }) => {
     <div className="myFlights-container">
       <h2>Mis Vuelos</h2>
       <p>Explorá tu historial de vuelos</p>
-      // Renderiza FlightPanel y si no está logueado muestra el modal
       <FlightPanel setModalVisible={setModalVisible} />{" "}
       <button onClick={() => navigate("/")} className="myFlights-button">
         Comprar vuelos

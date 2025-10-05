@@ -15,16 +15,18 @@
   display: flex;
   width: 800px;
   height: 500px;
-  background-color: white;
+  background-color: var(--modal-bg);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  color: var(--text-primary);
 }
 
 .modal-side {
   flex: 1;
   padding: 30px;
   position: relative;
+  overflow-y: auto;
 }
 
 .register-left {
@@ -33,12 +35,12 @@
 }
 
 .register-right {
-  background-color: #428780;
+  background-color: var(--teal-green);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: white;
+  color: var(--text-inverse);
   text-align: center;
 }
 
@@ -48,32 +50,38 @@
   right: 15px;
   font-size: 24px;
   cursor: pointer;
-  color: #666;
+  color: var(--text-tertiary);
+  transition: color 0.2s ease;
+}
+
+.close:hover {
+  color: var(--teal-green);
 }
 
 h2 {
   margin-top: 40px;
   margin-bottom: 10px;
   font-size: 28px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .description {
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 30px;
 }
 
 .input-group {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 10px; /* Reducido para dar más espacio */
+  min-height: 45px; /* Altura mínima fija */
 }
 
 .input-group i {
   position: absolute;
   left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 24px; /* Posición fija en lugar de centrado */
   color: #428780;
+  z-index: 1;
 }
 
 .input-group input {
@@ -85,15 +93,20 @@ h2 {
 }
 
 .register-button {
-  background-color: #428780;
-  color: white;
-  border: none;
+  background-color: var(--teal-green);
+  color: #fff;
+  padding: 8px 15px;
   border-radius: 5px;
-  padding: 12px;
-  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  border: none;
   cursor: pointer;
-  width: 100%;
-  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
+.register-button:hover{
+  background-color: #3a7670;
+  transform: scale(1.05);
 }
 
 .overlay-shape {
@@ -139,4 +152,31 @@ h2 {
   text-align: center;
   margin-top: 10px;
   font-size: 14px;
+}
+.login-button{
+  background-color: var(--teal-green);
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.login-button:hover{
+  background-color: #3a7670;
+  transform: scale(1.05);
+}
+
+.modal-side.register-right{
+  display: flex;
+  width: 800px;
+  height: 500px;
+  background-color: var(--modal-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  color: var(--text-primary);
 }

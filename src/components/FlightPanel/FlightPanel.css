@@ -1,6 +1,6 @@
 .flightPanel-container {
   width: 100%;
-  color: black;
+  color: var(--text-primary);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.3);
@@ -9,26 +9,45 @@
 .flightPanel-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: white;
+  background-color: var(--card-bg);
 }
 
 .flightPanel-table th,
 .flightPanel-table td {
-  border: 1px solid #c7c8ca;
+  border: 1px solid var(--border-color);
   padding: 8px;
 }
 
 .flightPanel-table tr:first-child th {
   border-top: none;
 }
+
 .flightPanel-table tr:last-child td {
   border-bottom: none;
 }
+
 .flightPanel-table tr td:first-child,
 .flightPanel-table tr th:first-child {
   border-left: none;
 }
+
 .flightPanel-table tr td:last-child,
 .flightPanel-table tr th:last-child {
   border-right: none;
+}
+
+.refresh-button {
+  background-color: var(--teal-green);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.refresh-button:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
 }

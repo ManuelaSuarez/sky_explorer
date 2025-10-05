@@ -1,30 +1,38 @@
-// FlightResults.jsx
-import { FaHeart, FaPlane } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaHeart, FaRegHeart, FaPlane } from "react-icons/fa";
+import { useNavigate, useLocation } from "react-router-dom";
+import useFavorite from "../../hooks/useFavorite"; // 👈 hook
 import "./FlightResults.css";
 
 const FlightResults = ({ flight, passengers }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isFav, toggleFav] = useFavorite(flight.id); // 👈 estado y toggle
 
-  // Se ejecuta cuando el usuario toca "Comprar"
   const handleBuyClick = () => {
+    const params = new URLSearchParams(location.search);
     navigate("/checkout", {
       state: {
-        flight, // Pasamos el vuelo seleccionado
-        passengers: passengers, // Pasamos la cantidad de pasajeros
+        flight,
+        passengers,
+        departureDate: params.get("departureDate"),
+        returnDate: params.get("returnDate"),
       },
     });
   };
+
   return (
     <div className="flight-card">
       <div className="flight-header">
         <span className="airline-name">{flight.airline}</span>
-        <button className="save-button">
-          <FaHeart />
-          <span>Guardar</span>
+
+        {/* 👇 tu botón original, ahora inteligente */}
+        <button className="save-button" onClick={toggleFav} title={isFav ? "Quitar de favoritos" : "Guardar"}>
+          {isFav ? <FaHeart color="crimson" /> : <FaRegHeart />}
+          <span>{isFav ? "Guardado" : "Guardar"}</span>
         </button>
       </div>
 
+      {/* resto idéntico a tu código */}
       <div className="flight-details">
         <div className="flight-info">
           <div className="flight-leg">
@@ -54,8 +62,7 @@ const FlightResults = ({ flight, passengers }) => {
                   {flight.returnDepartureTime} - {flight.returnArrivalTime}
                 </span>
                 <span className="flight-airports">
-                  {flight.returnDepartureAirport} -{" "}
-                  {flight.returnArrivalAirport}
+                  {flight.returnDepartureAirport} - {flight.returnArrivalAirport}
                 </span>
               </div>
               <div className="flight-duration">{flight.returnDuration}</div>
@@ -71,11 +78,8 @@ const FlightResults = ({ flight, passengers }) => {
             <span className="price-value">{flight.price}</span>
           </div>
           <div className="unit-price">
-            <small>
-              Precio por persona: ${flight.originalPrice.toLocaleString()}
-            </small>
+            <small>Precio por persona: ${flight.originalPrice.toLocaleString()}</small>
           </div>
-          {/* Botón con redirección al checkout */}
           <button className="buy-button" onClick={handleBuyClick}>
             Comprar
           </button>

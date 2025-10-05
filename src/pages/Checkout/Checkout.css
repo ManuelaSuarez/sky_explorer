@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #b8dccc;
+  background-color: var(--bg-primary);
 }
 
 .checkout-content {
@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #27785c;
+  color: var(--teal-green);
   text-decoration: none;
   font-size: 12px;
   font-weight: 400;
@@ -32,7 +32,7 @@
 }
 
 .checkout-title {
-  color: #428780;
+  color: var(--teal-green);
   font-size: 20px;
   font-weight: 400;
   margin-bottom: 20px;
@@ -40,7 +40,7 @@
 }
 
 .checkout-subtitle {
-  color: #428780;
+  color: var(--teal-green);
   font-weight: 400;
 }
 
@@ -58,10 +58,10 @@
 }
 
 .passenger-info-form {
-  background-color: #52a39b;
+  background-color: var(--bg-form);
   border-radius: 5px;
   padding: 15px 20px;
-  color: white;
+  color: var(--text-inverse);
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
@@ -76,7 +76,7 @@
   font-size: 12px;
   font-weight: 700;
   margin-bottom: 5px;
-  color: white;
+  color: var(--text-inverse);
   font-family: "League Spartan", sans-serif;
 }
 
@@ -99,18 +99,19 @@
   font-size: 10px;
   font-family: "Radio Canada", sans-serif;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
+  background-color: var(--input-bg);
   height: 27px;
 }
 
 .form-group input::placeholder {
-  color: #999;
+  color: var(--text-tertiary);
 }
 
 .option-buttons {
   display: flex;
   margin-bottom: 15px;
-  background-color: white;
+  background-color: var(--input-bg);
   border-radius: 3px;
   overflow: hidden;
   height: 27px;
@@ -131,7 +132,7 @@
   border: none;
   cursor: pointer;
   font-size: 9px;
-  color: #000;
+  color: var(--text-primary);
   font-family: "Radio Canada", sans-serif;
   font-weight: 600;
   flex: 1;
@@ -143,7 +144,7 @@
 
 .option-divider {
   width: 1px;
-  background-color: #d9d9d9;
+  background-color: var(--border-color);
   height: 23px;
   align-self: center;
 }
@@ -154,7 +155,7 @@
 }
 
 .voucher-section-title {
-  color: #428780;
+  color: var(--teal-green);
   font-size: 20px;
   font-weight: 400;
   line-height: 31px;
@@ -162,15 +163,15 @@
 }
 
 .voucher-section {
-  background-color: #52a39b;
+  background-color: var(--bg-form);
   border-radius: 5px;
   padding: 15px 20px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
 .buy-button {
-  background-color: #428780;
-  color: white;
+  background-color: var(--teal-green);
+  color: var(--text-inverse);
   border: none;
   border-radius: 3px;
   padding: 0 10px;
@@ -187,18 +188,19 @@
 }
 
 .info-card {
-  background-color: #fdfbf6;
+  background-color: var(--card-bg);
   border-radius: 5px;
   padding: 15px;
   margin-bottom: 20px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-color);
 }
 
 .card-title {
   font-size: 20px;
   font-weight: 400;
   margin-bottom: 15px;
-  color: #323255;
+  color: var(--text-primary);
   font-family: "League Spartan", sans-serif;
 }
 
@@ -209,6 +211,7 @@
   font-size: 12px;
   font-family: "League Spartan", sans-serif;
   font-weight: 400;
+  color: var(--text-secondary);
 }
 
 .price {
@@ -217,19 +220,19 @@
 
 .divider {
   height: 1px;
-  background-color: #409373;
+  background-color: var(--border-color);
   margin: 10px 0;
 }
 
 .detail-row.total {
   font-weight: 500;
   font-size: 14px;
-  color: #323255;
+  color: var(--text-primary);
 }
 
 .info-card.flight-details {
   padding: 20px;
-  background-color: #fdfbf6;
+  background-color: var(--card-bg);
   border-radius: 5px;
 }
 
@@ -237,14 +240,14 @@
   font-size: 20px;
   font-weight: 400;
   margin-bottom: 15px;
-  color: #323255;
+  color: var(--text-primary);
   font-family: "League Spartan", sans-serif;
 }
 
 .flight-plane-icon {
   font-size: 22px;
   margin-top: 20px;
-  color: #323255;
+  color: var(--text-primary);
 }
 
 .route-line {
@@ -254,11 +257,10 @@
 .route-line strong {
   font-size: 16px;
   font-weight: 700;
-  color: #323255;
+  color: var(--text-primary);
   line-height: 1.4;
 }
 
-/* Estilos para la sección de fechas */
 .flight-date-column {
   margin-top: 20px;
   float: left;
@@ -273,19 +275,19 @@
 .date-label {
   font-size: 16px;
   font-weight: 700;
-  color: #323255;
+  color: var(--text-primary);
   margin-bottom: 5px;
 }
 
 .date-value {
   font-size: 16px;
-  color: #323255;
+  color: var(--text-primary);
   margin-bottom: 2px;
 }
 
 .time-value {
   font-size: 16px;
-  color: #323255;
+  color: var(--text-primary);
   margin-bottom: 15px;
 }
 
@@ -293,13 +295,12 @@
   clear: both;
   padding-top: 15px;
   font-size: 16px;
-  color: #323255;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
-/* Estilo para los mensajes de error debajo de cada input */
 .error {
-  color: red;
+  color: #ff4d4d;
   font-size: 12px;
   margin-bottom: 8px;
 }

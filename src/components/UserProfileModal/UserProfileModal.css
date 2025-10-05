@@ -14,7 +14,7 @@
 }
 
 .profile-modal-content {
-  background: #f0f8ff;
+  background: var(--modal-bg);
   padding: 2rem;
   border-radius: 12px;
   max-width: 500px;
@@ -23,6 +23,7 @@
   transform: scale(0.95);
   animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
+  color: var(--text-primary);
 }
 
 .profile-modal-close {
@@ -32,19 +33,19 @@
   background: none;
   border: none;
   font-size: 2.5rem;
-  color: #a5a5a5;
+  color: var(--text-tertiary);
   cursor: pointer;
   transition: color 0.2s ease;
 }
 
 .profile-modal-close:hover {
-  color: #777;
+  color: var(--teal-green);
 }
 
 .profile-modal-content h2 {
   text-align: center;
   margin-bottom: 2rem;
-  color: #428780;
+  color: var(--teal-green);
   font-family: 'Inter', sans-serif;
   font-weight: 600;
 }
@@ -77,27 +78,29 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #3a7670;
+  color: var(--text-secondary);
 }
 
 .profile-form-group input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
   box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .profile-form-group input:focus {
-  border-color: #52a39b;
+  border-color: var(--teal-green);
   box-shadow: 0 0 5px rgba(82, 163, 155, 0.5);
   outline: none;
 }
 
 .profile-form-group input:disabled {
-  background-color: #e9ecef;
+  background-color: var(--bg-tertiary);
   cursor: not-allowed;
 }
 
@@ -125,7 +128,7 @@
   height: 100%;
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid #b8dccc;
+  border: 4px solid var(--border-color);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -138,7 +141,7 @@
 .profile-placeholder-circle {
   width: 100%;
   height: 100%;
-  background-color: #428780;
+  background-color: var(--teal-green);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -170,7 +173,7 @@
 }
 
 .change-photo-btn {
-  background-color: #428780;
+  background-color: var(--teal-green);
   color: #fff;
 }
 
@@ -215,8 +218,8 @@
 
 .profile-edit-btn,
 .profile-save-btn {
-  background-color: #428780;
-  color: #fff;
+  background-color: var(--teal-green);
+  color: var(--text-inverse);
 }
 
 .profile-edit-btn:hover,
@@ -226,12 +229,12 @@
 }
 
 .profile-cancel-btn {
-  background-color: #e0e0e0;
-  color: #555;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .profile-cancel-btn:hover {
-  background-color: #d0d0d0;
+  background-color: var(--border-color);
   transform: translateY(-2px);
 }
 

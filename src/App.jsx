@@ -15,6 +15,7 @@ import Checkout from "./pages/Checkout/Checkout.jsx";
 import MyFlights from "./pages/MyFlights/MyFlights.jsx";
 import FlightManagement from "./pages/FlightManagement/FlightManagement.jsx";
 import AirlineManagement from "./pages/AirlineManagement/AirlineManagement.jsx";
+import Favorites from "./pages/Favorites/Favorites.jsx"; // 👈 1) NUEVA IMPORTACIÓN
 import ModalLogin from "./components/ModalLogin/ModalLogin.jsx";
 import ModalRegister from "./components/ModalRegister/ModalRegister.jsx";
 import UserRoute from "./components/ProtectedRoutes/UserRoute.jsx";
@@ -38,25 +39,20 @@ function App() {
     }
 
     try {
-      // Intenta obtener la información del perfil del servidor usando el token
       const response = await fetch("http://localhost:3000/api/users/profile/me", {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
         const userData = await response.json();
-        // Construir la URL completa de la imagen antes de guardar en el estado
         const userWithFullImageUrl = {
           ...userData,
-          profileImageUrl: userData.profilePicture 
+          profileImageUrl: userData.profilePicture
             ? `http://localhost:3000/uploads/profile-pictures/${userData.profilePicture}`
             : null,
         };
         setUser(userWithFullImageUrl);
       } else {
-        // Si el token no es válido, lo eliminamos
         console.error("Token inválido o expirado. Vuelve a iniciar sesión.");
         localStorage.removeItem("token");
         setUser(null);
@@ -69,25 +65,22 @@ function App() {
     }
   }, []);
 
-  // Carga la información del usuario al montar el componente
   useEffect(() => {
     fetchUserProfile();
   }, [fetchUserProfile]);
 
   const closeModal = () => setModalVisible("");
 
-  // Función que se ejecuta cuando el inicio de sesión es exitoso
   const handleLoginSuccess = async ({ token }) => {
     try {
       localStorage.setItem("token", token);
-      await fetchUserProfile(); // Llama a la función para obtener el perfil completo después del login
+      await fetchUserProfile();
     } catch (error) {
       console.error("Error al decodificar token o obtener perfil:", error);
     }
     closeModal();
   };
 
-  // Función para cerrar la sesión del usuario
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
@@ -95,15 +88,9 @@ function App() {
     closeModal();
   };
 
-  // Función para actualizar la información del usuario en el estado
-  const handleUserUpdate = (updatedUser) => {
-    // La función que sube la foto ya devuelve la URL completa, la pasamos directamente
-    setUser(updatedUser);
-  };
+  const handleUserUpdate = (updatedUser) => setUser(updatedUser);
 
-  if (loading) {
-    return <div className="loading-container">Cargando...</div>;
-  }
+  if (loading) return <div className="loading-container">Cargando...</div>;
 
   return (
     <div className="app">
@@ -136,14 +123,13 @@ function App() {
               </UserRoute>
             }
           />
+
+          {/* 👇 2) RUTA NUEVA DE FAVORITOS */}
           <Route
             path="/favorites"
             element={
               <UserRoute user={user} setModalVisible={setModalVisible}>
-                <div className="page-container">
-                  <h1>Mis Favoritos</h1>
-                  <p>Esta página está en construcción</p>
-                </div>
+                <Favorites />
               </UserRoute>
             }
           />

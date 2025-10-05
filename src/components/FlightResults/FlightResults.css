@@ -1,9 +1,10 @@
 .flight-card {
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   margin-bottom: 15px;
+  border: 1px solid var(--border-color);
 }
 
 .flight-header {
@@ -11,12 +12,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .airline-name {
   font-weight: 500;
   font-size: 15px;
+  color: var(--text-primary);
 }
 
 .save-button {
@@ -25,13 +27,14 @@
   gap: 5px;
   background: none;
   border: none;
-  color: #666;
+  color: var(--text-tertiary);
   cursor: pointer;
   font-size: 14px;
+  transition: color 0.2s ease;
 }
 
 .save-button:hover {
-  color: #428780;
+  color: var(--teal-green);
 }
 
 .flight-details {
@@ -40,10 +43,9 @@
   justify-content: space-between;
 }
 
-/* Vertical divider line */
 .vertical-divider {
   width: 2px;
-  background-color: #e0e0e0;
+  background-color: var(--border-color);
   margin: 0 20px;
 }
 
@@ -70,7 +72,7 @@
 
 .plane-icon {
   font-size: 24px;
-  color: #000;
+  color: var(--text-primary);
 }
 
 .plane-icon-container.return .plane-icon {
@@ -93,16 +95,17 @@
 .flight-time {
   font-weight: 600;
   font-size: 16px;
+  color: var(--text-primary);
 }
 
 .flight-airports {
   font-size: 14px;
-  color: #666;
+  color: var(--text-tertiary);
 }
 
 .flight-duration {
   font-weight: 500;
-  color: #428780;
+  color: var(--teal-green);
   font-size: 15px;
   text-align: right;
   min-width: 70px;
@@ -120,6 +123,7 @@
 .flight-price {
   display: flex;
   align-items: baseline;
+  color: var(--text-primary);
 }
 
 .price-symbol {
@@ -135,14 +139,14 @@
 
 .unit-price {
   font-size: 13px;
-  color: #666;
+  color: var(--text-tertiary);
   margin-top: -10px;
   text-align: right;
 }
 
 .buy-button {
-  background-color: #428780;
-  color: white;
+  background-color: var(--teal-green);
+  color: var(--text-inverse);
   border: none;
   border-radius: 6px;
   padding: 10px 20px;

@@ -1,6 +1,6 @@
 .myFlights-container {
   margin: 3% 10% 10%;
-  color: #428780;
+  color: var(--teal-green);
 }
 
 .myFlights-container p {
@@ -8,8 +8,8 @@
 }
 
 .myFlights-button {
-  background-color: #428780;
-  color: #fff;
+  background-color: var(--teal-green);
+  color: white;
   padding: 1%;
   border-radius: 5px;
   transition: all 0.2s ease-in-out;
@@ -18,5 +18,5 @@
 
 .myFlights-button:hover {
   transform: scale(1.05);
-  background-color: #3a7670;
+  filter: brightness(1.1);
 }

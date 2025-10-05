@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #b8dccc;
+  background-color: var(--bg-primary);
 }
 
 .management-content {
@@ -15,17 +15,17 @@
 .management-title {
   font-size: 24px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 20px;
 }
 
-/* Tabla de vuelos */
 .flights-table-container {
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 10px;
   padding: 15px;
   margin-bottom: 30px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
 }
 
 .table-with-scrollbar {
@@ -42,39 +42,39 @@
 .flights-table td {
   padding: 12px 15px;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .flights-table th {
-  background-color: #f8f8f8;
+  background-color: var(--bg-tertiary);
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
 .active-row {
-  background-color: #f9fffc;
+  background-color: var(--bg-secondary);
 }
 
 .inactive-row {
-  background-color: #f9f9f9;
+  background-color: var(--bg-tertiary);
 }
 
 .status-active {
-  color: #409373;
+  color: var(--teal-green);
   font-weight: 600;
 }
 
 .status-inactive {
-  color: #777;
+  color: var(--text-tertiary);
   font-weight: 600;
 }
 
 .edit-button {
-  background-color: #428780;
-  color: white;
+  background-color: var(--teal-green);
+  color: var(--text-inverse);
   border: none;
   border-radius: 5px;
   padding: 6px 12px;
@@ -93,9 +93,8 @@
   align-items: center;
 }
 
-/* Formulario de creación */
 .create-flight-section {
-  background-color: #428780;
+  background-color: var(--bg-form);
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -104,7 +103,7 @@
 }
 
 .create-flight-title {
-  color: white;
+  color: var(--text-inverse);
   font-size: 22px;
   font-weight: 500;
   margin-bottom: 20px;
@@ -122,7 +121,6 @@
   gap: 20px;
 }
 
-/* Primera fila con todos los inputs al mismo nivel */
 .form-row {
   display: flex;
   gap: 15px;
@@ -137,28 +135,25 @@
 
 .form-group label {
   display: block;
-  color: white;
+  color: var(--text-inverse);
   font-size: 12px;
   margin-bottom: 5px;
 }
 
-.form-group input,
-select {
+.create-flight-section .form-group input,
+.create-flight-section .form-group select {
   width: 100%;
-  padding: 8px 10px;
-  border: none;
+  padding: 8px 10px !important;
+  border: none !important;
   border-radius: 3px;
   font-size: 14px;
   height: 35px;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  box-sizing: border-box;
+  cursor: pointer;
 }
 
-/* Ajustes específicos para cada grupo de inputs */
-.origin-group,
-.destination-group {
-  flex: 1.5;
-}
-
-/* Botón de intercambio simplificado */
 .exchange-button {
   background-color: white;
   border: none;
@@ -169,46 +164,74 @@ select {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #428780;
+  color: var(--teal-green);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 25px;
 }
 
-.input-with-icon {
+.create-flight-section .input-with-icon {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.input-icon {
+.create-flight-section .input-icon,
+.create-flight-section .field-icon {
   position: absolute;
   left: 10px;
-  color: #428780;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--teal-green);
   font-size: 16px;
+  z-index: 1;
+  pointer-events: none;
 }
 
-.input-with-icon input {
-  padding-left: 35px;
+.create-flight-section .input-with-icon input,
+.create-flight-section .input-with-icon select {
+  padding-left: 35px !important;
 }
 
-/* Segunda fila */
 .second-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 15px;
 }
 
-/* Estilos para el selector de fecha */
-.date-picker {
+.date-picker-container {
+  position: relative;
   width: 100%;
-  padding-left: 35px !important;
-  height: 35px;
-  border: none;
-  border-radius: 3px;
-  font-size: 14px;
 }
 
-/* Botón de crear */
+.create-flight-section .date-picker {
+  width: 100% !important;
+  padding: 8px 10px 8px 35px !important;
+  height: 35px !important;
+  border: none !important;
+  border-radius: 3px !important;
+  font-size: 14px !important;
+  background-color: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  box-sizing: border-box !important;
+}
+
+.time-picker-container {
+  position: relative;
+  width: 100%;
+}
+
+.create-flight-section .time-picker {
+  width: 100%;
+  padding: 8px 10px 8px 35px !important;
+  height: 35px;
+  border: none !important;
+  border-radius: 3px;
+  font-size: 14px;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
 .create-button-container {
   display: flex;
   justify-content: flex-end;
@@ -234,7 +257,7 @@ select {
 
 .create-button {
   background-color: white;
-  color: #428780;
+  color: var(--teal-green);
   border: none;
   border-radius: 5px;
   padding: 8px 25px;
@@ -242,57 +265,6 @@ select {
   font-weight: 600;
   cursor: pointer;
   height: 35px;
-}
-
-.access-denied-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 80vh;
-  background-color: #b8dccc;
-}
-
-.access-denied-content {
-  background-color: white;
-  border-radius: 10px;
-  padding: 40px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
-  width: 90%;
-}
-
-.access-denied-icon {
-  font-size: 60px;
-  color: #d32f2f;
-  margin-bottom: 20px;
-}
-
-.access-denied-content h2 {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 15px;
-}
-
-.access-denied-content p {
-  color: #666;
-  margin-bottom: 10px;
-}
-
-.back-button {
-  background-color: #428780;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  font-size: 16px;
-  margin-top: 20px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.back-button:hover {
-  background-color: #27785c;
 }
 
 @media (max-width: 1024px) {
@@ -315,3 +287,10 @@ select {
     justify-content: center;
   }
 }
+
+.react-datepicker-popper,
+.react-datepicker__portal {
+  z-index: 50 !important;
+}
+
+

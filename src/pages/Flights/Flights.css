@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #b8dccc;
+  background-color: var(--bg-primary);
 }
 
 .main-content {
@@ -27,7 +27,7 @@
 .flights-title {
   font-size: 24px;
   font-weight: 700;
-  color: #000;
+  color: var(--text-primary);
 }
 
 .flights-sort {
@@ -38,15 +38,21 @@
 }
 
 .sort-label {
-  color: #333;
+  color: var(--text-secondary);
 }
 
-.sort-dropdown {
+.sort-dropdown,
+.sort-select {
   display: flex;
   align-items: center;
   gap: 5px;
   font-weight: 600;
   cursor: pointer;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  border-radius: 6px;
 }
 
 .dropdown-arrow {
@@ -64,7 +70,6 @@
   flex-direction: column;
 }
 
-/* Added styles for flight cards with ratings */
 .flight-with-rating {
   margin-bottom: 20px;
 }
@@ -73,29 +78,41 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
+  background: var(--card-bg);
   padding: 12px 20px;
   border-radius: 12px 12px 0 0;
-  border-bottom: 1px solid #e1e5e9;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .airline-name-with-rating {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
-/* Added styles for reviews section */
+.no-flights {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.no-flights p {
+  color: var(--text-secondary);
+  margin: 10px 0;
+}
+
 .reviews-section {
   margin-top: 50px;
   padding-top: 30px;
-  border-top: 2px solid #e1e5e9;
+  border-top: 2px solid var(--border-color);
 }
 
 .reviews-section h2 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 30px;
   text-align: center;
 }
@@ -103,7 +120,7 @@
 .loading {
   text-align: center;
   padding: 20px;
-  color: #666;
+  color: var(--text-tertiary);
   font-size: 1rem;
 }
 
@@ -118,7 +135,6 @@
     gap: 10px;
   }
 
-  /* Added mobile styles for flight rating header */
   .flight-rating-header {
     flex-direction: column;
     gap: 8px;
