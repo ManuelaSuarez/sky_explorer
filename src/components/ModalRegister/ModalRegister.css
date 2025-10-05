@@ -174,7 +174,7 @@ h2 {
   display: flex;
   width: 800px;
   height: 500px;
-  background-color: var(--modal-bg);
+  background-color: var(--right-bg);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
