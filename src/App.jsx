@@ -15,13 +15,15 @@ import Checkout from "./pages/Checkout/Checkout.jsx";
 import MyFlights from "./pages/MyFlights/MyFlights.jsx";
 import FlightManagement from "./pages/FlightManagement/FlightManagement.jsx";
 import AirlineManagement from "./pages/AirlineManagement/AirlineManagement.jsx";
-import Favorites from "./pages/Favorites/Favorites.jsx"; // 👈 1) NUEVA IMPORTACIÓN
+import Favorites from "./pages/Favorites/Favorites.jsx";
 import ModalLogin from "./components/ModalLogin/ModalLogin.jsx";
 import ModalRegister from "./components/ModalRegister/ModalRegister.jsx";
 import UserRoute from "./components/ProtectedRoutes/UserRoute.jsx";
 import AdminRoute from "./components/ProtectedRoutes/AdminRoute.jsx";
 import AirlineAdminRoute from "./components/ProtectedRoutes/AirlineAdmin.jsx";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import { ToastContainer, toast, Bounce  } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   // Estados
@@ -179,6 +181,20 @@ function App() {
         {modalVisible === "register" && (
           <ModalRegister closeModal={closeModal} openLogin={setModalVisible} />
         )}
+        {/* Contenedor global de toasts */}
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          transition={Bounce}
+        />
       </Router>
     </div>
   );

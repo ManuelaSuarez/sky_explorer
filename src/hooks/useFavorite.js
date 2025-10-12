@@ -1,5 +1,5 @@
-// src/hooks/useFavorite.js
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 const API = "http://localhost:3000/api/favorites";
 const token = () => localStorage.getItem("token");
@@ -16,7 +16,7 @@ export default function useFavorite(flightId) {
   }, [flightId]);
 
   const toggle = async () => {
-    if (!token()) return alert("Inicia sesión para guardar vuelos");
+    if (!token()) return toast.info("Inicia sesión para guardar vuelos");
     try {
       if (isFav) {
         await fetch(`${API}/${flightId}`, {

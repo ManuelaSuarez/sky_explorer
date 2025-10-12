@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./AirlineManagement.css";
 import { FaUser, FaGlobe, FaIdCard, FaTrash, FaCog } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const AirlineManagement = () => {
   const [airlines, setAirlines] = useState([]);
@@ -69,27 +70,27 @@ const AirlineManagement = () => {
       !newAirline.email ||
       !newAirline.password
     ) {
-      alert("Por favor, complete todos los campos.");
+      toast.warning("Por favor, complete todos los campos.");
       return;
     }
 
     // Valida formato del CUIT
     const cuitRegex = /^\d{2}-\d{8}-\d{1}$/;
     if (!cuitRegex.test(newAirline.cuit)) {
-      alert("El formato del CUIT debe ser XX-XXXXXXXX-X");
+      toast.warning("El formato del CUIT debe ser XX-XXXXXXXX-X");
       return;
     }
 
     // Valida formato del email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newAirline.email)) {
-      alert("El formato del email no es válido");
+      toast.warning("El formato del email no es válido");
       return;
     }
 
     // Valida que la contraseña sea mayor a 7 caracteres
     if (newAirline.password.length < 7) {
-      alert("La contraseña debe tener al menos 7 caracteres.");
+      toast.warning("La contraseña debe tener al menos 7 caracteres.");
       return;
     }
 
@@ -117,7 +118,7 @@ const AirlineManagement = () => {
       setAirlines([createdAirline, ...airlines]); // Agrega la nueva aerolínea al estado local
       setNewAirline({ name: "", code: "", cuit: "", email: "", password: "" }); // Limpiar formulario
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
 
@@ -146,7 +147,7 @@ const AirlineManagement = () => {
 
       setAirlines(airlines.filter((airline) => airline.id !== id));
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.warning(`Error: ${err.message}`);
     }
   };
 
@@ -166,24 +167,24 @@ const AirlineManagement = () => {
       !newAirline.cuit ||
       !newAirline.email
     ) {
-      alert("Por favor, complete todos los campos.");
+      toast.warning("Por favor, complete todos los campos.");
       return;
     }
 
     const cuitRegex = /^\d{2}-\d{8}-\d{1}$/;
     if (!cuitRegex.test(newAirline.cuit)) {
-      alert("El formato del CUIT debe ser XX-XXXXXXXX-X");
+      toast.warning("El formato del CUIT debe ser XX-XXXXXXXX-X");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newAirline.email)) {
-      alert("El formato del email no es válido");
+      toast.warning("El formato del email no es válido");
       return;
     }
 
     if (newAirline.password.length < 7) {
-      alert("La contraseña debe tener al menos 7 caracteres.");
+      toast.warning("La contraseña debe tener al menos 7 caracteres.");
       return;
     }
 
@@ -229,7 +230,7 @@ const AirlineManagement = () => {
       // Limpia el formulario.
       setNewAirline({ name: "", code: "", cuit: "", email: "", password: "" }); // Limpiar formulario
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
 

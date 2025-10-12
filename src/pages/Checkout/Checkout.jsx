@@ -1,15 +1,16 @@
-import { useState } from "react";
-import { useLocation, Link, useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaPlane, FaDownload } from "react-icons/fa";
-import jsPDF from 'jspdf';
-import ValidationsCheckout from "../../components/ValidationsCheckout/ValidationsCheckout";
-import "./Checkout.css";
+import { useState } from "react"
+import { useLocation, Link, useNavigate } from "react-router-dom"
+import { FaArrowLeft, FaPlane, FaDownload } from "react-icons/fa"
+import jsPDF from 'jspdf'
+import { toast } from "react-toastify"
+import ValidationsCheckout from "../../components/ValidationsCheckout/ValidationsCheckout"
+import "./Checkout.css"
 
 const Checkout = () => {
   // Recupera el vuelo elegido y la cantidad de pasajeros pasados por navigate
-  const { state } = useLocation();
-  const { flight, passengers, departureDate, returnDate } = state || {};
-  const navigate = useNavigate();
+  const { state } = useLocation()
+  const { flight, passengers, departureDate, returnDate } = state || {}
+  const navigate = useNavigate()
 
   // Estado para los datos del form según cuántos pasajeros son
   const [formData, setFormData] = useState(
@@ -21,232 +22,232 @@ const Checkout = () => {
       fechaNacimiento: "",
       email: "",
     }))
-  );
+  )
 
-  const [errores, setErrores] = useState([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [bookingCompleted, setBookingCompleted] = useState(false);
-  const [savedBookingData, setSavedBookingData] = useState(null);
+  const [errores, setErrores] = useState([])
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [bookingCompleted, setBookingCompleted] = useState(false)
+  const [savedBookingData, setSavedBookingData] = useState(null)
 
   const getAuthToken = () => {
-    return localStorage.getItem("token");
-  };
+    return localStorage.getItem("token")
+  }
 
   // Función para generar el PDF del ticket
   const generateTicketPDF = (bookingData) => {
     // DEBUG: Ver qué datos tenemos
-    console.log("=== DEBUG PDF ===");
-    console.log("flight object:", flight);
-    console.log("flight.date:", flight?.date);
-    console.log("flight.departureDate:", flight?.departureDate);
-    console.log("departureDate from state:", departureDate);
-    console.log("returnDate from state:", returnDate);
-    console.log("=================");
+    console.log("=== DEBUG PDF ===")
+    console.log("flight object:", flight)
+    console.log("flight.date:", flight?.date)
+    console.log("flight.departureDate:", flight?.departureDate)
+    console.log("departureDate from state:", departureDate)
+    console.log("returnDate from state:", returnDate)
+    console.log("=================")
     
-    const doc = new jsPDF();
+    const doc = new jsPDF()
     
     // Configuración de colores y fuentes
-    const primaryColor = [41, 128, 185];
-    const secondaryColor = [52, 73, 94];
-    const accentColor = [231, 76, 60];
+    const primaryColor = [41, 128, 185]
+    const secondaryColor = [52, 73, 94]
+    const accentColor = [231, 76, 60]
     
     // Header
-    doc.setFillColor(...primaryColor);
-    doc.rect(0, 0, 210, 40, 'F');
+    doc.setFillColor(...primaryColor)
+    doc.rect(0, 0, 210, 40, 'F')
     
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.setFont("helvetica", "bold");
-    doc.text("TICKET DE VUELO", 105, 25, { align: "center" });
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(24)
+    doc.setFont("helvetica", "bold")
+    doc.text("TICKET DE VUELO", 105, 25, { align: "center" })
     
     // Información del vuelo
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text("DETALLES DEL VUELO", 20, 60);
+    doc.setTextColor(0, 0, 0)
+    doc.setFontSize(16)
+    doc.setFont("helvetica", "bold")
+    doc.text("DETALLES DEL VUELO", 20, 60)
     
     // Línea divisoria
-    doc.setDrawColor(...primaryColor);
-    doc.setLineWidth(1);
-    doc.line(20, 65, 190, 65);
+    doc.setDrawColor(...primaryColor)
+    doc.setLineWidth(1)
+    doc.line(20, 65, 190, 65)
     
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12)
+    doc.setFont("helvetica", "normal")
     
-    let yPos = 80;
+    let yPos = 80
     
     // Información del vuelo en dos columnas
-    doc.setFont("helvetica", "bold");
-    doc.text("Origen:", 20, yPos);
-    doc.setFont("helvetica", "normal");
-    doc.text(flight?.departureAirport || "N/A", 60, yPos);
+    doc.setFont("helvetica", "bold")
+    doc.text("Origen:", 20, yPos)
+    doc.setFont("helvetica", "normal")
+    doc.text(flight?.departureAirport || "N/A", 60, yPos)
     
-    doc.setFont("helvetica", "bold");
-    doc.text("Destino:", 110, yPos);
-    doc.setFont("helvetica", "normal");
-    doc.text(flight?.arrivalAirport || "N/A", 150, yPos);
+    doc.setFont("helvetica", "bold")
+    doc.text("Destino:", 110, yPos)
+    doc.setFont("helvetica", "normal")
+    doc.text(flight?.arrivalAirport || "N/A", 150, yPos)
     
-    yPos += 15;
-    doc.setFont("helvetica", "bold");
-    doc.text("Fecha Ida:", 20, yPos);
-    doc.setFont("helvetica", "normal");
+    yPos += 15
+    doc.setFont("helvetica", "bold")
+    doc.text("Fecha Ida:", 20, yPos)
+    doc.setFont("helvetica", "normal")
     // Usar múltiples fallbacks para obtener la fecha
-    const fechaIda = flight?.date || flight?.departureDate || departureDate || "N/A";
-    doc.text(fechaIda, 60, yPos);
+    const fechaIda = flight?.date || flight?.departureDate || departureDate || "N/A"
+    doc.text(fechaIda, 60, yPos)
     
-    doc.setFont("helvetica", "bold");
-    doc.text("Aerolínea:", 110, yPos);
-    doc.setFont("helvetica", "normal");
-    doc.text(flight?.airline || "N/A", 150, yPos);
+    doc.setFont("helvetica", "bold")
+    doc.text("Aerolínea:", 110, yPos)
+    doc.setFont("helvetica", "normal")
+    doc.text(flight?.airline || "N/A", 150, yPos)
     
-    yPos += 15;
+    yPos += 15
     // Mostrar fecha de vuelta si la búsqueda era ida y vuelta
     if (returnDate) {
-      doc.setFont("helvetica", "bold");
-      doc.text("Fecha Vuelta:", 20, yPos);
-      doc.setFont("helvetica", "normal");
-      doc.text(returnDate, 60, yPos);
-      yPos += 15;
+      doc.setFont("helvetica", "bold")
+      doc.text("Fecha Vuelta:", 20, yPos)
+      doc.setFont("helvetica", "normal")
+      doc.text(returnDate, 60, yPos)
+      yPos += 15
     }
     
-    doc.setFont("helvetica", "bold");
-    doc.text("Salida Ida:", 20, yPos);
-    doc.setFont("helvetica", "normal");
-    doc.text(flight?.departureTime || "N/A", 70, yPos);
+    doc.setFont("helvetica", "bold")
+    doc.text("Salida Ida:", 20, yPos)
+    doc.setFont("helvetica", "normal")
+    doc.text(flight?.departureTime || "N/A", 70, yPos)
     
-    doc.setFont("helvetica", "bold");
-    doc.text("Llegada Ida:", 110, yPos);
-    doc.setFont("helvetica", "normal");
-    doc.text(flight?.arrivalTime || "N/A", 165, yPos);
+    doc.setFont("helvetica", "bold")
+    doc.text("Llegada Ida:", 110, yPos)
+    doc.setFont("helvetica", "normal")
+    doc.text(flight?.arrivalTime || "N/A", 165, yPos)
     
     // Si es ida y vuelta, mostrar horarios de vuelta (usando los mismos horarios)
     if (returnDate) {
-      yPos += 15;
-      doc.setFont("helvetica", "bold");
-      doc.text("Salida Vuelta:", 20, yPos);
-      doc.setFont("helvetica", "normal");
-      doc.text(flight?.departureTime || "N/A", 70, yPos);
+      yPos += 15
+      doc.setFont("helvetica", "bold")
+      doc.text("Salida Vuelta:", 20, yPos)
+      doc.setFont("helvetica", "normal")
+      doc.text(flight?.departureTime || "N/A", 70, yPos)
       
-      doc.setFont("helvetica", "bold");
-      doc.text("Llegada Vuelta:", 110, yPos);
-      doc.setFont("helvetica", "normal");
-      doc.text(flight?.arrivalTime || "N/A", 165, yPos);
+      doc.setFont("helvetica", "bold")
+      doc.text("Llegada Vuelta:", 110, yPos)
+      doc.setFont("helvetica", "normal")
+      doc.text(flight?.arrivalTime || "N/A", 165, yPos)
       
-      yPos += 10;
-      doc.setFont("helvetica", "italic");
-      doc.setFontSize(10);
-      doc.text("* Horarios estimados. Confirmar con aerolínea.", 20, yPos);
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "normal");
+      yPos += 10
+      doc.setFont("helvetica", "italic")
+      doc.setFontSize(10)
+      doc.text("* Horarios estimados. Confirmar con aerolínea.", 20, yPos)
+      doc.setFontSize(12)
+      doc.setFont("helvetica", "normal")
     }
     
     // Información de pasajeros (más compacta)
-    yPos += 20;
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text("PASAJEROS", 20, yPos);
+    yPos += 20
+    doc.setFontSize(16)
+    doc.setFont("helvetica", "bold")
+    doc.text("PASAJEROS", 20, yPos)
     
-    doc.setDrawColor(...primaryColor);
-    doc.line(20, yPos + 5, 190, yPos + 5);
+    doc.setDrawColor(...primaryColor)
+    doc.line(20, yPos + 5, 190, yPos + 5)
     
-    yPos += 15;
-    doc.setFontSize(12);
+    yPos += 15
+    doc.setFontSize(12)
     
     formData.forEach((passenger, index) => {
-      doc.setFont("helvetica", "bold");
-      doc.text(`Pasajero ${index + 1}: ${passenger.nombre} ${passenger.apellido}`, 20, yPos);
-      doc.setFont("helvetica", "normal");
-      doc.text(`DNI: ${passenger.dni} | ${passenger.nacionalidad} | ${passenger.email}`, 20, yPos + 8);
-      yPos += 18;
-    });
+      doc.setFont("helvetica", "bold")
+      doc.text(`Pasajero ${index + 1}: ${passenger.nombre} ${passenger.apellido}`, 20, yPos)
+      doc.setFont("helvetica", "normal")
+      doc.text(`DNI: ${passenger.dni} | ${passenger.nacionalidad} | ${passenger.email}`, 20, yPos + 8)
+      yPos += 18
+    })
     
     // Información de pago
-    yPos += 10;
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text("RESUMEN DE PAGO", 20, yPos);
+    yPos += 10
+    doc.setFontSize(16)
+    doc.setFont("helvetica", "bold")
+    doc.text("RESUMEN DE PAGO", 20, yPos)
     
-    doc.setDrawColor(...primaryColor);
-    doc.line(20, yPos + 5, 190, yPos + 5);
+    doc.setDrawColor(...primaryColor)
+    doc.line(20, yPos + 5, 190, yPos + 5)
     
-    yPos += 20;
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
+    yPos += 20
+    doc.setFontSize(12)
+    doc.setFont("helvetica", "normal")
     
-    const totalBase = flight?.originalPrice * passengers;
-    const taxes = totalBase * 0.2;
-    const totalFinal = totalBase + taxes;
+    const totalBase = flight?.originalPrice * passengers
+    const taxes = totalBase * 0.2
+    const totalFinal = totalBase + taxes
     
-    doc.text(`Precio por persona: $${flight?.originalPrice.toLocaleString()}`, 20, yPos);
-    doc.text(`Cantidad de pasajeros: ${passengers}`, 20, yPos + 10);
-    doc.text(`Subtotal: $${totalBase?.toLocaleString()}`, 20, yPos + 20);
-    doc.text(`Impuestos (20%): $${taxes?.toLocaleString()}`, 20, yPos + 30);
+    doc.text(`Precio por persona: $${flight?.originalPrice.toLocaleString()}`, 20, yPos)
+    doc.text(`Cantidad de pasajeros: ${passengers}`, 20, yPos + 10)
+    doc.text(`Subtotal: $${totalBase?.toLocaleString()}`, 20, yPos + 20)
+    doc.text(`Impuestos (20%): $${taxes?.toLocaleString()}`, 20, yPos + 30)
     
     // Total destacado con mejor diseño
-    doc.setFillColor(...accentColor);
-    doc.rect(15, yPos + 40, 180, 20, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.text(`TOTAL: ${totalFinal?.toLocaleString()}`, 105, yPos + 53, { align: "center" });
+    doc.setFillColor(...accentColor)
+    doc.rect(15, yPos + 40, 180, 20, 'F')
+    doc.setTextColor(255, 255, 255)
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(16)
+    doc.text(`TOTAL: ${totalFinal?.toLocaleString()}`, 105, yPos + 53, { align: "center" })
     
     // Espaciado adicional antes del footer
-    yPos += 80;
+    yPos += 80
     
     // Footer mejorado con más estilo
-    doc.setTextColor(128, 128, 128);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-    doc.text("Gracias por volar con nosotros", 105, yPos, { align: "center" });
+    doc.setTextColor(128, 128, 128)
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(12)
+    doc.text("Gracias por volar con nosotros", 105, yPos, { align: "center" })
     
-    yPos += 15;
-    doc.setFontSize(10);
-    doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`, 105, yPos, { align: "center" });
+    yPos += 15
+    doc.setFontSize(10)
+    doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`, 105, yPos, { align: "center" })
     
-    yPos += 10;
+    yPos += 10
     // Código de reserva (simulado)
-    const bookingCode = `${flight?.airline?.substring(0, 2).toUpperCase() || 'FL'}${Date.now().toString().slice(-6)}`;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    doc.setTextColor(52, 73, 94);
-    doc.text(`Código de reserva: ${bookingCode}`, 105, yPos, { align: "center" });
+    const bookingCode = `${flight?.airline?.substring(0, 2).toUpperCase() || 'FL'}${Date.now().toString().slice(-6)}`
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(11)
+    doc.setTextColor(52, 73, 94)
+    doc.text(`Código de reserva: ${bookingCode}`, 105, yPos, { align: "center" })
     
     // Línea decorativa final
-    yPos += 15;
-    doc.setDrawColor(...primaryColor);
-    doc.setLineWidth(0.5);
-    doc.line(60, yPos, 150, yPos);
+    yPos += 15
+    doc.setDrawColor(...primaryColor)
+    doc.setLineWidth(0.5)
+    doc.line(60, yPos, 150, yPos)
     
-    yPos += 10;
-    doc.setTextColor(100, 100, 100);
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(9);
-    doc.text("Este ticket es válido únicamente con documento de identidad", 105, yPos, { align: "center" });
+    yPos += 10
+    doc.setTextColor(100, 100, 100)
+    doc.setFont("helvetica", "italic")
+    doc.setFontSize(9)
+    doc.text("Este ticket es válido únicamente con documento de identidad", 105, yPos, { align: "center" })
     
-    yPos += 8;
-    doc.text("Conserve este comprobante para futuras consultas", 105, yPos, { align: "center" });
+    yPos += 8
+    doc.text("Conserve este comprobante para futuras consultas", 105, yPos, { align: "center" })
     
     // Guardar el PDF
-    const fileName = `ticket-${bookingCode}-${new Date().getTime()}.pdf`;
-    doc.save(fileName);
-  };
+    const fileName = `ticket-${bookingCode}-${new Date().getTime()}.pdf`
+    doc.save(fileName)
+  }
 
   // Maneja cambios en el formulario
   const handleChange = (index, e) => {
-    const { name, value } = e.target;
-    const updated = [...formData];
-    updated[index][name] = value;
-    setFormData(updated);
-  };
+    const { name, value } = e.target
+    const updated = [...formData]
+    updated[index][name] = value
+    setFormData(updated)
+  }
 
   // Función para guardar la reserva en el backend
   const saveBookingToBackend = async (bookingData) => {
     try {
       // token para asociar la reserva al usuario
-      const token = getAuthToken();
+      const token = getAuthToken()
 
       if (!token) {
-        throw new Error("No estás autenticado. Por favor, inicia sesión.");
+        throw new Error("No estás autenticado. Por favor, inicia sesión.")
       }
 
       const response = await fetch("http://localhost:3000/api/bookings", {
@@ -256,108 +257,108 @@ const Checkout = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(bookingData),
-      });
+      })
 
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error(
             "Sesión expirada. Por favor, inicia sesión nuevamente."
-          );
+          )
         }
-        throw new Error("Error al guardar la reserva");
+        throw new Error("Error al guardar la reserva")
       }
 
-      const result = await response.json();
-      return result;
+      const result = await response.json()
+      return result
     } catch (error) {
-      console.error("Error al comunicarse con el servidor:", error);
-      throw error;
+      console.error("Error al comunicarse con el servidor:", error)
+      throw error
     }
-  };
+  }
 
   // Gestiona el envío del formulario
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsProcessing(true);
+    e.preventDefault()
+    setIsProcessing(true)
 
-    const erroresValidados = ValidationsCheckout(formData);
-    setErrores(erroresValidados);
+    const erroresValidados = ValidationsCheckout(formData)
+    setErrores(erroresValidados)
 
     const tieneErrores = erroresValidados.some(
       (error) => Object.keys(error).length > 0
-    );
+    )
 
     if (!tieneErrores) {
       try {
         // Verificar que el usuario esté autenticado
-        const token = getAuthToken();
+        const token = getAuthToken()
         if (!token) {
-          alert("Debes iniciar sesión para realizar la compra.");
-          navigate("/login");
-          return;
+          toast.info("Debes iniciar sesión para realizar la compra.")
+          navigate("/login")
+          return
         }
 
         // Calcular el precio total
-        const totalBase = flight?.originalPrice * passengers;
-        const taxes = totalBase * 0.2;
-        const totalFinal = totalBase + taxes;
+        const totalBase = flight?.originalPrice * passengers
+        const taxes = totalBase * 0.2
+        const totalFinal = totalBase + taxes
 
         // Preparar datos para enviar al backend (sin userId, se obtiene del token)
         const bookingData = {
           flightId: flight.id,
           passengers: formData,
           totalPrice: totalFinal,
-        };
+        }
 
         // Guardar en el backend
-        const savedBooking = await saveBookingToBackend(bookingData);
+        const savedBooking = await saveBookingToBackend(bookingData)
         
         // Guardar datos para mostrar después
         setSavedBookingData({
           ...bookingData,
           bookingId: savedBooking.id,
           bookingCode: `${flight?.airline?.substring(0, 2).toUpperCase() || 'FL'}${Date.now().toString().slice(-6)}`
-        });
+        })
         
-        setBookingCompleted(true);
+        setBookingCompleted(true)
         
-        alert("¡Compra realizada con éxito! Ahora puedes descargar tu ticket.");
+        toast.success("¡Compra realizada con éxito! Ahora puedes descargar tu ticket.")
 
-        console.log("Reserva guardada:", savedBooking);
+        console.log("Reserva guardada:", savedBooking)
 
       } catch (error) {
         if (
           error.message.includes("autenticado") ||
           error.message.includes("Sesión expirada")
         ) {
-          alert(error.message);
-          navigate("/login");
+          toast.error(error.message)
+          navigate("/login")
         } else {
-          alert(
+          toast.error(
             "Hubo un error al procesar tu compra. Por favor, intenta nuevamente."
-          );
+          )
         }
-        console.error("Error en la compra:", error);
+        console.error("Error en la compra:", error)
       }
     }
 
-    setIsProcessing(false);
-  };
+    setIsProcessing(false)
+  }
 
   // Función para manejar la descarga del PDF
   const handleDownloadPDF = () => {
-    generateTicketPDF(savedBookingData);
-  };
+    generateTicketPDF(savedBookingData)
+  }
 
   // Función para continuar al panel de vuelos
   const handleContinueToPanel = () => {
-    navigate("/flights-panel");
-  };
+    navigate("/flights-panel")
+  }
 
   // Calcular los valores del resumen de pago
-  const totalBase = flight?.originalPrice * passengers;
-  const taxes = totalBase * 0.2;
-  const totalFinal = totalBase + taxes;
+  const totalBase = flight?.originalPrice * passengers
+  const taxes = totalBase * 0.2
+  const totalFinal = totalBase + taxes
 
   // Si la compra está completada, mostrar la pantalla de éxito
   if (bookingCompleted) {
@@ -413,7 +414,7 @@ const Checkout = () => {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -606,7 +607,7 @@ const Checkout = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Checkout;
+export default Checkout

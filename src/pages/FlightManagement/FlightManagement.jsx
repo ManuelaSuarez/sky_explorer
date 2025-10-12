@@ -13,6 +13,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./FlightManagement.css";
 import { jwtDecode } from "jwt-decode";
+import { toast } from "react-toastify";
 
 const FlightManagement = () => {
   // Estados principales
@@ -144,7 +145,7 @@ const FlightManagement = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error al cargar vuelos");
+      toast.error("Error al cargar vuelos");
     } finally {
       setLoading(false);
     }
@@ -185,7 +186,7 @@ const FlightManagement = () => {
 
     // Validar que origen y destino no sean iguales
     if (newFlight.origin === newFlight.destination) {
-      alert("El origen y el destino no pueden ser iguales");
+      toast.warning("El origen y el destino no pueden ser iguales");
       return false;
     }
 
@@ -207,7 +208,7 @@ const FlightManagement = () => {
   // Crear vuelo
   const handleCreateFlight = async () => {
     if (!validateForm()) {
-      alert("Por favor complete todos los campos obligatorios");
+      toast.warning("Por favor complete todos los campos obligatorios");
       return;
     }
 
@@ -223,7 +224,7 @@ const FlightManagement = () => {
       });
 
       if (response.ok) {
-        alert("Vuelo creado con éxito");
+        toast.success("Vuelo creado con éxito");
         resetForm();
         fetchFlights();
       } else {
@@ -232,7 +233,7 @@ const FlightManagement = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-      alert(error.message || "Error al crear el vuelo");
+      toast.error(error.message || "Error al crear el vuelo");
     }
   };
 
@@ -240,7 +241,7 @@ const FlightManagement = () => {
   const handleEdit = (id) => {
     const flightToEdit = flights.find((flight) => flight.id === id);
     if (!flightToEdit) {
-      alert("No se encontró el vuelo seleccionado");
+      toast.error("No se encontró el vuelo seleccionado");
       return;
     }
 
@@ -265,7 +266,7 @@ const FlightManagement = () => {
   // Actualiza el vuelo
   const handleSaveChanges = async () => {
     if (!validateForm()) {
-      alert("Por favor complete todos los campos obligatorios");
+      toast.warning("Por favor complete todos los campos obligatorios");
       return;
     }
 
@@ -284,7 +285,7 @@ const FlightManagement = () => {
       );
 
       if (response.ok) {
-        alert("Vuelo actualizado con éxito");
+        toast.success("Vuelo actualizado con éxito");
         resetForm();
         fetchFlights();
       } else {
@@ -293,7 +294,7 @@ const FlightManagement = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-      alert(error.message || "Error al actualizar el vuelo");
+      toast.error(error.message || "Error al actualizar el vuelo");
     }
   };
 
@@ -309,7 +310,7 @@ const FlightManagement = () => {
       });
 
       if (response.ok) {
-        alert("Vuelo eliminado con éxito");
+        toast.success("Vuelo eliminado con éxito");
         fetchFlights();
       } else {
         const errorData = await response.json();
@@ -317,7 +318,7 @@ const FlightManagement = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-      alert(error.message || "Error al eliminar el vuelo");
+      toast.error(error.message || "Error al eliminar el vuelo");
     }
   };
 

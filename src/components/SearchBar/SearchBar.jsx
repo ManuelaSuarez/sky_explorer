@@ -1,23 +1,24 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { FaMapMarkerAlt, FaCalendarAlt, FaExchangeAlt } from "react-icons/fa";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import es from "date-fns/locale/es";
-import "./SearchBar.css";
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
+import { FaMapMarkerAlt, FaCalendarAlt, FaExchangeAlt } from "react-icons/fa"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
+import es from "date-fns/locale/es"
+import "./SearchBar.css"
 
 const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const [origin, setOrigin] = useState("");
-  const [destination, setDestination] = useState("");
-  const [passengers, setPassengers] = useState("1");
-  const [departureDate, setDepartureDate] = useState(new Date());
+  const [origin, setOrigin] = useState("")
+  const [destination, setDestination] = useState("")
+  const [passengers, setPassengers] = useState("1")
+  const [departureDate, setDepartureDate] = useState(new Date())
   const [returnDate, setReturnDate] = useState(() => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow;
-  });
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    return tomorrow
+  })
 
   const airports = [
     "Bahía Blanca (BHI)", "Bariloche (BRC)", "Buenos Aires (BUE)",
@@ -33,56 +34,56 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
     "San Luis (LUQ)", "San Rafael (AFA)", "Santa Rosa (RSA)",
     "Santa Teresita (STT)", "Santiago del Estero (SDE)", "Tandil (TDL)",
     "Trelew (REL)", "Tucumán (TUC)", "Ushuaia (USH)", "Villa Gesell (VLG)",
-  ];
+  ]
 
   const createDateFromString = (dateString) => {
-    if (!dateString) return null;
-    return new Date(dateString + "T00:00:00");
-  };
+    if (!dateString) return null
+    return new Date(dateString + "T00:00:00")
+  }
 
   const getTomorrow = (fromDate = new Date()) => {
-    const tomorrow = new Date(fromDate);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow;
-  };
+    const tomorrow = new Date(fromDate)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    return tomorrow
+  }
 
   useEffect(() => {
     if (initialSearchParams) {
-      setOrigin(initialSearchParams.origin || "");
-      setDestination(initialSearchParams.destination || "");
-      setPassengers(initialSearchParams.passengers || "1");
+      setOrigin(initialSearchParams.origin || "")
+      setDestination(initialSearchParams.destination || "")
+      setPassengers(initialSearchParams.passengers || "1")
 
       const newDepartureDate =
-        createDateFromString(initialSearchParams.departureDate) || new Date();
+        createDateFromString(initialSearchParams.departureDate) || new Date()
       const newReturnDate =
         createDateFromString(initialSearchParams.returnDate) ||
-        getTomorrow(newDepartureDate);
+        getTomorrow(newDepartureDate)
 
-      setDepartureDate(newDepartureDate);
-      setReturnDate(newReturnDate);
+      setDepartureDate(newDepartureDate)
+      setReturnDate(newReturnDate)
     }
-  }, [initialSearchParams]);
+  }, [initialSearchParams])
 
   const handleExchange = () => {
-    const tempOrigin = origin;
-    setOrigin(destination);
-    setDestination(tempOrigin);
-  };
+    const tempOrigin = origin
+    setOrigin(destination)
+    setDestination(tempOrigin)
+  }
 
   const handleDepartureChange = (date) => {
-    setDepartureDate(date);
+    setDepartureDate(date)
     if (returnDate && date && returnDate < date) {
-      setReturnDate(getTomorrow(date));
+      setReturnDate(getTomorrow(date))
     }
-  };
+  }
 
   const handleSubmit = () => {
     if (origin === destination) {
-      alert("El origen y el destino no pueden ser iguales.");
-      return;
+      toast.warning("El origen y el destino no pueden ser iguales.")
+      return
     }
 
-    const formatDate = (date) => date?.toISOString().split("T")[0] || "";
+    const formatDate = (date) => date?.toISOString().split("T")[0] || ""
 
     const searchParams = {
       origin,
@@ -90,15 +91,15 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
       departureDate: formatDate(departureDate),
       returnDate: formatDate(returnDate),
       passengers,
-    };
+    }
 
     if (onSearch) {
-      onSearch(searchParams);
+      onSearch(searchParams)
     } else {
-      const urlParams = new URLSearchParams(searchParams);
-      navigate(`/flights?${urlParams.toString()}`);
+      const urlParams = new URLSearchParams(searchParams)
+      navigate(`/flights?${urlParams.toString()}`)
     }
-  };
+  }
 
   return (
     <div className="sb-container">
@@ -212,7 +213,7 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SearchBar;
+export default SearchBar
