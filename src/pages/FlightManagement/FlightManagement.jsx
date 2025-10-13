@@ -1,3 +1,4 @@
+// src/pages/FlightManagement/FlightManagement.jsx
 import React, { useState, useEffect } from "react";
 import {
   FaTrash,
@@ -35,9 +36,11 @@ const FlightManagement = () => {
     basePrice: "85000",
     departureTime: "08:30",
     arrivalTime: "10:15",
+    image: null,
+    isFeatured: false,
   });
 
-  // Lista de aeropuertos para el select
+  // Lista de aeropuertos
   const airports = [
     "Bahía Blanca (BHI)",
     "Bariloche (BRC)",
@@ -83,66 +86,44 @@ const FlightManagement = () => {
     "Villa Gesell (VLG)",
   ];
 
-  // Obtener datos de la aerolínea o del admin
+  // Cargar datos al iniciar
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        setUserRole(decodedToken.role);
-        setAirlineName(decodedToken.name);
+      const decodedToken = jwtDecode(token);
+      setUserRole(decodedToken.role);
+      setAirlineName(decodedToken.name);
 
-        if (decodedToken.role === "airline") {
-          setNewFlight((prev) => ({ ...prev, airline: decodedToken.name }));
-        }
-      } catch (error) {
-        console.error("Error al decodificar token:", error);
+      if (decodedToken.role === "airline") {
+        setNewFlight((prev) => ({ ...prev, airline: decodedToken.name }));
       }
     }
-
-    // carga los vuelos desde el backend
     fetchFlights();
   }, []);
 
-  // Cargar nombres de aerolíneas disponibles si el user es admin
+  // Cargar aerolíneas si es admin
   useEffect(() => {
-    const fetchAirlines = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:3000/api/airlines", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) throw new Error("Error al obtener aerolíneas");
-        const data = await res.json();
-        setAirlines(data);
-      } catch (error) {
-        console.error("Error cargando aerolíneas:", error);
-      }
-    };
-
-    // si es admin trae todos los nombres disponibles de aerolíneas
     if (userRole === "admin") {
-      fetchAirlines();
+      fetch("http://localhost:3000/api/airlines", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setAirlines(data))
+        .catch((err) => console.error("Error:", err));
     }
   }, [userRole]);
 
-  // Cargar vuelos
+  // Cargar vuelos (TODOS para administración)
   const fetchFlights = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/flights", {
-        headers: { Authorization: token ? `Bearer ${token}` : "" },
+      const response = await fetch("http://localhost:3000/api/flights/all", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setFlights(data);
-      } else {
-        throw new Error("Error al cargar vuelos");
-      }
+      const data = await response.json();
+      setFlights(data);
     } catch (error) {
       console.error("Error:", error);
       toast.error("Error al cargar vuelos");
@@ -151,7 +132,7 @@ const FlightManagement = () => {
     }
   };
 
-  // Función para resetear el formulario
+  // Resetear formulario
   const resetForm = () => {
     setNewFlight({
       airline: userRole === "airline" ? airlineName : "",
@@ -162,65 +143,75 @@ const FlightManagement = () => {
       basePrice: "85000",
       departureTime: "08:30",
       arrivalTime: "10:15",
+      image: null,
+      isFeatured: false,
     });
     setEditMode(false);
     setSelectedFlightId(null);
   };
 
-  // Validación y armado del objeto vuelo
+  // Validar formulario (MEJORADO CON VALIDACIÓN DE IMAGEN)
   const validateForm = () => {
-    const required = [
-      "airline",
-      "origin",
-      "destination",
-      "date",
-      "departureTime",
-      "arrivalTime",
-      "capacity",
-      "basePrice",
-    ];
+    if (!newFlight.airline || !newFlight.origin || !newFlight.destination) {
+      alert("Por favor complete todos los campos obligatorios");
+      return false;
+    }
 
-    const allFieldsFilled = required.every((field) => newFlight[field]);
-
-    if (!allFieldsFilled) return false;
-
-    // Validar que origen y destino no sean iguales
     if (newFlight.origin === newFlight.destination) {
       toast.warning("El origen y el destino no pueden ser iguales");
       return false;
     }
 
+    // Validar imagen si es destacado
+    if (newFlight.isFeatured) {
+      // Si es nuevo vuelo: imagen es obligatoria
+      if (!editMode && !newFlight.image) {
+        alert("La imagen es obligatoria para vuelos destacados");
+        return false;
+      }
+
+      // Si estamos editando: validar que tenga imagen
+      if (editMode && !newFlight.image) {
+        const flight = flights.find((f) => f.id === selectedFlightId);
+        if (!flight.imageUrl) {
+          alert("La imagen es obligatoria para vuelos destacados");
+          return false;
+        }
+      }
+    }
+
     return true;
   };
 
-  // Preparar datos del vuelo
-  const prepareFlightData = () => ({
-    airline: newFlight.airline,
-    origin: newFlight.origin,
-    destination: newFlight.destination,
-    date: newFlight.date.toISOString().split("T")[0],
-    departureTime: newFlight.departureTime,
-    arrivalTime: newFlight.arrivalTime,
-    capacity: parseInt(newFlight.capacity),
-    basePrice: parseFloat(newFlight.basePrice),
-  });
-
-  // Crear vuelo
+  // Crear vuelo NUEVO
   const handleCreateFlight = async () => {
     if (!validateForm()) {
       toast.warning("Por favor complete todos los campos obligatorios");
       return;
     }
+    
+    const formData = new FormData();
+    formData.append("airline", newFlight.airline);
+    formData.append("origin", newFlight.origin);
+    formData.append("destination", newFlight.destination);
+    formData.append("date", newFlight.date.toISOString().split("T")[0]);
+    formData.append("departureTime", newFlight.departureTime);
+    formData.append("arrivalTime", newFlight.arrivalTime);
+    formData.append("capacity", newFlight.capacity);
+    formData.append("basePrice", newFlight.basePrice);
+    formData.append("isFeatured", newFlight.isFeatured);
+
+    if (newFlight.image) {
+      formData.append("image", newFlight.image);
+    }
 
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch("http://localhost:3000/api/flights", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify(prepareFlightData()),
+        body: formData,
       });
 
       if (response.ok) {
@@ -228,8 +219,7 @@ const FlightManagement = () => {
         resetForm();
         fetchFlights();
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al crear el vuelo");
+        alert("Error al crear el vuelo");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -237,7 +227,7 @@ const FlightManagement = () => {
     }
   };
 
-  // Carga los datos del vuelo para editarlo
+  // Editar vuelo
   const handleEdit = (id) => {
     const flightToEdit = flights.find((flight) => flight.id === id);
     if (!flightToEdit) {
@@ -246,41 +236,53 @@ const FlightManagement = () => {
     }
 
     setNewFlight({
-      airline: flightToEdit.airline || "",
-      origin: flightToEdit.origin || "",
-      destination: flightToEdit.destination || "",
-      date: new Date(flightToEdit.date) || new Date(),
-      capacity: flightToEdit.capacity?.toString() || "",
-      basePrice: flightToEdit.basePrice?.toString() || "",
-      departureTime: flightToEdit.departureTime || "",
-      arrivalTime: flightToEdit.arrivalTime || "",
+      airline: flight.airline,
+      origin: flight.origin,
+      destination: flight.destination,
+      date: new Date(flight.date),
+      capacity: flight.capacity.toString(),
+      basePrice: flight.basePrice.toString(),
+      departureTime: flight.departureTime,
+      arrivalTime: flight.arrivalTime,
+      image: null,
+      isFeatured: flight.isFeatured || false,
     });
 
     setEditMode(true);
     setSelectedFlightId(id);
-    document
-      .querySelector(".create-flight-section")
-      ?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Actualiza el vuelo
+  // Actualizar vuelo
   const handleSaveChanges = async () => {
     if (!validateForm()) {
       toast.warning("Por favor complete todos los campos obligatorios");
       return;
     }
 
+    const formData = new FormData();
+    formData.append("airline", newFlight.airline);
+    formData.append("origin", newFlight.origin);
+    formData.append("destination", newFlight.destination);
+    formData.append("date", newFlight.date.toISOString().split("T")[0]);
+    formData.append("departureTime", newFlight.departureTime);
+    formData.append("arrivalTime", newFlight.arrivalTime);
+    formData.append("capacity", newFlight.capacity);
+    formData.append("basePrice", newFlight.basePrice);
+    formData.append("isFeatured", newFlight.isFeatured);
+
+    if (newFlight.image) {
+      formData.append("image", newFlight.image);
+    }
+
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(
         `http://localhost:3000/api/flights/${selectedFlightId}`,
         {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: JSON.stringify(prepareFlightData()),
+          body: formData,
         }
       );
 
@@ -289,8 +291,7 @@ const FlightManagement = () => {
         resetForm();
         fetchFlights();
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al actualizar el vuelo");
+        alert("Error al actualizar el vuelo");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -303,18 +304,18 @@ const FlightManagement = () => {
     if (!window.confirm("¿Está seguro que desea eliminar este vuelo?")) return;
 
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(`http://localhost:3000/api/flights/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
 
       if (response.ok) {
         toast.success("Vuelo eliminado con éxito");
         fetchFlights();
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al eliminar el vuelo");
+        alert("Error al eliminar el vuelo");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -322,18 +323,18 @@ const FlightManagement = () => {
     }
   };
 
-  // Manejo de cambios en el formulario
+  // Cambiar campo del formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewFlight((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Maneja fechas del calendario
+  // Cambiar fecha
   const handleDateChange = (date) => {
     setNewFlight((prev) => ({ ...prev, date }));
   };
 
-  // Intercambia el origen por el destino
+  // Intercambiar origen y destino
   const handleExchangeLocations = () => {
     setNewFlight((prev) => ({
       ...prev,
@@ -379,7 +380,6 @@ const FlightManagement = () => {
                     </td>
                   </tr>
                 ) : (
-                  // Filtra solo los vuelos propios si es airline, si es admin muestra todos
                   flights
                     .filter(
                       (flight) =>
@@ -450,7 +450,6 @@ const FlightManagement = () => {
                   <label>Nombre Empresa*</label>
                   <div className="input-with-icon">
                     <FaBuilding className="input-icon" />
-
                     {userRole === "admin" ? (
                       <select
                         name="airline"
@@ -466,7 +465,6 @@ const FlightManagement = () => {
                         ))}
                       </select>
                     ) : (
-                      // sino, es un input no modificable con con nombre de la aerolínea
                       <input
                         type="text"
                         name="airline"
@@ -600,6 +598,68 @@ const FlightManagement = () => {
                       className="time-picker"
                     />
                   </div>
+                </div>
+              </div>
+
+              {/* Tercera fila: Imagen y destacado */}
+              <div className="form-row third-row">
+                <div className="form-group image-group">
+                  <label>
+                    Imagen del vuelo
+                    {newFlight.isFeatured && (
+                      <span style={{ color: "red" }}>*</span>
+                    )}
+                  </label>
+                  <div className="image-input-container">
+                    <input
+                      type="file"
+                      name="image"
+                      accept="image/*"
+                      onChange={(e) =>
+                        setNewFlight({ ...newFlight, image: e.target.files[0] })
+                      }
+                      id="image-input"
+                    />
+                    {newFlight.image && (
+                      <button
+                        type="button"
+                        className="delete-image-button"
+                        onClick={() =>
+                          setNewFlight({ ...newFlight, image: null })
+                        }
+                        title="Eliminar imagen"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                  {newFlight.image && (
+                    <small className="image-selected">
+                      ✓ {newFlight.image.name}
+                    </small>
+                  )}
+                  {newFlight.isFeatured && !newFlight.image && (
+                    <small style={{ color: "orange", marginTop: "4px" }}>
+                      Obligatoria para vuelos destacados
+                    </small>
+                  )}
+                </div>
+
+                <div className="featured-group">
+                  <label htmlFor="featured-checkbox" className="featured-label">
+                    <input
+                      type="checkbox"
+                      id="featured-checkbox"
+                      checked={newFlight.isFeatured}
+                      onChange={(e) =>
+                        setNewFlight({
+                          ...newFlight,
+                          isFeatured: e.target.checked,
+                        })
+                      }
+                    />
+                    <span>Destacado</span>
+                  </label>
                 </div>
               </div>
 

@@ -80,6 +80,12 @@
   padding: 6px 12px;
   cursor: pointer;
   font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.edit-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .delete-button {
@@ -91,6 +97,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.delete-button:hover {
+  transform: scale(1.2);
 }
 
 .create-flight-section {
@@ -138,8 +149,140 @@
   color: var(--text-inverse);
   font-size: 12px;
   margin-bottom: 5px;
+  font-weight: 500;
 }
 
+/* Checkbox */
+.form-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  cursor: pointer;
+  accent-color: var(--teal-green);
+  flex-shrink: 0;
+}
+
+/* Tercera fila mejorada - Alineada correctamente */
+.third-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+/* Grupo de imagen */
+.image-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.image-group label {
+  margin-bottom: 8px;
+}
+
+.image-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.image-group input[type="file"] {
+  flex: 1;
+  padding: 8px 10px !important;
+  border: none !important;
+  border-radius: 3px;
+  font-size: 14px;
+  height: 35px;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.delete-image-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 35px;
+  width: 35px;
+  height: 35px;
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.delete-image-button:hover {
+  background-color: #c62828;
+  transform: scale(1.05);
+}
+
+.delete-image-button:active {
+  transform: scale(0.95);
+}
+
+.image-selected {
+  display: block;
+  color: var(--teal-green);
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* Grupo de destacado */
+.featured-group {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+.featured-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--text-inverse) !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+  background-color: transparent !important;
+  border: none !important;
+  height: auto !important;
+  width: auto !important;
+  white-space: nowrap;
+}
+
+.featured-label input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  cursor: pointer;
+  accent-color: var(--teal-green);
+  flex-shrink: 0;
+}
+
+
+.featured-group label:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+
+
+/* Inputs y selects */
 .create-flight-section .form-group input,
 .create-flight-section .form-group select {
   width: 100%;
@@ -152,6 +295,13 @@
   color: var(--text-primary);
   box-sizing: border-box;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-flight-section .form-group input:focus,
+.create-flight-section .form-group select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(82, 212, 199, 0.2);
 }
 
 .exchange-button {
@@ -167,6 +317,13 @@
   color: var(--teal-green);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 25px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.exchange-button:hover {
+  transform: rotate(180deg) scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .create-flight-section .input-with-icon {
@@ -236,6 +393,7 @@
   display: flex;
   justify-content: flex-end;
   margin-top: 10px;
+  gap: 10px;
 }
 
 .cancel-button {
@@ -248,11 +406,12 @@
   font-weight: 600;
   cursor: pointer;
   height: 35px;
-  margin-right: 10px;
+  transition: all 0.2s ease;
 }
 
 .cancel-button:hover {
   background-color: #e0e0e0;
+  transform: translateY(-2px);
 }
 
 .create-button {
@@ -265,6 +424,21 @@
   font-weight: 600;
   cursor: pointer;
   height: 35px;
+  transition: all 0.2s ease;
+}
+
+.create-button:hover {
+  background-color: var(--teal-green);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Mensaje informativo */
+.form-group small {
+  margin-top: 5px;
+  font-size: 12px;
+  display: block;
 }
 
 @media (max-width: 1024px) {
@@ -275,6 +449,10 @@
   }
 
   .second-row {
+    grid-template-columns: 1fr;
+  }
+
+  .third-row {
     grid-template-columns: 1fr;
   }
 
@@ -292,5 +470,4 @@
 .react-datepicker__portal {
   z-index: 50 !important;
 }
-
 

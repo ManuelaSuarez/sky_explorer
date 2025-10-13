@@ -77,29 +77,36 @@ const SearchBar = ({ buttonText, onSearch, initialSearchParams }) => {
     }
   }
 
-  const handleSubmit = () => {
-    if (origin === destination) {
-      toast.warning("El origen y el destino no pueden ser iguales.")
-      return
-    }
-
-    const formatDate = (date) => date?.toISOString().split("T")[0] || ""
-
-    const searchParams = {
-      origin,
-      destination,
-      departureDate: formatDate(departureDate),
-      returnDate: formatDate(returnDate),
-      passengers,
-    }
-
-    if (onSearch) {
-      onSearch(searchParams)
-    } else {
-      const urlParams = new URLSearchParams(searchParams)
-      navigate(`/flights?${urlParams.toString()}`)
-    }
+const handleSubmit = () => {
+  if (origin === destination) {
+    toast.warning("El origen y el destino no pueden ser iguales.")
+    return
   }
+
+  // Formatear fecha SIN UTC conversion
+  const formatDate = (date) => {
+    if (!date) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const searchParams = {
+    origin,
+    destination,
+    departureDate: formatDate(departureDate),
+    returnDate: formatDate(returnDate),
+    passengers,
+  };
+
+  if (onSearch) {
+    onSearch(searchParams);
+  } else {
+    const urlParams = new URLSearchParams(searchParams);
+    navigate(`/flights?${urlParams.toString()}`);
+  }
+};
 
   return (
     <div className="sb-container">
