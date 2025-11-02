@@ -137,14 +137,15 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: #3a7670c7;
+  color: #3a7670;
   transition: 0.4s;
   border-radius: 34px;
 }
 
 .slider:before {
   position: absolute;
-  content: "☀️";
+  content: "☀︎";
   height: 18px;
   width: 18px;
   left: 3px;
@@ -160,11 +161,12 @@
 
 input:checked + .slider {
   background-color: var(--teal-green);
+  color: var(--teal-green);
 }
 
 input:checked + .slider:before {
   transform: translateX(26px);
-  content: "🌙";
+  content: "⏾";
 }
 
 .user-avatar.user-avatar {   /* doble clase para ganar especificidad */

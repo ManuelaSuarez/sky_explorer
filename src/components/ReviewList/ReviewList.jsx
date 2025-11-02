@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { FaStar, FaEdit, FaTrash, FaUser } from "react-icons/fa"
 import "./ReviewList.css"
+import { showConfirmToast } from "../../utils/toasts/confirmToast"
 
 const ReviewList = ({
   reviews = [],
@@ -53,11 +54,11 @@ const ReviewList = ({
   }
 
   const handleDelete = async (reviewId) => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar esta reseña?")) {
+    showConfirmToast("¿Estás seguro de que quieres eliminar esta reseña?", async () => {
       if (onDeleteReview) {
         await onDeleteReview(reviewId)
       }
-    }
+    })
   }
 
   if (reviews.length === 0) {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { FaStar } from "react-icons/fa"
 import "./ReviewForm.css"
+import { showConfirmToast } from "../../utils/toasts/confirmToast"
 
 const ReviewForm = ({ onReviewSubmit, existingReview = null, airlines = [] }) => {
   const [formData, setFormData] = useState({
@@ -59,25 +60,30 @@ const ReviewForm = ({ onReviewSubmit, existingReview = null, airlines = [] }) =>
       return
     }
 
-    setIsSubmitting(true)
-    setError("")
+    // Mensaje dinámico según acción
+    const confirmMessage = existingReview ? "¿Está seguro de que quiere modificar su reseña?" : "¿Está seguro de que quiere publicar esta reseña?"
 
-    try {
-      await onReviewSubmit(formData)
+    showConfirmToast( confirmMessage, async () => {
+      setIsSubmitting(true)
+      setError("")
 
-      // Limpiar formulario solo si no es edición
-      if (!existingReview) {
-        setFormData({
-          airline: "",
-          rating: 0,
-          comment: "",
-        })
+      try {
+        await onReviewSubmit(formData)
+
+        // Limpiar formulario solo si no es edición
+        if (!existingReview) {
+          setFormData({
+            airline: "",
+            rating: 0,
+            comment: "",
+          })
+        }
+      } catch (error) {
+        setError(error.message || "Error al enviar la reseña")
+      } finally {
+        setIsSubmitting(false)
       }
-    } catch (error) {
-      setError(error.message || "Error al enviar la reseña")
-    } finally {
-      setIsSubmitting(false)
-    }
+    })
   }
 
   return (

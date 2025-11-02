@@ -1,55 +1,56 @@
 // src/pages/Flights/Flights.jsx
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useLocation, useSearchParams } from "react-router-dom";
-import SearchBar from "../../components/SearchBar/SearchBar.jsx";
-import FlightResults from "../../components/FlightResults/FlightResults.jsx";
-import FlightFilters from "../../components/FlightFilters/FlightFilters.jsx";
-import ReviewForm from "../../components/ReviewForm/ReviewForm.jsx";
-import ReviewList from "../../components/ReviewList/ReviewList.jsx";
-import AirlineRating from "../../components/AirlineRating/AirlineRating.jsx";
-import "./Flights.css";
+import { useState, useEffect } from "react"
+import { useLocation, useSearchParams } from "react-router-dom"
+import SearchBar from "../../components/SearchBar/SearchBar.jsx"
+import FlightResults from "../../components/FlightResults/FlightResults.jsx"
+import FlightFilters from "../../components/FlightFilters/FlightFilters.jsx"
+import ReviewForm from "../../components/ReviewForm/ReviewForm.jsx"
+import ReviewList from "../../components/ReviewList/ReviewList.jsx"
+import AirlineRating from "../../components/AirlineRating/AirlineRating.jsx"
+import "./Flights.css"
+import { showConfirmToast } from "../../utils/toasts/confirmToast"
 
 const Flights = () => {
-  const location = useLocation();
-  const [searchParams] = useSearchParams(); // ✅ leemos la URL
+  const location = useLocation()
+  const [searchParams] = useSearchParams()
 
   // Vuelos del backend
-  const [allFlights, setAllFlights] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [allFlights, setAllFlights] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
-  const [reviews, setReviews] = useState([]);
-  const [reviewsLoading, setReviewsLoading] = useState(false);
-  const [editingReview, setEditingReview] = useState(null);
-  const [user, setUser] = useState(null);
+  const [reviews, setReviews] = useState([])
+  const [reviewsLoading, setReviewsLoading] = useState(false)
+  const [editingReview, setEditingReview] = useState(null)
+  const [user, setUser] = useState(null)
 
   // Datos de la búsqueda del usuario
-  const [searchFrom, setSearchFrom] = useState("");
-  const [searchTo, setSearchTo] = useState("");
-  const [departureDate, setDepartureDate] = useState("");
-  const [returnDate, setReturnDate] = useState("");
-  const [passengers, setPassengers] = useState("");
+  const [searchFrom, setSearchFrom] = useState("")
+  const [searchTo, setSearchTo] = useState("")
+  const [departureDate, setDepartureDate] = useState("")
+  const [returnDate, setReturnDate] = useState("")
+  const [passengers, setPassengers] = useState("")
 
   // Filtros adicionales
-  const [chosenAirlines, setChosenAirlines] = useState([]);
-  const [priceOrder, setPriceOrder] = useState("low-to-high");
+  const [chosenAirlines, setChosenAirlines] = useState([])
+  const [priceOrder, setPriceOrder] = useState("low-to-high")
 
   // Cargar usuario autenticado
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token")
     if (token) {
       fetch("http://localhost:3000/api/users/profile/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
         .then((userData) => setUser(userData))
-        .catch((err) => console.error("Error fetching user:", err));
+        .catch((err) => console.error("Error fetching user:", err))
     }
-  }, []);
+  }, [])
 
-  // ✅ Cargar filtros desde la URL (query-string) o desde location.state
+  // Cargar filtros desde la URL (query-string) o desde location.state
   useEffect(() => {
     const fromUrl = {
       origin: searchParams.get("origin") || "",
@@ -57,9 +58,9 @@ const Flights = () => {
       departureDate: searchParams.get("departureDate") || "",
       returnDate: searchParams.get("returnDate") || "",
       passengers: searchParams.get("passengers") || "1",
-    };
+    }
 
-    const fromState = location.state || {};
+    const fromState = location.state || {}
 
     const final = {
       origin: fromState.origin || fromUrl.origin,
@@ -67,63 +68,63 @@ const Flights = () => {
       departureDate: fromState.departureDate || fromUrl.departureDate,
       returnDate: fromState.returnDate || fromUrl.returnDate,
       passengers: fromState.passengers || fromUrl.passengers,
-    };
+    }
 
-    setSearchFrom(final.origin);
-    setSearchTo(final.destination);
-    setDepartureDate(final.departureDate);
-    setReturnDate(final.returnDate);
-    setPassengers(String(final.passengers));
-  }, [searchParams, location.state]);
+    setSearchFrom(final.origin)
+    setSearchTo(final.destination)
+    setDepartureDate(final.departureDate)
+    setReturnDate(final.returnDate)
+    setPassengers(String(final.passengers))
+  }, [searchParams, location.state])
 
-  // ✅ Ejecutar búsqueda cuando cambian los filtros
+  // Ejecutar búsqueda cuando cambian los filtros
   useEffect(() => {
     if (searchFrom || searchTo || departureDate) {
-      getMatchingFlights();
+      getMatchingFlights()
     }
-  }, [searchFrom, searchTo, departureDate, returnDate, passengers]);
+  }, [searchFrom, searchTo, departureDate, returnDate, passengers])
 
   // Función que trae vuelos del servidor
   const getFlights = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const response = await fetch("http://localhost:3000/api/flights");
-      const flights = await response.json();
-      setAllFlights(flights);
-      setError("");
+      const response = await fetch("http://localhost:3000/api/flights")
+      const flights = await response.json()
+      setAllFlights(flights)
+      setError("")
     } catch (err) {
-      setError("No se pudieron cargar los vuelos");
+      setError("No se pudieron cargar los vuelos")
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   const fetchReviews = async () => {
-    setReviewsLoading(true);
+    setReviewsLoading(true)
     try {
-      const response = await fetch("http://localhost:3000/api/reviews");
+      const response = await fetch("http://localhost:3000/api/reviews")
       if (response.ok) {
-        const reviewsData = await response.json();
-        setReviews(reviewsData);
+        const reviewsData = await response.json()
+        setReviews(reviewsData)
       }
     } catch (error) {
-      console.error("Error fetching reviews:", error);
+      console.error("Error fetching reviews:", error)
     } finally {
-      setReviewsLoading(false);
+      setReviewsLoading(false)
     }
-  };
+  }
 
   const handleReviewSubmit = async (reviewData) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token")
     if (!token) {
-      throw new Error("Debes iniciar sesión para escribir una reseña");
+      throw new Error("Debes iniciar sesión para escribir una reseña")
     }
 
     try {
       const url = editingReview
         ? `http://localhost:3000/api/reviews/${editingReview.id}`
-        : "http://localhost:3000/api/reviews";
+        : "http://localhost:3000/api/reviews"
 
-      const method = editingReview ? "PUT" : "POST";
+      const method = editingReview ? "PUT" : "POST"
 
       const response = await fetch(url, {
         method,
@@ -135,118 +136,120 @@ const Flights = () => {
           ...reviewData,
           flightId: 1, // Default flight ID since we don't have specific flight selection
         }),
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al enviar la reseña");
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Error al enviar la reseña")
       }
 
-      await fetchReviews();
-      setEditingReview(null);
+      await fetchReviews()
+      setEditingReview(null)
     } catch (error) {
-      throw error;
+      throw error
     }
-  };
+  }
 
   const handleEditReview = (review) => {
-    setEditingReview(review);
+    setEditingReview(review)
     document.querySelector(".review-form-container")?.scrollIntoView({
       behavior: "smooth",
-    });
-  };
+    })
+  }
 
   const handleDeleteReview = async (reviewId) => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    showConfirmToast("¿Estás seguro de que quieres eliminar esta reseña?", async () => {
+      const token = localStorage.getItem("token")
+      if (!token) return
 
-    try {
-      const response = await fetch(`http://localhost:3000/api/reviews/${reviewId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      try {
+        const response = await fetch(`http://localhost:3000/api/reviews/${reviewId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
 
-      if (response.ok) {
-        await fetchReviews();
+        if (response.ok) {
+          await fetchReviews()
+        }
+      } catch (error) {
+        console.error("Error deleting review:", error)
       }
-    } catch (error) {
-      console.error("Error deleting review:", error);
-    }
-  };
+    })
+  }
 
   // Actualiza los datos en una nueva búsqueda
   const handleSearch = (searchData) => {
-    setSearchFrom(searchData.origin || "");
-    setSearchTo(searchData.destination || "");
-    setDepartureDate(searchData.departureDate || "");
-    setReturnDate(searchData.returnDate || "");
-    setPassengers(searchData.passengers || "");
-    setChosenAirlines([]); // Limpiar filtros
-  };
+    setSearchFrom(searchData.origin || "")
+    setSearchTo(searchData.destination || "")
+    setDepartureDate(searchData.departureDate || "")
+    setReturnDate(searchData.returnDate || "")
+    setPassengers(searchData.passengers || "")
+    setChosenAirlines([]) // Limpiar filtros
+  }
 
   // Muestra los vuelos que coinciden con la búsqueda
   const getMatchingFlights = () => {
-    let flights = [...allFlights];
+    let flights = [...allFlights]
 
     if (searchFrom) {
       flights = flights.filter((flight) =>
         flight.origin.toLowerCase().includes(searchFrom.toLowerCase())
-      );
+      )
     }
 
     if (searchTo) {
       flights = flights.filter((flight) =>
         flight.destination.toLowerCase().includes(searchTo.toLowerCase())
-      );
+      )
     }
 
     // Filtrar por fecha de salida
     if (departureDate) {
       flights = flights.filter((flight) => {
-        const flightDate = flight.date || flight.departureDate;
+        const flightDate = flight.date || flight.departureDate
         if (flightDate) {
-          const searchDate = new Date(departureDate).toISOString().split("T")[0];
-          const flightDateFormatted = new Date(flightDate).toISOString().split("T")[0];
-          return flightDateFormatted === searchDate;
+          const searchDate = new Date(departureDate).toISOString().split("T")[0]
+          const flightDateFormatted = new Date(flightDate).toISOString().split("T")[0]
+          return flightDateFormatted === searchDate
         }
-        return false;
-      });
+        return false
+      })
     }
 
     // Filtrar por fecha de regreso (si aplica)
     if (returnDate) {
       flights = flights.filter((flight) => {
-        const flightReturnDate = flight.returnDate;
+        const flightReturnDate = flight.returnDate
         if (flightReturnDate) {
-          const searchReturn = new Date(returnDate).toISOString().split("T")[0];
-          const flightReturnFormatted = new Date(flightReturnDate).toISOString().split("T")[0];
-          return flightReturnFormatted === searchReturn;
+          const searchReturn = new Date(returnDate).toISOString().split("T")[0]
+          const flightReturnFormatted = new Date(flightReturnDate).toISOString().split("T")[0]
+          return flightReturnFormatted === searchReturn
         }
-        return true;
-      });
+        return true
+      })
     }
 
     // Filtra por aerolíneas específicas
     if (chosenAirlines.length > 0) {
-      flights = flights.filter((flight) => chosenAirlines.includes(flight.airline));
+      flights = flights.filter((flight) => chosenAirlines.includes(flight.airline))
     }
 
     // Ordena por precio
     if (priceOrder === "low-to-high") {
-      flights.sort((a, b) => a.basePrice - b.basePrice);
+      flights.sort((a, b) => a.basePrice - b.basePrice)
     } else {
-      flights.sort((a, b) => b.basePrice - a.basePrice);
+      flights.sort((a, b) => b.basePrice - a.basePrice)
     }
 
-    return flights;
-  };
+    return flights
+  }
 
   // Prepara vuelo para mostrar en pantalla
   const prepareFlightData = (flight) => {
-    const passengersCount = Number.parseInt(passengers) || 1;
-    const totalPrice = flight.basePrice * passengersCount;
+    const passengersCount = Number.parseInt(passengers) || 1
+    const totalPrice = flight.basePrice * passengersCount
 
     return {
       id: flight.id,
@@ -263,51 +266,51 @@ const Flights = () => {
       returnDuration: flight.returnDuration || flight.duration || "—",
       price: totalPrice.toLocaleString(),
       originalPrice: flight.basePrice,
-    };
-  };
+    }
+  }
 
   // Título dinámico de resultados
   const getTitle = () => {
     if (searchFrom && searchTo) {
-      return `Vuelos de ${searchFrom} a ${searchTo}`;
+      return `Vuelos de ${searchFrom} a ${searchTo}`
     }
-    return "Todos los vuelos";
-  };
+    return "Todos los vuelos"
+  }
 
   // Resumen dinámico de los resultados
   const getSearchInfo = () => {
-    const info = [];
-    if (departureDate) info.push(`Salida: ${departureDate}`);
-    if (returnDate) info.push(`Regreso: ${returnDate}`);
-    if (passengers) info.push(`Pasajeros: ${passengers}`);
-    return info.join(" | ");
-  };
+    const info = []
+    if (departureDate) info.push(`Salida: ${departureDate}`)
+    if (returnDate) info.push(`Regreso: ${returnDate}`)
+    if (passengers) info.push(`Pasajeros: ${passengers}`)
+    return info.join(" | ")
+  }
 
   // Obtener aerolíneas disponibles para el filtrado
   const getAirlines = () => {
-    const airlines = allFlights.map((flight) => flight.airline);
-    const uniqueAirlines = [...new Set(airlines)];
-    return uniqueAirlines.sort();
-  };
+    const airlines = allFlights.map((flight) => flight.airline)
+    const uniqueAirlines = [...new Set(airlines)]
+    return uniqueAirlines.sort()
+  }
 
   const isSearching = () => {
-    return searchFrom || searchTo || departureDate || returnDate || chosenAirlines.length > 0;
-  };
+    return searchFrom || searchTo || departureDate || returnDate || chosenAirlines.length > 0
+  }
 
   // Cargar vuelos cuando se abre la página
   useEffect(() => {
-    getFlights();
-    fetchReviews();
-  }, []);
+    getFlights()
+    fetchReviews()
+  }, [])
 
-  if (loading) return <div className="loading">Cargando vuelos...</div>;
-  if (error) return <div className="error">{error}</div>;
+  if (loading) return <div className="loading">Cargando vuelos...</div>
+  if (error) return <div className="error">{error}</div>
 
   // Muestra los vuelos que coinciden
-  const flightsToShow = getMatchingFlights();
+  const flightsToShow = getMatchingFlights()
 
   // Muestra si no hay resultados
-  const noResults = flightsToShow.length === 0 && isSearching();
+  const noResults = flightsToShow.length === 0 && isSearching()
 
   // Mostrar la página
   return (
@@ -387,7 +390,7 @@ const Flights = () => {
         </div>
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default Flights;
+export default Flights

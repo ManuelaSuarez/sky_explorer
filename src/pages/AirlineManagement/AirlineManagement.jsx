@@ -1,64 +1,65 @@
-import { useState, useEffect } from "react";
-import "./AirlineManagement.css";
-import { FaUser, FaGlobe, FaIdCard, FaTrash, FaCog } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { useState, useEffect } from "react"
+import "./AirlineManagement.css"
+import { FaUser, FaGlobe, FaIdCard, FaTrash, FaCog } from "react-icons/fa"
+import { toast } from "react-toastify"
+import { showConfirmToast } from "../../utils/toasts/confirmToast"
 
 const AirlineManagement = () => {
-  const [airlines, setAirlines] = useState([]);
+  const [airlines, setAirlines] = useState([])
   const [newAirline, setNewAirline] = useState({
     name: "",
     code: "",
     cuit: "",
     email: "",
     password: "",
-  });
-  const [editingAirlineId, setEditingAirlineId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  })
+  const [editingAirlineId, setEditingAirlineId] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   const getToken = () => {
-    return localStorage.getItem("token");
-  };
+    return localStorage.getItem("token")
+  }
 
   // Obtener aerolíneas EXPLICAR
   const fetchAirlines = async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
     try {
-      const token = getToken();
+      const token = getToken()
       if (!token) {
-        throw new Error("No autenticado. Por favor inicie sesión.");
+        throw new Error("No autenticado. Por favor inicie sesión.")
       }
 
       const response = await fetch("http://localhost:3000/api/airlines", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al cargar aerolíneas.");
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Error al cargar aerolíneas.")
       }
 
-      const data = await response.json();
-      setAirlines(data);
+      const data = await response.json()
+      setAirlines(data)
     } catch (err) {
-      setError(err.message);
+      setError(err.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchAirlines();
-  }, []);
+    fetchAirlines()
+  }, [])
 
   // Maneja cambios en el form
   const handleAirlineInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewAirline({ ...newAirline, [name]: value });
-  };
+    const { name, value } = e.target
+    setNewAirline({ ...newAirline, [name]: value })
+  }
 
   // Maneja la creación de aerolíneas
   const handleCreateAirline = async () => {
@@ -70,93 +71,95 @@ const AirlineManagement = () => {
       !newAirline.email ||
       !newAirline.password
     ) {
-      toast.warning("Por favor, complete todos los campos.");
-      return;
+      toast.warning("Por favor, complete todos los campos.")
+      return
     }
 
     // Valida formato del CUIT
-    const cuitRegex = /^\d{2}-\d{8}-\d{1}$/;
+    const cuitRegex = /^\d{2}-\d{8}-\d{1}$/
     if (!cuitRegex.test(newAirline.cuit)) {
-      toast.warning("El formato del CUIT debe ser XX-XXXXXXXX-X");
-      return;
+      toast.warning("El formato del CUIT debe ser XX-XXXXXXXX-X")
+      return
     }
 
     // Valida formato del email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(newAirline.email)) {
-      toast.warning("El formato del email no es válido");
-      return;
+      toast.warning("El formato del email no es válido")
+      return
     }
 
     // Valida que la contraseña sea mayor a 7 caracteres
     if (newAirline.password.length < 7) {
-      toast.warning("La contraseña debe tener al menos 7 caracteres.");
-      return;
+      toast.warning("La contraseña debe tener al menos 7 caracteres.")
+      return
     }
 
-    try {
-      const token = getToken();
-      if (!token) {
-        throw new Error("No autenticado. Por favor inicie sesión.");
+    showConfirmToast("¿Deseas crear esta nueva aerolínea?", async () => {
+      try {
+        const token = getToken()
+        if (!token) {
+          throw new Error("No autenticado. Por favor inicie sesión.")
+        }
+
+        const response = await fetch("http://localhost:3000/api/airlines", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(newAirline),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Error al crear aerolínea.")
+        }
+
+        const createdAirline = await response.json()
+        setAirlines([createdAirline, ...airlines]) // Agrega la nueva aerolínea al estado local
+        setNewAirline({ name: "", code: "", cuit: "", email: "", password: "" }) // Limpiar formulario
+      } catch (err) {
+        toast.error(`Error: ${err.message}`)
       }
-
-      const response = await fetch("http://localhost:3000/api/airlines", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newAirline),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al crear aerolínea.");
-      }
-
-      const createdAirline = await response.json();
-      setAirlines([createdAirline, ...airlines]); // Agrega la nueva aerolínea al estado local
-      setNewAirline({ name: "", code: "", cuit: "", email: "", password: "" }); // Limpiar formulario
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
-    }
-  };
+    })
+  }
 
   // Maneja la eliminación de aerolíneas
   const handleDeleteAirline = async (id) => {
-    if (!window.confirm("¿Está seguro que desea eliminar esta aerolínea?")) {
-      return;
-    }
-    try {
-      const token = getToken();
-      if (!token) {
-        throw new Error("No autenticado. Por favor inicie sesión.");
+    showConfirmToast("¿Está seguro que desea eliminar esta aerolínea?", async () => {
+      try {
+        const token = getToken()
+        if (!token) {
+          throw new Error("No autenticado. Por favor inicie sesión.")
+        }
+
+        const response = await fetch(`http://localhost:3000/api/airlines/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Error al eliminar aerolínea.")
+        }
+
+        setAirlines(airlines.filter((airline) => airline.id !== id))
+      } catch (err) {
+        toast.warning(`Error: ${err.message}`)
       }
-
-      const response = await fetch(`http://localhost:3000/api/airlines/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al eliminar aerolínea.");
-      }
-
-      setAirlines(airlines.filter((airline) => airline.id !== id));
-    } catch (err) {
-      toast.warning(`Error: ${err.message}`);
-    }
-  };
+    })
+    
+  }
 
   // Carga los campos en el form para la posterior edición
   const handleEditAirline = (id) => {
-    setEditingAirlineId(id);
-    const airlineToEdit = airlines.find((airline) => airline.id === id);
-    setNewAirline({ ...airlineToEdit, password: "" }); // No cargar la contraseña para edición
-  };
+    setEditingAirlineId(id)
+    const airlineToEdit = airlines.find((airline) => airline.id === id)
+    setNewAirline({ ...airlineToEdit, password: "" }) // No cargar la contraseña para edición
+  }
 
   // Maneja la edición de aerolíneas
   const handleUpdateAirline = async () => {
@@ -167,83 +170,85 @@ const AirlineManagement = () => {
       !newAirline.cuit ||
       !newAirline.email
     ) {
-      toast.warning("Por favor, complete todos los campos.");
-      return;
+      toast.warning("Por favor, complete todos los campos.")
+      return
     }
 
-    const cuitRegex = /^\d{2}-\d{8}-\d{1}$/;
+    const cuitRegex = /^\d{2}-\d{8}-\d{1}$/
     if (!cuitRegex.test(newAirline.cuit)) {
-      toast.warning("El formato del CUIT debe ser XX-XXXXXXXX-X");
-      return;
+      toast.warning("El formato del CUIT debe ser XX-XXXXXXXX-X")
+      return
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(newAirline.email)) {
-      toast.warning("El formato del email no es válido");
-      return;
+      toast.warning("El formato del email no es válido")
+      return
     }
 
     if (newAirline.password.length < 7) {
-      toast.warning("La contraseña debe tener al menos 7 caracteres.");
-      return;
+      toast.warning("La contraseña debe tener al menos 7 caracteres.")
+      return
     }
 
-    try {
-      const token = getToken();
-      if (!token) {
-        throw new Error("No autenticado. Por favor inicie sesión.");
-      }
-
-      const response = await fetch(
-        `http://localhost:3000/api/airlines/${editingAirlineId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            name: newAirline.name,
-            code: newAirline.code,
-            cuit: newAirline.cuit,
-            email: newAirline.email,
-          }), // No se envía la contraseña al actualizar
+    showConfirmToast("¿Deseas guardar los cambios de esta aerolínea?", async () => {
+      try {
+        const token = getToken()
+        if (!token) {
+          throw new Error("No autenticado. Por favor inicie sesión.")
         }
-      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al actualizar aerolínea.");
-      }
-
-      // Reemplaza la aerolínea editada en airlines
-      const updatedAirline = await response.json();
-      setAirlines(
-        airlines.map((airline) =>
-          airline.id === editingAirlineId ? updatedAirline : airline
+        const response = await fetch(
+          `http://localhost:3000/api/airlines/${editingAirlineId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              name: newAirline.name,
+              code: newAirline.code,
+              cuit: newAirline.cuit,
+              email: newAirline.email,
+            }), // No se envía la contraseña al actualizar
+          }
         )
-      );
 
-      // Sale del modo edición.
-      setEditingAirlineId(null);
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Error al actualizar aerolínea.")
+        }
 
-      // Limpia el formulario.
-      setNewAirline({ name: "", code: "", cuit: "", email: "", password: "" }); // Limpiar formulario
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
-    }
-  };
+        // Reemplaza la aerolínea editada en airlines
+        const updatedAirline = await response.json()
+        setAirlines(
+          airlines.map((airline) =>
+            airline.id === editingAirlineId ? updatedAirline : airline
+          )
+        )
+
+        // Sale del modo edición.
+        setEditingAirlineId(null)
+
+        // Limpia el formulario.
+        setNewAirline({ name: "", code: "", cuit: "", email: "", password: "" }) // Limpiar formulario
+      } catch (err) {
+        toast.error(`Error: ${err.message}`)
+      }
+    })
+  }
 
   // Sale del modo edición
   const handleCancelEdit = () => {
-    setEditingAirlineId(null);
-    setNewAirline({ name: "", code: "", cuit: "", email: "", password: "" });
-  };
+    setEditingAirlineId(null)
+    setNewAirline({ name: "", code: "", cuit: "", email: "", password: "" })
+  }
 
   if (loading) {
     return (
       <div className="airline-management-container">Cargando aerolíneas...</div>
-    );
+    )
   }
 
   if (error) {
@@ -251,7 +256,7 @@ const AirlineManagement = () => {
       <div className="airline-management-container error-message">
         Error: {error}
       </div>
-    );
+    )
   }
 
   return (
@@ -398,7 +403,7 @@ const AirlineManagement = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AirlineManagement;
+export default AirlineManagement

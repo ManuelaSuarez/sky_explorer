@@ -5,6 +5,7 @@ import jsPDF from 'jspdf'
 import { toast } from "react-toastify"
 import ValidationsCheckout from "../../components/ValidationsCheckout/ValidationsCheckout"
 import "./Checkout.css"
+import { showConfirmToast } from "../../utils/toasts/confirmToast"
 
 const Checkout = () => {
   // Recupera el vuelo elegido y la cantidad de pasajeros pasados por navigate
@@ -343,60 +344,61 @@ const generateTicketPDF = (bookingData) => {
     )
 
     if (!tieneErrores) {
-      try {
-        // Verificar que el usuario esté autenticado
-        const token = getAuthToken()
-        if (!token) {
-          toast.info("Debes iniciar sesión para realizar la compra.")
-          navigate("/login")
-          return
+      showConfirmToast("¿Deseas confirmar esta compra? Se realizará el cargo a tu cuenta.", async () => {
+        setIsProcessing(true)
+        try {
+          // Verificar que el usuario esté autenticado
+          const token = getAuthToken()
+          if (!token) {
+            toast.info("Debes iniciar sesión para realizar la compra.")
+            navigate("/login")
+            return
+          }
+
+          // Calcular el precio total
+          const totalBase = flight?.originalPrice * passengers
+          const taxes = totalBase * 0.2
+          const totalFinal = totalBase + taxes
+
+          // Preparar datos para enviar al backend (sin userId, se obtiene del token)
+          const bookingData = {
+            flightId: flight.id,
+            passengers: formData,
+            totalPrice: totalFinal,
+          }
+
+          // Guardar en el backend
+          const savedBooking = await saveBookingToBackend(bookingData)
+          
+          // Guardar datos para mostrar después
+          setSavedBookingData({
+            ...bookingData,
+            bookingId: savedBooking.id,
+            bookingCode: `${flight?.airline?.substring(0, 2).toUpperCase() || 'FL'}${Date.now().toString().slice(-6)}`
+          })
+          
+          setBookingCompleted(true)
+          
+          toast.success("¡Compra realizada con éxito! Ahora puedes descargar tu ticket.")
+
+        } catch (error) {
+          if (
+            error.message.includes("autenticado") ||
+            error.message.includes("Sesión expirada")
+          ) {
+            toast.error(error.message)
+            navigate("/login")
+          } else {
+            toast.error(
+              "Hubo un error al procesar tu compra. Por favor, intenta nuevamente."
+            )
+          }
+          console.error("Error en la compra:", error)
+        } finally {
+          setIsProcessing(false)
         }
-
-        // Calcular el precio total
-        const totalBase = flight?.originalPrice * passengers
-        const taxes = totalBase * 0.2
-        const totalFinal = totalBase + taxes
-
-        // Preparar datos para enviar al backend (sin userId, se obtiene del token)
-        const bookingData = {
-          flightId: flight.id,
-          passengers: formData,
-          totalPrice: totalFinal,
-        }
-
-        // Guardar en el backend
-        const savedBooking = await saveBookingToBackend(bookingData)
-        
-        // Guardar datos para mostrar después
-        setSavedBookingData({
-          ...bookingData,
-          bookingId: savedBooking.id,
-          bookingCode: `${flight?.airline?.substring(0, 2).toUpperCase() || 'FL'}${Date.now().toString().slice(-6)}`
-        })
-        
-        setBookingCompleted(true)
-        
-        toast.success("¡Compra realizada con éxito! Ahora puedes descargar tu ticket.")
-
-        console.log("Reserva guardada:", savedBooking)
-
-      } catch (error) {
-        if (
-          error.message.includes("autenticado") ||
-          error.message.includes("Sesión expirada")
-        ) {
-          toast.error(error.message)
-          navigate("/login")
-        } else {
-          toast.error(
-            "Hubo un error al procesar tu compra. Por favor, intenta nuevamente."
-          )
-        }
-        console.error("Error en la compra:", error)
-      }
+      })
     }
-
-    setIsProcessing(false)
   }
 
   // Función para manejar la descarga del PDF
