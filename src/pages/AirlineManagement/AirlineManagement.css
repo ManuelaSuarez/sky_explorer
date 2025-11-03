@@ -99,12 +99,11 @@
 }
 
 .create-button {
-  background-color: white;
-  color: var(--teal-green);
+  background-color: var(--bg-button-create);
+  color: var(--color-button-create);
 }
 
 .create-button:hover {
-  background-color: #f0f0f0;
   transform: translateY(-1px);
 }
 

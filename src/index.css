@@ -28,6 +28,9 @@
   --right-bg: #428780; 
   --text-inverse:#ffffff;
   --bg-avatar:#52a39b;
+  --bg-input-disabled: #e3e0e0;
+  --bg-button-create: white;
+  --color-button-create: #428780;
 }
 
 [data-theme="dark"] {
@@ -47,6 +50,9 @@
   --bg-form: #0c0c1b;
   --right-bg: #16213e; 
   --bg-avatar:#0f3460;
+  --bg-input-disabled: #263b55;
+  --bg-button-create: #0f3460;
+  --color-button-create: white;
 }
 
 * {

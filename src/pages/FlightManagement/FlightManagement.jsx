@@ -472,15 +472,12 @@ const FlightManagement = () => {
                       </select>
                     ) : (
                       <input
+                        className="input-disabled"
                         type="text"
                         name="airline"
                         value={newFlight.airline}
                         readOnly
                         disabled
-                        style={{
-                          backgroundColor: "#f0f0f0",
-                          cursor: "not-allowed",
-                        }}
                       />
                     )}
                   </div>
