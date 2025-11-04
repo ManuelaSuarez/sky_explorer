@@ -151,7 +151,7 @@ const FlightManagement = () => {
     setSelectedFlightId(null)
   }
 
-  // Validar formulario (MEJORADO CON VALIDACIÓN DE IMAGEN)
+  // Validar formulario
   const validateForm = () => {
     if (!newFlight.airline || !newFlight.origin || !newFlight.destination) {
       toast.warning("Por favor complete todos los campos obligatorios")
@@ -239,16 +239,16 @@ const FlightManagement = () => {
     }
 
     setNewFlight({
-      airline: flight.airline,
-      origin: flight.origin,
-      destination: flight.destination,
-      date: new Date(flight.date),
-      capacity: flight.capacity.toString(),
-      basePrice: flight.basePrice.toString(),
-      departureTime: flight.departureTime,
-      arrivalTime: flight.arrivalTime,
+      airline: flightToEdit.airline,
+      origin: flightToEdit.origin,
+      destination: flightToEdit.destination,
+      date: new Date(flightToEdit.date),
+      capacity: flightToEdit.capacity.toString(),
+      basePrice: flightToEdit.basePrice.toString(),
+      departureTime: flightToEdit.departureTime,
+      arrivalTime: flightToEdit.arrivalTime,
       image: null,
-      isFeatured: flight.isFeatured || false,
+      isFeatured: flightToEdit.isFeatured || false,
     })
 
     setEditMode(true)

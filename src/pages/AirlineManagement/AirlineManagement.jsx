@@ -186,7 +186,7 @@ const AirlineManagement = () => {
       return
     }
 
-    if (newAirline.password.length < 7) {
+    if (newAirline.password && newAirline.password.length < 7) {
       toast.warning("La contraseña debe tener al menos 7 caracteres.")
       return
     }
