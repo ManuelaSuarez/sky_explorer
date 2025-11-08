@@ -1,5 +1,3 @@
-/* src/components/OfferBox/OfferBox.css */
-
 .offer-carousel {
   max-width: 1400px;
   margin: 3rem auto;
@@ -240,4 +238,11 @@
   .swiper-button-prev {
     display: none;
   }
+}
+
+/* Ajusta el tamaño de las flechas SVG dentro del círculo */
+.swiper-button-next .swiper-navigation-icon,
+.swiper-button-prev .swiper-navigation-icon {
+  width: 8px;   
+  height: 15px; 
 }
