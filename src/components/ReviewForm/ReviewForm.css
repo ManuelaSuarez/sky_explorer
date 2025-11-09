@@ -33,12 +33,13 @@
 
 .form-group select,
 .form-group textarea {
-  border-radius: 8px;
+  border-radius: 5px;
   font-size: 1rem;
   transition: border-color 0.2s ease;
   background-color: var(--input-bg);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
+  padding: 0.5%;
 }
 
 .form-group select:focus,

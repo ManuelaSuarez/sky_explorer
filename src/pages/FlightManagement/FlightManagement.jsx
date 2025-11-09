@@ -1,5 +1,5 @@
 // src/pages/FlightManagement/FlightManagement.jsx
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import {
   FaTrash,
   FaExchangeAlt,
@@ -86,6 +86,12 @@ const FlightManagement = () => {
     "Ushuaia (USH)",
     "Villa Gesell (VLG)",
   ]
+
+  const isFlightInactive = (date) => {
+    const today = new Date()
+    const flightDate = new Date(date)
+    return flightDate < today
+  }
 
   // Cargar datos al iniciar
   useEffect(() => {
@@ -201,7 +207,7 @@ const FlightManagement = () => {
       formData.append("arrivalTime", newFlight.arrivalTime)
       formData.append("capacity", newFlight.capacity)
       formData.append("basePrice", newFlight.basePrice)
-      formData.append("isFeatured", newFlight.isFeatured)
+      formData.append("isFeatured", isFlightInactive(newFlight.date) ? false : newFlight.isFeatured)
 
       if (newFlight.image) {
         formData.append("image", newFlight.image)
@@ -248,7 +254,7 @@ const FlightManagement = () => {
       departureTime: flightToEdit.departureTime,
       arrivalTime: flightToEdit.arrivalTime,
       image: null,
-      isFeatured: flightToEdit.isFeatured || false,
+      isFeatured: isFlightInactive(flightToEdit.date) ? false : flightToEdit.isFeatured || false
     })
 
     setEditMode(true)
@@ -263,7 +269,6 @@ const FlightManagement = () => {
     }
 
     showConfirmToast("¿Deseas guardar los cambios de este vuelo?", async () => {
-
       const formData = new FormData()
       formData.append("airline", newFlight.airline)
       formData.append("origin", newFlight.origin)
@@ -273,7 +278,7 @@ const FlightManagement = () => {
       formData.append("arrivalTime", newFlight.arrivalTime)
       formData.append("capacity", newFlight.capacity)
       formData.append("basePrice", newFlight.basePrice)
-      formData.append("isFeatured", newFlight.isFeatured)
+      formData.append("isFeatured", isFlightInactive(newFlight.date) ? false : newFlight.isFeatured)
 
       if (newFlight.image) {
         formData.append("image", newFlight.image)
@@ -395,9 +400,11 @@ const FlightManagement = () => {
                       <tr
                         key={flight.id}
                         className={
-                          flight.status === "Activo"
-                            ? "active-row"
-                            : "inactive-row"
+                          isFlightInactive(flight.date)
+                            ? "inactive-row"
+                            : flight.status === "Activo"
+                              ? "active-row"
+                              : ""
                         }
                       >
                         <td>{flight.id}</td>
@@ -409,28 +416,24 @@ const FlightManagement = () => {
                         <td>{flight.arrivalTime}</td>
                         <td
                           className={
-                            flight.status === "Activo"
-                              ? "status-active"
-                              : "status-inactive"
+                            isFlightInactive(flight.date)
+                              ? "status-inactive"
+                              : flight.status === "Activo"
+                                ? "status-active"
+                                : ""
                           }
                         >
                           {flight.status}
                         </td>
                         <td>
                           {flight.status === "Activo" && (
-                            <button
-                              className="edit-button"
-                              onClick={() => handleEdit(flight.id)}
-                            >
+                            <button className="edit-button" onClick={() => handleEdit(flight.id)}>
                               Editar
                             </button>
                           )}
                         </td>
                         <td>
-                          <button
-                            className="delete-button"
-                            onClick={() => handleDelete(flight.id)}
-                          >
+                          <button className="delete-button" onClick={() => handleDelete(flight.id)}>
                             <FaTrash />
                           </button>
                         </td>
@@ -654,6 +657,7 @@ const FlightManagement = () => {
                       type="checkbox"
                       id="featured-checkbox"
                       checked={newFlight.isFeatured}
+                      disabled={isFlightInactive(newFlight.date)}
                       onChange={(e) =>
                         setNewFlight({
                           ...newFlight,
