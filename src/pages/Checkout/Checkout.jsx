@@ -295,111 +295,116 @@ const generateTicketPDF = (bookingData) => {
     setFormData(updated)
   }
 
-  // Función para guardar la reserva en el backend
-  const saveBookingToBackend = async (bookingData) => {
-    try {
-      // token para asociar la reserva al usuario
-      const token = getAuthToken()
+// Función para guardar la reserva en el backend
+const saveBookingToBackend = async (bookingData) => {
+  try {
+    const token = getAuthToken();
 
-      if (!token) {
-        throw new Error("No estás autenticado. Por favor, inicia sesión.")
-      }
-
-      const response = await fetch("http://localhost:3000/api/bookings", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(bookingData),
-      })
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error(
-            "Sesión expirada. Por favor, inicia sesión nuevamente."
-          )
-        }
-        throw new Error("Error al guardar la reserva")
-      }
-
-      const result = await response.json()
-      return result
-    } catch (error) {
-      console.error("Error al comunicarse con el servidor:", error)
-      throw error
+    if (!token) {
+      throw new Error("No estás autenticado. Por favor, inicia sesión.");
     }
+
+    const response = await fetch("http://localhost:3000/api/bookings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(bookingData),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      // Mostrar el mensaje exacto del backend si existe
+      const errorMsg = result.message || "Error al guardar la reserva";
+      throw new Error(errorMsg);
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Error al comunicarse con el servidor:", error);
+    throw error;
   }
+};
+
 
   // Gestiona el envío del formulario
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsProcessing(true)
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsProcessing(true);
 
-    const erroresValidados = ValidationsCheckout(formData)
-    setErrores(erroresValidados)
+  const erroresValidados = ValidationsCheckout(formData);
+  setErrores(erroresValidados);
 
-    const tieneErrores = erroresValidados.some(
-      (error) => Object.keys(error).length > 0
-    )
+  const tieneErrores = erroresValidados.some(
+    (error) => Object.keys(error).length > 0
+  );
 
-    if (!tieneErrores) {
-      showConfirmToast("¿Deseas confirmar esta compra? Se realizará el cargo a tu cuenta.", async () => {
-        setIsProcessing(true)
-        try {
-          // Verificar que el usuario esté autenticado
-          const token = getAuthToken()
-          if (!token) {
-            toast.info("Debes iniciar sesión para realizar la compra.")
-            navigate("/login")
-            return
-          }
-
-          // Calcular el precio total
-          const totalBase = flight?.originalPrice * passengers
-          const taxes = totalBase * 0.2
-          const totalFinal = totalBase + taxes
-
-          // Preparar datos para enviar al backend (sin userId, se obtiene del token)
-          const bookingData = {
-            flightId: flight.id,
-            passengers: formData,
-            totalPrice: totalFinal,
-          }
-
-          // Guardar en el backend
-          const savedBooking = await saveBookingToBackend(bookingData)
-          
-          // Guardar datos para mostrar después
-          setSavedBookingData({
-            ...bookingData,
-            bookingId: savedBooking.id,
-            bookingCode: `${flight?.airline?.substring(0, 2).toUpperCase() || 'FL'}${Date.now().toString().slice(-6)}`
-          })
-          
-          setBookingCompleted(true)
-          
-          toast.success("¡Compra realizada con éxito! Ahora puedes descargar tu ticket.")
-
-        } catch (error) {
-          if (
-            error.message.includes("autenticado") ||
-            error.message.includes("Sesión expirada")
-          ) {
-            toast.error(error.message)
-            navigate("/login")
-          } else {
-            toast.error(
-              "Hubo un error al procesar tu compra. Por favor, intenta nuevamente."
-            )
-          }
-          console.error("Error en la compra:", error)
-        } finally {
-          setIsProcessing(false)
-        }
-      })
-    }
+  if (tieneErrores) {
+    toast.error("Por favor, corrige los errores antes de continuar.");
+    setIsProcessing(false); // Liberamos el botón si hay errores
+    return;
   }
+
+  // Confirmación con callback que respeta cancelación
+  showConfirmToast(
+    "¿Deseas confirmar esta compra? Se realizará el cargo a tu cuenta.",
+    async () => {
+      setIsProcessing(true);
+      try {
+        const token = getAuthToken();
+        if (!token) {
+          toast.info("Debes iniciar sesión para realizar la compra.");
+          navigate("/login");
+          return;
+        }
+
+        const totalBase = flight?.originalPrice * passengers;
+        const taxes = totalBase * 0.2;
+        const totalFinal = totalBase + taxes;
+
+        const bookingData = {
+          flightId: flight.id,
+          passengers: formData,
+          totalPrice: totalFinal,
+        };
+
+        const savedBooking = await saveBookingToBackend(bookingData);
+
+        setSavedBookingData({
+          ...bookingData,
+          bookingId: savedBooking.id,
+          bookingCode: `${
+            flight?.airline?.substring(0, 2).toUpperCase() || "FL"
+          }${Date.now().toString().slice(-6)}`,
+        });
+
+        setBookingCompleted(true);
+        toast.success("¡Compra realizada con éxito! Ahora puedes descargar tu ticket.");
+      } catch (error) {
+        console.error("Error en la compra:", error);
+
+        if (
+          error.message.includes("autenticado") ||
+          error.message.includes("Sesión expirada")
+        ) {
+          toast.error(error.message);
+          navigate("/login");
+        } else {
+          toast.error(error.message || "Hubo un error al procesar tu compra.");
+        }
+      } finally {
+        setIsProcessing(false); // aseguramos liberar siempre
+      }
+    },
+    () => {
+      // callback si el usuario cancela
+      setIsProcessing(false);
+    }
+  );
+};
+
 
   // Función para manejar la descarga del PDF
   const handleDownloadPDF = () => {
