@@ -11,7 +11,8 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const { isDark, toggleTheme } = useTheme();
 
-  const hasAdminAirlineAccess = user && (user.role === "admin" || user.role === "airline");
+  const hasAdminAirlineAccess =
+    user && (user.role === "admin" || user.role === "airline");
   const isAdmin = user && user.role === "admin";
 
   const getUserFromToken = useCallback(() => {
@@ -42,7 +43,10 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
   useEffect(() => {
     if (hasAdminAirlineAccess) {
       const userOnlyRoutes = ["/favorites", "/myFlights", "/checkout"];
-      if (location.pathname === "/" || userOnlyRoutes.some((route) => location.pathname.startsWith(route))) {
+      if (
+        location.pathname === "/" ||
+        userOnlyRoutes.some((route) => location.pathname.startsWith(route))
+      ) {
         navigate("/admin/flights");
       }
     }
@@ -65,13 +69,21 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
 
   const getInitials = useCallback(() => {
     if (!user?.name) return "US";
-    return user.name.split(" ").map((n) => n[0]).join("").toUpperCase();
+    return user.name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   }, [user]);
 
   return (
     <>
       <div className="header_container">
-        <div className="header_logo" onClick={handleLogoClick} style={{ cursor: "pointer" }}>
+        <div
+          className="header_logo"
+          onClick={handleLogoClick}
+          style={{ cursor: "pointer" }}
+        >
           <i className="fa-solid fa-globe"></i>
           <h1 className="header_title">Sky Explorer</h1>
         </div>
@@ -87,22 +99,30 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
               {isAdmin && (
                 <li>
                   <Link to="/admin/accounts" className="header_link">
-                    <i className="fa-solid fa-user-cog"></i> <span>Cuentas</span>
+                    <i className="fa-solid fa-user-cog"></i>{" "}
+                    <span>Cuentas</span>
                   </Link>
                 </li>
               )}
             </>
           ) : (
             <>
-              <li><i className="fa-solid fa-compass"></i> <span>Destinos</span></li>
+              <li>
+                <Link to="/destinations" className="header_link">
+                  <i className="fa-solid fa-compass"></i> <span>Destinos</span>
+                </Link>
+              </li>
+
               <li>
                 <Link to="/favorites" className="header_link">
-                  <i className="fa-solid fa-bookmark"></i> <span>Favoritos</span>
+                  <i className="fa-solid fa-bookmark"></i>{" "}
+                  <span>Favoritos</span>
                 </Link>
               </li>
               <li>
                 <Link to="/myFlights" className="header_link">
-                  <i className="fa-solid fa-passport"></i> <span>Mis Vuelos</span>
+                  <i className="fa-solid fa-passport"></i>{" "}
+                  <span>Mis Vuelos</span>
                 </Link>
               </li>
             </>
@@ -118,7 +138,9 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
 
           {user && (
             <div className="user-profile-container">
-              <span className="user-greeting">Hola, {user.name || "Usuario"}</span>
+              <span className="user-greeting">
+                Hola, {user.name || "Usuario"}
+              </span>
               <div
                 className="user-avatar"
                 onClick={() => setShowProfileModal(true)}
@@ -130,7 +152,7 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
                     alt="Perfil"
                     className="user-avatar-img"
                     onError={(e) => {
-                      e.target.style.display = 'none';
+                      e.target.style.display = "none";
                     }}
                   />
                 ) : (
@@ -154,20 +176,30 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
             user={user}
             onClose={() => setShowProfileModal(false)}
             onUpdate={async (data) => {
-              const res = await fetch(`http://localhost:3000/api/users/profile/me`, {
-                method: "PUT",
-                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-                body: data,
-              });
+              const res = await fetch(
+                `http://localhost:3000/api/users/profile/me`,
+                {
+                  method: "PUT",
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                  body: data,
+                }
+              );
               if (!res.ok) throw new Error("Error al actualizar");
               const updated = await res.json();
               onUserUpdate(updated.user);
             }}
             onDelete={async () => {
-              await fetch(`http://localhost:3000/api/users/profile/me/with-bookings`, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-              });
+              await fetch(
+                `http://localhost:3000/api/users/profile/me/with-bookings`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                }
+              );
               onLogout();
             }}
           />

@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { FaStar, FaEdit, FaTrash, FaUser } from "react-icons/fa"
 import "./ReviewList.css"

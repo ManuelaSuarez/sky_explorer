@@ -1,12 +1,12 @@
 import { FaHeart, FaRegHeart, FaPlane } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
-import useFavorite from "../../hooks/useFavorite"; // 👈 hook
+import useFavorite from "../../hooks/useFavorite"; 
 import "./FlightResults.css";
 
 const FlightResults = ({ flight, passengers }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isFav, toggleFav] = useFavorite(flight.id); // 👈 estado y toggle
+  const [isFav, toggleFav] = useFavorite(flight.id); // estado y toggle
 
   const handleBuyClick = () => {
     const params = new URLSearchParams(location.search);

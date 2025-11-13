@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { FaStar } from "react-icons/fa"
 import "./AirlineRating.css"

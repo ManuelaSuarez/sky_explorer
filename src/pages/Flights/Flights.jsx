@@ -1,6 +1,3 @@
-// src/pages/Flights/Flights.jsx
-"use client"
-
 import { useState, useEffect } from "react"
 import { useLocation, useSearchParams } from "react-router-dom"
 import SearchBar from "../../components/SearchBar/SearchBar.jsx"

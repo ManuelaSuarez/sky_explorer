@@ -1,0 +1,69 @@
+.destinations-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 75vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 40px 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.destinations-card {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 50px 60px;
+  max-width: 700px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.destinations-icon {
+  font-size: 60px;
+  color: var(--teal-green);
+  margin-bottom: 20px;
+  animation: spin 8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.destinations-title {
+  font-size: 2rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.destinations-text {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 35px;
+  line-height: 1.6;
+}
+
+.destinations-button {
+  background-color: var(--teal-green);
+  color: var(--white);
+  border: none;
+  padding: 12px 30px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.destinations-button:hover {
+  background-color: var(--dark-green);
+  transform: scale(1.05);
+}
+
+/* Modo oscuro */
+[data-theme="dark"] .destinations-card {
+  background-color: var(--bg-secondary);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.05);
+}
