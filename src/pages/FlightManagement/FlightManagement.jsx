@@ -1,4 +1,3 @@
-// src/pages/FlightManagement/FlightManagement.jsx
 import { useState, useEffect } from "react"
 import {
   FaTrash,

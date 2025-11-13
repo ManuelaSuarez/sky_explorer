@@ -1,4 +1,3 @@
-// App.jsx
 import { useState, useEffect, useCallback } from "react";
 import {
   BrowserRouter as Router,
@@ -21,6 +20,7 @@ import ModalRegister from "./components/ModalRegister/ModalRegister.jsx";
 import UserRoute from "./components/ProtectedRoutes/UserRoute.jsx";
 import AdminRoute from "./components/ProtectedRoutes/AdminRoute.jsx";
 import AirlineAdminRoute from "./components/ProtectedRoutes/AirlineAdmin.jsx";
+import Destinations from "./pages/Destinations/Destinations.jsx";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { ToastContainer, toast, Bounce  } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -117,6 +117,16 @@ function App() {
               </UserRoute>
             }
           />
+
+          <Route
+            path="/destinations"
+            element={
+              <UserRoute user={user} setModalVisible={setModalVisible}>
+                <Destinations />
+              </UserRoute>
+            }
+          />
+          
           <Route
             path="/myFlights"
             element={
@@ -126,7 +136,7 @@ function App() {
             }
           />
 
-          {/* 👇 2) RUTA NUEVA DE FAVORITOS */}
+          {/* RUTA DE FAVORITOS */}
           <Route
             path="/favorites"
             element={
