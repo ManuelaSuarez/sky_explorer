@@ -17,28 +17,47 @@ const OfferBox = () => {
       .catch((err) => console.error("Error cargando destacados:", err));
   }, []);
 
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const handleClick = (vuelo) => {
     console.log("Vuelo seleccionado:", vuelo);
 
-    // Si no tiene fecha, usamos mañana como fecha por defecto
-    const fechaHoy = new Date();
-    fechaHoy.setDate(fechaHoy.getDate() + 1);
-    const fechaSalida = vuelo.date || vuelo.departureDate || fechaHoy.toISOString().split("T")[0];
+    // Si no tiene fecha, usar mañana como base
+    const hoy = new Date();
+    hoy.setDate(hoy.getDate() + 1);
 
-    // Calcular fecha de regreso: una semana después
-    const fechaRegreso = new Date(fechaHoy);
+    // Fecha de salida
+    const fechaSalida = vuelo.date
+      ? new Date(vuelo.date + "T00:00:00")
+      : hoy;
+
+    // Sugerimos una fecha de regreso, pero no la forzamos
+    const fechaRegreso = new Date(fechaSalida);
     fechaRegreso.setDate(fechaRegreso.getDate() + 7);
-    const fechaRegresoStr = fechaRegreso.toISOString().split("T")[0];
 
     const params = new URLSearchParams({
       origin: vuelo.origin,
       destination: vuelo.destination,
-      departureDate: fechaSalida,
-      returnDate: fechaRegresoStr,
+      departureDate: formatDate(fechaSalida),
+      returnDate: formatDate(fechaRegreso),
       passengers: 1,
     });
 
-    navigate(`/flights?${params.toString()}`);
+    // Pasamos también los datos por state
+    navigate(`/flights?${params.toString()}`, {
+      state: {
+        origin: vuelo.origin,
+        destination: vuelo.destination,
+        departureDate: formatDate(fechaSalida),
+        returnDate: formatDate(fechaRegreso),
+        passengers: 1,
+      },
+    });
   };
 
   if (!destacados.length) return <p>Cargando destacados...</p>;
