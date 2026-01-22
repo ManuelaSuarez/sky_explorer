@@ -21,7 +21,7 @@ const AirlineManagement = () => {
     return localStorage.getItem("token")
   }
 
-  // Obtener aerolíneas EXPLICAR
+  // Obtener aerolíneas 
   const fetchAirlines = async () => {
     setLoading(true)
     setError(null)

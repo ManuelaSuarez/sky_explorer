@@ -86,10 +86,60 @@ const FlightManagement = () => {
     "Villa Gesell (VLG)",
   ];
 
-  const isFlightInactive = (date) => {
-    const today = new Date();
-    const flightDate = new Date(date);
-    return flightDate < today;
+const isFlightInactive = (date, departureTime) => {
+  const now = new Date();
+
+  const flightDateTime = new Date(`${date}T${departureTime}`);
+
+  return flightDateTime <= now;
+};
+
+
+  // Función para obtener la fecha mínima permitida (hoy)
+  const getMinDate = () => {
+    return new Date();
+  };
+
+  // Función para validar fecha y hora
+  const validateDateTime = () => {
+    const now = new Date();
+    const selectedDate = new Date(newFlight.date);
+    
+    // Normalizar fechas para comparar solo día/mes/año
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const selectedDateStart = new Date(
+      selectedDate.getFullYear(), 
+      selectedDate.getMonth(), 
+      selectedDate.getDate()
+    );
+    
+    // Validar que la fecha no sea anterior a hoy
+    if (selectedDateStart < todayStart) {
+      toast.error("La fecha del vuelo no puede ser anterior a hoy");
+      return false;
+    }
+    
+    // Si es hoy, validar la hora
+    if (selectedDateStart.getTime() === todayStart.getTime()) {
+      const [hours, minutes] = newFlight.departureTime.split(':').map(Number);
+      const flightDateTime = new Date(
+        now.getFullYear(), 
+        now.getMonth(), 
+        now.getDate(), 
+        hours, 
+        minutes
+      );
+      
+      // Debe ser al menos 30 minutos en el futuro
+      const minValidTime = new Date(now.getTime() + 30 * 60000);
+      
+      if (flightDateTime < minValidTime) {
+        toast.error("La hora de salida debe ser al menos 30 minutos posterior a la hora actual");
+        return false;
+      }
+    }
+    
+    return true;
   };
 
   // Cargar datos al iniciar
@@ -158,31 +208,61 @@ const FlightManagement = () => {
 
   // Validar formulario
   const validateForm = () => {
+    // 1. Campos obligatorios
     if (!newFlight.airline || !newFlight.origin || !newFlight.destination) {
-      toast.warning("Por favor complete todos los campos obligatorios");
+      toast.error("Por favor complete todos los campos obligatorios");
       return false;
     }
 
+    // Origen y destino diferentes
     if (newFlight.origin === newFlight.destination) {
-      toast.warning("El origen y el destino no pueden ser iguales");
+      toast.error("El origen y el destino no pueden ser iguales");
       return false;
     }
 
-    if (!newFlight.capacity || newFlight.capacity <= 0) {
-    toast.warning("La capacidad del vuelo debe ser mayor que 0");
-    return false;
-  }
+    // Validar capacidad
+    const capacity = Number(newFlight.capacity);
+    if (!newFlight.capacity || isNaN(capacity) || capacity <= 0) {
+      toast.error("La capacidad del vuelo debe ser un número mayor que 0");
+      return false;
+    }
 
-  if (!newFlight.basePrice || newFlight.basePrice <= 0) {
-    toast.warning("El precio base debe ser mayor que 0");
-    return false;
-  }
+    // Validar precio
+    const basePrice = Number(newFlight.basePrice);
+    if (!newFlight.basePrice || isNaN(basePrice) || basePrice <= 0) {
+      toast.error("El precio base debe ser un número mayor que 0");
+      return false;
+    }
 
-    // Validar imagen si es destacado
+    // Validar fecha y hora
+    if (!validateDateTime()) {
+      return false;
+    }
+
+// Validar duración del vuelo (permite llegada al día siguiente)
+const [depHour, depMin] = newFlight.departureTime.split(":").map(Number);
+const [arrHour, arrMin] = newFlight.arrivalTime.split(":").map(Number);
+
+let depMinutes = depHour * 60 + depMin;
+let arrMinutes = arrHour * 60 + arrMin;
+
+// Si la llegada es menor o igual, se asume llegada al día siguiente
+if (arrMinutes <= depMinutes) {
+  arrMinutes += 24 * 60;
+}
+
+// Duración mínima razonable (30 minutos)
+if (arrMinutes - depMinutes < 30) {
+  toast.error("La duración del vuelo debe ser mayor a 30 minutos");
+  return false;
+}
+
+
+    // 7. Validar imagen si es destacado
     if (newFlight.isFeatured) {
       // Si es nuevo vuelo: imagen es obligatoria
       if (!editMode && !newFlight.image) {
-        toast.warning("La imagen es obligatoria para vuelos destacados");
+        toast.error("La imagen es obligatoria para vuelos destacados");
         return false;
       }
 
@@ -190,7 +270,7 @@ const FlightManagement = () => {
       if (editMode && !newFlight.image) {
         const flight = flights.find((f) => f.id === selectedFlightId);
         if (!flight.imageUrl) {
-          toast.warning("La imagen es obligatoria para vuelos destacados");
+          toast.error("La imagen es obligatoria para vuelos destacados");
           return false;
         }
       }
@@ -202,7 +282,6 @@ const FlightManagement = () => {
   // Crear vuelo
   const handleCreateFlight = async () => {
     if (!validateForm()) {
-      toast.warning("Por favor complete todos los campos obligatorios");
       return;
     }
 
@@ -235,16 +314,18 @@ const FlightManagement = () => {
           body: formData,
         });
 
+        const data = await response.json();
+
         if (response.ok) {
           toast.success("Vuelo creado con éxito");
           resetForm();
           fetchFlights();
         } else {
-          toast.error("Error al crear el vuelo");
+          toast.error(data.message || "Error al crear el vuelo");
         }
       } catch (error) {
         console.error("Error:", error);
-        toast.error(error.message || "Error al crear el vuelo");
+        toast.error("Error de conexión al crear el vuelo");
       }
     });
   };
@@ -257,20 +338,23 @@ const FlightManagement = () => {
       return;
     }
 
-    setNewFlight({
-      airline: flightToEdit.airline,
-      origin: flightToEdit.origin,
-      destination: flightToEdit.destination,
-      date: new Date(flightToEdit.date + "T00:00:00"),
-      capacity: flightToEdit.capacity.toString(),
-      basePrice: flightToEdit.basePrice.toString(),
-      departureTime: flightToEdit.departureTime,
-      arrivalTime: flightToEdit.arrivalTime,
-      image: null,
-      isFeatured: isFlightInactive(flightToEdit.date)
-        ? false
-        : flightToEdit.isFeatured || false,
-    });
+setNewFlight({
+  airline: flightToEdit.airline,
+  origin: flightToEdit.origin,
+  destination: flightToEdit.destination,
+  date: new Date(flightToEdit.date + "T00:00:00"),
+  capacity: flightToEdit.capacity.toString(),
+  basePrice: flightToEdit.basePrice.toString(),
+  departureTime: flightToEdit.departureTime,
+  arrivalTime: flightToEdit.arrivalTime,
+  image: null,
+  isFeatured: isFlightInactive(
+    flightToEdit.date,
+    flightToEdit.departureTime
+  )
+    ? false
+    : flightToEdit.isFeatured || false,
+});
 
     setEditMode(true);
     setSelectedFlightId(id);
@@ -279,7 +363,6 @@ const FlightManagement = () => {
   // Actualizar vuelo
   const handleSaveChanges = async () => {
     if (!validateForm()) {
-      toast.warning("Por favor complete todos los campos obligatorios");
       return;
     }
 
@@ -315,16 +398,18 @@ const FlightManagement = () => {
           }
         );
 
+        const data = await response.json();
+
         if (response.ok) {
           toast.success("Vuelo actualizado con éxito");
           resetForm();
           fetchFlights();
         } else {
-          toast.error("Error al actualizar el vuelo");
+          toast.error(data.message || "Error al actualizar el vuelo");
         }
       } catch (error) {
         console.error("Error:", error);
-        toast.error(error.message || "Error al actualizar el vuelo");
+        toast.error("Error de conexión al actualizar el vuelo");
       }
     });
   };
@@ -345,15 +430,17 @@ const FlightManagement = () => {
             }
           );
 
+          const data = await response.json();
+
           if (response.ok) {
             toast.success("Vuelo eliminado con éxito");
             fetchFlights();
           } else {
-            toast.error("Error al eliminar el vuelo");
+            toast.error(data.message || "Error al eliminar el vuelo");
           }
         } catch (error) {
           console.error("Error:", error);
-          toast.error(error.message || "Error al eliminar el vuelo");
+          toast.error("Error de conexión al eliminar el vuelo");
         }
       }
     );
@@ -368,6 +455,42 @@ const FlightManagement = () => {
   // Cambiar fecha
   const handleDateChange = (date) => {
     setNewFlight((prev) => ({ ...prev, date }));
+  };
+
+  // Manejar cambio de hora con validación en tiempo real
+  const handleTimeChange = (e) => {
+    const { name, value } = e.target;
+    setNewFlight((prev) => ({ ...prev, [name]: value }));
+    
+    // Validar en tiempo real si es hoy
+    if (name === 'departureTime') {
+      const now = new Date();
+      const selectedDate = new Date(newFlight.date);
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const selectedDateStart = new Date(
+        selectedDate.getFullYear(), 
+        selectedDate.getMonth(), 
+        selectedDate.getDate()
+      );
+      
+      if (selectedDateStart.getTime() === todayStart.getTime()) {
+        const [hours, minutes] = value.split(':').map(Number);
+        const flightDateTime = new Date(
+          now.getFullYear(), 
+          now.getMonth(), 
+          now.getDate(), 
+          hours, 
+          minutes
+        );
+        const minValidTime = new Date(now.getTime() + 30 * 60000);
+        
+        if (flightDateTime < minValidTime) {
+          toast.info("La hora debe ser al menos 30 minutos posterior a la actual", {
+            autoClose: 2000
+          });
+        }
+      }
+    }
   };
 
   // Intercambiar origen y destino
@@ -402,76 +525,73 @@ const FlightManagement = () => {
                   <th>Cancelar</th>
                 </tr>
               </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="10" style={{ textAlign: "center" }}>
-                      Cargando vuelos...
-                    </td>
-                  </tr>
-                ) : flights.length === 0 ? (
-                  <tr>
-                    <td colSpan="10" style={{ textAlign: "center" }}>
-                      No hay vuelos disponibles
-                    </td>
-                  </tr>
-                ) : (
-                  flights
-                    .filter(
-                      (flight) =>
-                        userRole === "admin" || flight.airline === airlineName
-                    )
-                    .map((flight) => (
-                      <tr
-                        key={flight.id}
-                        className={
-                          isFlightInactive(flight.date)
-                            ? "inactive-row"
-                            : flight.status === "Activo"
-                            ? "active-row"
-                            : ""
-                        }
-                      >
-                        <td>{flight.id}</td>
-                        <td>{flight.airline}</td>
-                        <td>{flight.origin}</td>
-                        <td>{flight.destination}</td>
-                        <td>{flight.date}</td>
-                        <td>{flight.departureTime}</td>
-                        <td>{flight.arrivalTime}</td>
-                        <td
-                          className={
-                            isFlightInactive(flight.date)
-                              ? "status-inactive"
-                              : flight.status === "Activo"
-                              ? "status-active"
-                              : ""
-                          }
-                        >
-                          {flight.status}
-                        </td>
-                        <td>
-                          {flight.status === "Activo" && (
-                            <button
-                              className="edit-button"
-                              onClick={() => handleEdit(flight.id)}
-                            >
-                              Editar
-                            </button>
-                          )}
-                        </td>
-                        <td>
-                          <button
-                            className="delete-button"
-                            onClick={() => handleDelete(flight.id)}
-                          >
-                            <FaTrash />
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                )}
-              </tbody>
+<tbody>
+  {loading ? (
+    <tr>
+      <td colSpan="10" style={{ textAlign: "center" }}>
+        Cargando vuelos...
+      </td>
+    </tr>
+  ) : flights.length === 0 ? (
+    <tr>
+      <td colSpan="10" style={{ textAlign: "center" }}>
+        No hay vuelos disponibles
+      </td>
+    </tr>
+  ) : (
+flights
+  .filter(
+    (flight) =>
+      userRole === "admin" || flight.airline === newFlight.airline
+  )
+  .map((flight) => {
+        const inactive = isFlightInactive(
+          flight.date,
+          flight.departureTime
+        );
+
+        return (
+          <tr
+            key={flight.id}
+            className={inactive ? "inactive-row" : "active-row"}
+          >
+            <td>{flight.id}</td>
+            <td>{flight.airline}</td>
+            <td>{flight.origin}</td>
+            <td>{flight.destination}</td>
+            <td>{flight.date}</td>
+            <td>{flight.departureTime}</td>
+            <td>{flight.arrivalTime}</td>
+
+            <td className={inactive ? "status-inactive" : "status-active"}>
+              {inactive ? "Inactivo" : "Activo"}
+            </td>
+
+            <td>
+              {!inactive && (
+                <button
+                  className="edit-button"
+                  onClick={() => handleEdit(flight.id)}
+                >
+                  Editar
+                </button>
+              )}
+            </td>
+
+            <td>
+              <button
+                className="delete-button"
+                onClick={() => handleDelete(flight.id)}
+              >
+                <FaTrash />
+              </button>
+            </td>
+          </tr>
+        );
+      })
+  )}
+</tbody>
+
             </table>
           </div>
         </div>
@@ -574,6 +694,7 @@ const FlightManagement = () => {
                       onChange={handleDateChange}
                       dateFormat="dd/MM/yyyy"
                       className="date-picker"
+                      minDate={getMinDate()}
                     />
                   </div>
                 </div>
@@ -591,6 +712,7 @@ const FlightManagement = () => {
                       value={newFlight.capacity}
                       onChange={handleInputChange}
                       placeholder="Número de pasajeros"
+                      min="1"
                     />
                   </div>
                 </div>
@@ -605,6 +727,7 @@ const FlightManagement = () => {
                       value={newFlight.basePrice}
                       onChange={handleInputChange}
                       placeholder="Precio en pesos"
+                      min="1"
                     />
                   </div>
                 </div>
@@ -617,7 +740,7 @@ const FlightManagement = () => {
                       type="time"
                       name="departureTime"
                       value={newFlight.departureTime}
-                      onChange={handleInputChange}
+                      onChange={handleTimeChange}
                       className="time-picker"
                     />
                   </div>
@@ -631,7 +754,7 @@ const FlightManagement = () => {
                       type="time"
                       name="arrivalTime"
                       value={newFlight.arrivalTime}
-                      onChange={handleInputChange}
+                      onChange={handleTimeChange}
                       className="time-picker"
                     />
                   </div>
@@ -684,18 +807,21 @@ const FlightManagement = () => {
 
                 <div className="featured-group">
                   <label htmlFor="featured-checkbox" className="featured-label">
-                    <input
-                      type="checkbox"
-                      id="featured-checkbox"
-                      checked={newFlight.isFeatured}
-                      disabled={isFlightInactive(newFlight.date)}
-                      onChange={(e) =>
-                        setNewFlight({
-                          ...newFlight,
-                          isFeatured: e.target.checked,
-                        })
-                      }
-                    />
+<input
+  type="checkbox"
+  id="featured-checkbox"
+  checked={newFlight.isFeatured}
+  disabled={isFlightInactive(
+    newFlight.date.toISOString().split("T")[0],
+    newFlight.departureTime
+  )}
+  onChange={(e) =>
+    setNewFlight({
+      ...newFlight,
+      isFeatured: e.target.checked,
+    })
+  }
+/>
                     <span>Destacado</span>
                   </label>
                 </div>

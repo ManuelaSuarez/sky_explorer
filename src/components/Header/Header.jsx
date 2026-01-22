@@ -130,7 +130,7 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
         </ul>
 
         <div className="header_user-section">
-          {/* 🌞 Switch de tema */}
+          {/* Switch de tema */}
           <label className="theme-switch">
             <input type="checkbox" checked={isDark} onChange={toggleTheme} />
             <span className="slider"></span>
@@ -190,17 +190,31 @@ const Header = ({ modalVisible, user, onLogout, onUserUpdate }) => {
               const updated = await res.json();
               onUserUpdate(updated.user);
             }}
-            onDelete={async () => {
-              await fetch(
-                `http://localhost:3000/api/users/profile/me/with-bookings`,
-                {
-                  method: "DELETE",
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  },
-                }
-              );
-              onLogout();
+onDelete={async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(
+      `http://localhost:3000/api/users/profile/me/with-bookings`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    // CAPTURAR ERROR DEL SERVIDOR
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Error al eliminar cuenta");
+    }
+
+    // Si todo salió bien, cerrar sesión
+    onLogout();
+  } catch (error) {
+    // RE-LANZAR EL ERROR PARA QUE EL MODAL LO CAPTURE
+    throw error;
+  }
             }}
           />
         )}

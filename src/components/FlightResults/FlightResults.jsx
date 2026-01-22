@@ -1,12 +1,17 @@
 import { FaHeart, FaRegHeart, FaPlane } from "react-icons/fa";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useFavorite from "../../hooks/useFavorite";
 import "./FlightResults.css";
 
-const FlightResults = ({ flight, passengers, departureDate, returnDate }) => {
+const FlightResults = ({
+  flight,
+  passengers,
+  departureDate,
+  returnDate,
+  onBuy, 
+}) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [isFav, toggleFav] = useFavorite(flight.id); // estado y toggle
+  const [isFav, toggleFav] = useFavorite(flight.id);
 
   const handleBuyClick = () => {
     navigate("/checkout", {
@@ -34,7 +39,6 @@ const FlightResults = ({ flight, passengers, departureDate, returnDate }) => {
         </button>
       </div>
 
-      {/* resto idéntico a tu código */}
       <div className="flight-details">
         <div className="flight-info">
           <div className="flight-leg">
@@ -85,7 +89,11 @@ const FlightResults = ({ flight, passengers, departureDate, returnDate }) => {
               Precio por persona: ${flight.originalPrice.toLocaleString()}
             </small>
           </div>
-          <button className="buy-button" onClick={handleBuyClick}>
+
+          <button
+            className="buy-button"
+            onClick={onBuy || handleBuyClick}
+          >
             Comprar
           </button>
         </div>

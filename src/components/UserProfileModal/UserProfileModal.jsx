@@ -165,21 +165,27 @@ const UserProfileModal = ({ user, onClose, onUpdate, onDelete }) => {
     })
   } 
 
-  const handleConfirmDelete = () => {
-    showConfirmToast(
-      "¿Estás completamente seguro? Esta acción no se puede deshacer y se eliminarán todas tus reservas.",
-      async () => {
-        setIsSubmitting(true)
-        try {
-          await onDelete()
-        } catch (error) {
-          setErrors({ ...errors, general: error.message || "Error al eliminar la cuenta" })
-        } finally {
-          setIsSubmitting(false)
-        }
-      },
-    )
-  }
+const handleConfirmDelete = () => {
+  showConfirmToast(
+    "¿Estás completamente seguro? Esta acción no se puede deshacer y se eliminarán todas tus reservas.",
+    async () => {
+      setIsSubmitting(true);
+      try {
+        await onDelete();
+        // Si llegamos aquí, todo salió bien
+        onClose();
+      } catch (error) {
+        // MOSTRAR EL ERROR AL USUARIO
+        setErrors({ 
+          ...errors, 
+          general: error.message || "Error al eliminar la cuenta" 
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  );
+};
   
   const currentProfilePicture = profileImagePreview ||
     (!isImageDeleted && user?.profilePicture
