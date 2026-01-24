@@ -3,44 +3,28 @@ import "./FlightPanel.css";
 import { useNavigate } from "react-router-dom";
 
 const FlightPanel = ({ setModalVisible }) => {
-  // Seteo de estados
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Función para obtener el token del usuario
-  const getAuthToken = () => {
-    return localStorage.getItem("token");
-  };
+  const getAuthToken = () => localStorage.getItem("token");
 
-  // Obtiene las reservas del usuario autenticado
   const fetchUserBookings = async () => {
     try {
       const token = getAuthToken();
+      if (!token) throw new Error("No estás autenticado. Por favor, inicia sesión.");
 
-      if (!token) {
-        throw new Error("No estás autenticado. Por favor, inicia sesión.");
-      }
-
-      // Obtiene las reservas del usuario autenticado
-      const response = await fetch(
-        "http://localhost:3000/api/bookings/my-bookings",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch("http://localhost:3000/api/bookings/my-bookings", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error(
-            "Sesión expirada. Por favor, inicia sesión nuevamente."
-          );
-        }
+        if (response.status === 401) throw new Error("Sesión expirada. Por favor, inicia sesión nuevamente.");
         throw new Error("Error al cargar las reservas");
       }
 
@@ -50,74 +34,55 @@ const FlightPanel = ({ setModalVisible }) => {
     } catch (error) {
       console.error("Error al obtener reservas:", error);
       setError(error.message);
-
-      // Si el error es por autenticación, abre el modal
-      if (
-        error.message.includes("autenticado") ||
-        error.message.includes("Sesión expirada")
-      ) {
-        if (setModalVisible) {
-          setModalVisible("login");
-        }
+      if (error.message.includes("autenticado") || error.message.includes("Sesión expirada")) {
+        if (setModalVisible) setModalVisible("login");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  // Formatea la fecha
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("es-ES", {
+  // Construcción local de fecha/hora
+  const buildLocalDateTime = (flight) => {
+    const [year, month, day] = flight.date.split("-").map(Number);
+    const [hour, minute] = flight.departureTime.split(":").map(Number);
+    return new Date(year, month - 1, day, hour, minute);
+  };
+
+  const formatDate = (flight) => {
+    const localDate = buildLocalDateTime(flight);
+    return localDate.toLocaleDateString("es-AR", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     });
   };
 
-  // Determina si el vuelo ya pasó o no y le asigna un estado
   const getFlightStatus = (booking) => {
     const today = new Date();
-    const flightDate = new Date(booking.flight.date);
-
-    // Si ya pasó la fecha de salida, es Inactivo
-    if (flightDate < today) {
-      return "Inactivo";
-    } else {
-      return "Activo";
-    }
+    const flightDate = buildLocalDateTime(booking.flight);
+    return flightDate < today ? "Inactivo" : "Activo";
   };
 
-  // Función para obtener la clase CSS del estado
   const getStatusClass = (status) => {
     switch (status) {
-      case "Activo":
-        return "status-active";
-      case "Inactivo":
-        return "status-inactive";
-      default:
-        return "status-default";
+      case "Activo": return "status-active";
+      case "Inactivo": return "status-inactive";
+      default: return "status-default";
     }
   };
 
-  // Carga inicial de las reservas
   useEffect(() => {
     const token = getAuthToken();
     if (!token) {
-      if (setModalVisible) {
-        setModalVisible("login");
-      }
+      if (setModalVisible) setModalVisible("login");
     } else {
       fetchUserBookings();
     }
   }, [setModalVisible]);
 
   if (loading) {
-    return (
-      <div className="flightPanel-container">
-        <div className="loading-message">Cargando tus vuelos...</div>
-      </div>
-    );
+    return <div className="flightPanel-container"><div className="loading-message">Cargando tus vuelos...</div></div>;
   }
 
   if (error) {
@@ -125,9 +90,7 @@ const FlightPanel = ({ setModalVisible }) => {
       <div className="flightPanel-container">
         <div className="error-message">
           {error}
-          <button onClick={fetchUserBookings} className="retry-button">
-            Reintentar
-          </button>
+          <button onClick={fetchUserBookings} className="retry-button">Reintentar</button>
         </div>
       </div>
     );
@@ -137,21 +100,14 @@ const FlightPanel = ({ setModalVisible }) => {
     <div className="flightPanel-container">
       <div className="panel-header">
         <h2>Mis Vuelos Reservados</h2>
-        <button onClick={fetchUserBookings} className="refresh-button">
-          Actualizar
-        </button>
+        <button onClick={fetchUserBookings} className="refresh-button">Actualizar</button>
       </div>
 
       {bookings.length === 0 ? (
         <div className="no-bookings">
           <p>No tienes vuelos reservados aún.</p>
           <p>¡Encuentra tu próximo destino!</p>
-          <button
-            onClick={() => navigate("/")}
-            className="search-flights-button"
-          >
-            Buscar Vuelos
-          </button>
+          <button onClick={() => navigate("/")} className="search-flights-button">Buscar Vuelos</button>
         </div>
       ) : (
         <table className="flightPanel-table">
@@ -173,26 +129,15 @@ const FlightPanel = ({ setModalVisible }) => {
               const status = getFlightStatus(booking);
               return (
                 <tr key={booking.id}>
-                  <td>{formatDate(booking.purchaseDate)}</td>
-                  <td>
-                    {booking.flight?.departureAirport || booking.flight?.origin}
-                  </td>
-                  <td>
-                    {booking.flight?.arrivalAirport ||
-                      booking.flight?.destination}
-                  </td>
-                  <td>{formatDate(booking.flight?.date)}</td>
+                  <td>{new Date(booking.purchaseDate).toLocaleDateString("es-AR")}</td>
+                  <td>{booking.flight?.departureAirport || booking.flight?.origin}</td>
+                  <td>{booking.flight?.arrivalAirport || booking.flight?.destination}</td>
+                  <td>{formatDate(booking.flight)}</td>
                   <td>{booking.flight?.departureTime}</td>
                   <td>{booking.flight?.arrivalTime}</td>
                   <td>{booking.passengerCount}</td>
-                  <td className="price">
-                    ${parseFloat(booking.totalPrice).toLocaleString()}
-                  </td>
-                  <td>
-                    <span className={`status ${getStatusClass(status)}`}>
-                      {status}
-                    </span>
-                  </td>
+                  <td className="price">${parseFloat(booking.totalPrice).toLocaleString()}</td>
+                  <td><span className={`status ${getStatusClass(status)}`}>{status}</span></td>
                 </tr>
               );
             })}
